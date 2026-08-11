@@ -14,6 +14,8 @@ require_once ROOT_PATH . '/app/Core/Config.php';
 require_once ROOT_PATH . '/app/Core/Logger.php';
 require_once ROOT_PATH . '/app/Core/Database.php';
 
+require_once ROOT_PATH . '/app/Helpers/functions.php';
+
 use App\Core\Config;
 use App\Core\Database;
 
@@ -86,10 +88,7 @@ try {
     $log[] = '❌ ' . $e->getMessage();
 }
 
-$webhookUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http')
-    . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
-    . preg_replace('#/admin/public/openwa-setup\.php.*$#', '', $_SERVER['REQUEST_URI'] ?? '')
-    . '/api/v1/openwa/webhook';
+$webhookUrl = openwa_webhook_url();
 
 ?><!DOCTYPE html>
 <html lang="en">
