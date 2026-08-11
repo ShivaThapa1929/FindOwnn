@@ -65,6 +65,7 @@ class OpenWAService
         if (str_contains($lower, 'openwa-setup.php')
             || str_contains($lower, '?key=')
             || str_contains($lower, '/admin/public')
+            || str_contains($lower, '/admin/openwa')
             || str_contains($lower, 'hostingersite.com')) {
             return true;
         }
