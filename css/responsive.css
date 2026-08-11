@@ -1,0 +1,431 @@
+/*
+ * Findownn — Site-wide mobile & tablet responsive layer
+ * Loaded after style.css on all public pages
+ */
+
+/* ── Base & safe areas ─────────────────────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: clip;
+}
+
+img,
+video,
+iframe,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+/* Cover / fill images must not collapse */
+.sport-card img,
+.venue-img-wrapper img,
+.user-venue-img img,
+.gallery-item img,
+.court-card img,
+.hero-phone-image,
+.mockup-wrapper img {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.container {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ── Typography ────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .display-3 {
+    font-size: clamp(1.85rem, 7vw, 2.45rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  .display-4 {
+    font-size: clamp(1.65rem, 6vw, 2.1rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .display-5 {
+    font-size: clamp(1.45rem, 5.5vw, 1.9rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .display-6 {
+    font-size: clamp(1.3rem, 5vw, 1.65rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  .lead {
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .page-header {
+    padding-top: 96px !important;
+    padding-bottom: 36px !important;
+  }
+
+  .page-header h1 {
+    word-break: break-word;
+  }
+}
+
+/* ── Navbar & footer ───────────────────────────────────────── */
+@media (max-width: 991.98px) {
+  #main-navbar .container {
+    padding-left: max(14px, env(safe-area-inset-left, 0px));
+    padding-right: max(14px, env(safe-area-inset-right, 0px));
+  }
+
+  .navbar-collapse .nav-item .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 575.98px) {
+  footer .row > [class*="col-6"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  footer .footer-brand {
+    justify-content: flex-start;
+  }
+}
+
+/* ── Section headers & CTAs ────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .section-header-split-row {
+    align-items: stretch;
+  }
+
+  .section-header-split-row .btn,
+  .section-header-title-center .btn,
+  .section-header-split .btn {
+    width: 100%;
+    justify-content: center;
+    align-self: stretch !important;
+  }
+
+  .live-pulse-tag {
+    align-self: flex-start;
+  }
+}
+
+/* ── Home grids — single column on small phones ────────────── */
+@media (max-width: 479.98px) {
+  .home-sports-grid,
+  .home-featured-grid,
+  .home-featured-skeleton,
+  .home-sports-skeleton {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .sport-card-stats span {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+  }
+
+  .sport-title {
+    font-size: 1.05rem;
+  }
+
+  .sport-subtitle {
+    font-size: 0.78rem;
+  }
+}
+
+/* ── Venues filter bar ─────────────────────────────────────── */
+@media (max-width: 575.98px) {
+  #sport-filter-buttons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start !important;
+    padding-bottom: 6px;
+    margin: 0 -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  #sport-filter-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .glass-card.p-4,
+  .glass-card.p-5 {
+    padding: 1rem !important;
+  }
+}
+
+/* ── Auth modal ────────────────────────────────────────────── */
+@media (max-width: 575.98px) {
+  #authModal.auth-modal .auth-modal-dialog {
+    margin: 10px auto;
+    max-width: calc(100% - 20px);
+  }
+
+  #authModal .auth-modal-content {
+    border-radius: var(--r-lg);
+  }
+
+  #authModal .auth-modal-body {
+    padding: 18px 16px 22px;
+  }
+
+  #authModal .auth-modal-header {
+    padding: 20px 16px 0;
+  }
+}
+
+/* ── Dashboard ─────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .page-header .d-flex.flex-wrap.align-items-end.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .page-header .d-flex.gap-2.flex-wrap {
+    width: 100%;
+  }
+
+  .page-header .d-flex.gap-2.flex-wrap .btn {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+  }
+
+  .user-dash-table {
+    font-size: 0.8rem;
+  }
+
+  .user-dash-table th,
+  .user-dash-table td {
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -4px;
+  }
+}
+
+/* ── Partner page ──────────────────────────────────────────── */
+@media (max-width: 575.98px) {
+  #partnerMap {
+    height: 260px;
+  }
+
+  .map-coords-badge {
+    font-size: 0.68rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .map-search-wrapper .input-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .map-search-wrapper .input-group .form-control {
+    border-radius: var(--r-sm) !important;
+  }
+
+  .map-search-wrapper .input-group .btn {
+    width: 100%;
+    border-radius: var(--r-sm) !important;
+    justify-content: center;
+  }
+
+  .partner-cta-card .row.g-3 .col-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── Contact & maps ────────────────────────────────────────── */
+.contact-map-embed {
+  height: 400px;
+}
+
+@media (max-width: 767.98px) {
+  .contact-map-embed {
+    height: 280px;
+  }
+}
+
+/* ── Payment page ──────────────────────────────────────────── */
+.payment-page-wrap {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+@media (max-width: 767.98px) {
+  .payment-page-wrap {
+    margin: 16px auto;
+    padding: 16px;
+  }
+
+  .payment-page-wrap > h1 {
+    font-size: 1.45rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .payment-card {
+    padding: 18px 16px;
+  }
+
+  .payment-row {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .payment-row span:first-child {
+    flex: 1 1 100%;
+    color: #6b7280;
+  }
+
+  .payment-row strong,
+  .payment-row span:last-child {
+    flex: 1 1 100%;
+    text-align: right;
+  }
+}
+
+/* ── Venue details ─────────────────────────────────────────── */
+@media (max-width: 575.98px) {
+  #venue-availability {
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+    gap: 8px;
+  }
+
+  #venue-amenities {
+    grid-template-columns: 1fr;
+  }
+
+  .occupancy-card .row.g-2 .col-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── Modals ────────────────────────────────────────────────── */
+@media (max-width: 575.98px) {
+  .modal-dialog {
+    margin: 10px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+}
+
+/* ── Text overflow ─────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6,
+.sport-title,
+.venue-card h3,
+.user-booking-card .text-white.fw-600 {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ── Touch devices — scoped targets only ───────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  .btn,
+  .navbar-toggler,
+  .filter-btn,
+  .btn-premium,
+  .btn-premium-outline,
+  .testimonial-arrow,
+  .whatsapp-float {
+    min-height: 44px;
+  }
+
+  .nav-link,
+  .footer-link,
+  .sport-card-cta,
+  .social-icon,
+  .breadcrumb-item a {
+    min-height: auto;
+    min-width: auto;
+  }
+
+  .glass-card:hover,
+  .venue-card:hover,
+  .sport-card-live:hover,
+  .step-card:hover,
+  .feature-card:hover {
+    transform: none !important;
+  }
+}
+
+/* ── WhatsApp float — notch safe ───────────────────────────── */
+.whatsapp-float {
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ── Sports & venue imagery ──────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .venue-img-wrapper {
+    height: 240px !important;
+    max-height: 55vw;
+  }
+
+  .sports-spec-grid .col-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* ── Playground listing cards (venues page) ────────────────── */
+@media (max-width: 575.98px) {
+  .playground-listing-card {
+    margin-bottom: 16px;
+  }
+
+  .playground-listing-media {
+    height: 200px;
+  }
+
+  .playground-listing-name {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 359.98px) {
+  .navbar-brand-text {
+    font-size: 1.1rem !important;
+  }
+
+  .badge-premium {
+    font-size: 0.72rem;
+    padding: 5px 10px;
+  }
+
+  .btn-premium,
+  .btn-premium-outline {
+    font-size: 0.85rem;
+    padding: 11px 18px;
+  }
+}

@@ -1,0 +1,14 @@
+Options -Indexes
+DirectoryIndex index.php
+
+RewriteEngine On
+
+# Strip /admin prefix and forward to public/index.php
+# while keeping the rest of the URI intact
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/index.php [QSA,L]
+
+# If requesting a real file inside /public directly, serve it
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^public/(.*)$ public/$1 [L]

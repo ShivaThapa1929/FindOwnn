@@ -1,0 +1,996 @@
+<div class="content-header">
+    <div class="content-header-left">
+        <h1>
+            <i class="fas fa-calendar-check"></i>
+            Booking Slots
+        </h1>
+        <p class="text-muted">View and manage time slot bookings</p>
+    </div>
+    <div class="content-header-right">
+        <?php if ($venue_id && $court_id && $venue && $court): ?>
+        <a href="/admin/bookings" class="btn btn-secondary" style="margin-right: 0.5rem;">
+            <i class="fas fa-list"></i>
+            All Bookings
+        </a>
+        <?php endif; ?>
+        <a href="/admin/bookings/offline/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            New Booking
+        </a>
+    </div>
+</div>
+
+<div class="slot-booking-container">
+    <!-- Venue Selection -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-building"></i> Select Venue & Court</h3>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="" class="slot-filter-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue</label>
+                        <select name="venue_id" id="venue_id" class="form-control" required onchange="loadCourts(this.value)">
+                            <option value="">Select Venue</option>
+                            <?php foreach ($venues as $v): ?>
+                                <option value="<?= $v['id'] ?>" <?= $v['id'] == $venue_id ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($v['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Court</label>
+                        <select name="court_id" id="court_id" class="form-control" required>
+                            <option value="">Select Court</option>
+                            <?php foreach ($courts as $c): ?>
+                                <option value="<?= $c['id'] ?>" <?= $c['id'] == $court_id ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($c['name']) ?> (Court #<?= $c['court_number'] ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control" value="<?= $date ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> View Slots
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <?php if ($venue_id && $court_id && $venue && $court): ?>
+    <!-- Booking Stats Summary -->
+    <div class="stats-summary">
+        <?php
+        $totalSlots = count($slots);
+        $bookedSlots = count(array_filter($slots, fn($s) => $s['is_booked']));
+        $availableSlots = $totalSlots - $bookedSlots;
+        $occupancyRate = $totalSlots > 0 ? round(($bookedSlots / $totalSlots) * 100) : 0;
+        $totalRevenue = array_sum(array_map(fn($s) => $s['is_booked'] ? ($s['booking']['total_amount'] ?? 0) : 0, $slots));
+        ?>
+        <div class="stat-card">
+            <div class="stat-icon available-color">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><?= $totalSlots ?></div>
+                <div class="stat-label">Total Slots</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon booked-color">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><?= $bookedSlots ?></div>
+                <div class="stat-label">Booked</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon available-color">
+                <i class="fas fa-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><?= $availableSlots ?></div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon occupancy-color">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><?= $occupancyRate ?>%</div>
+                <div class="stat-label">Occupancy</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon revenue-color">
+                <i class="fas fa-rupee-sign"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">₹<?= number_format($totalRevenue) ?></div>
+                <div class="stat-label">Revenue (Today)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Venue Info Card -->
+    <div class="venue-info-card">
+        <div class="venue-info-header">
+            <div>
+                <h2><?= htmlspecialchars($venue['name']) ?></h2>
+                <p class="venue-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <?= htmlspecialchars($venue['city']) ?>, <?= htmlspecialchars($venue['state']) ?>
+                </p>
+            </div>
+            <div class="venue-info-meta">
+                <span class="venue-date">
+                    <i class="fas fa-calendar"></i>
+                    <?= date('D, M d, Y', strtotime($date)) ?>
+                </span>
+            </div>
+        </div>
+        
+        <div class="court-info-bar">
+            <div class="court-detail">
+                <i class="fas fa-tennis-ball"></i>
+                <span><?= htmlspecialchars($court['name']) ?></span>
+            </div>
+            <div class="court-detail">
+                <i class="fas fa-volleyball-ball"></i>
+                <span><?= htmlspecialchars($court['sport_name']) ?></span>
+            </div>
+            <div class="court-detail">
+                <i class="fas fa-tag"></i>
+                <span>₹<?= number_format($court['price_per_hour']) ?>/hour</span>
+            </div>
+            <div class="court-detail">
+                <i class="fas fa-users"></i>
+                <span>Capacity: <?= $court['capacity'] ?></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Navigation -->
+    <div class="date-picker-nav">
+        <button class="date-nav-btn" onclick="changeDate(-7)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <div class="date-grid">
+            <?php
+            for ($i = 0; $i < 7; $i++) {
+                $checkDate = date('Y-m-d', strtotime($date . " +{$i} days"));
+                $isActive = $checkDate === $date ? 'active' : '';
+                $dayName = date('D', strtotime($checkDate));
+                $dayNum = date('d', strtotime($checkDate));
+                $monthName = date('M', strtotime($checkDate));
+                
+                echo "<a href='?venue_id={$venue_id}&court_id={$court_id}&date={$checkDate}' class='date-card {$isActive}'>
+                        <div class='date-day'>{$dayName}</div>
+                        <div class='date-number'>{$dayNum}</div>
+                        <div class='date-month'>{$monthName}</div>
+                      </a>";
+            }
+            ?>
+        </div>
+        
+        <button class="date-nav-btn" onclick="changeDate(7)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Time Slots Grid -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-clock"></i> Available Times</h3>
+            <div class="slot-legend">
+                <span class="legend-item"><span class="legend-box available"></span> Available</span>
+                <span class="legend-item"><span class="legend-box booked"></span> Booked</span>
+                <span class="legend-item"><span class="legend-box selected"></span> Selected</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <?php if (empty($slots)): ?>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <h3>No Time Slots Available</h3>
+                <p>The venue may be closed on this day, or no slots are configured.</p>
+                <a href="?venue_id=<?= $venue_id ?>&court_id=<?= $court_id ?>&date=<?= date('Y-m-d') ?>" class="btn btn-primary">
+                    <i class="fas fa-calendar"></i> View Today's Slots
+                </a>
+            </div>
+            <?php else: ?>
+            <div class="time-slots-grid">
+                <?php foreach ($slots as $slot): ?>
+                <div class="time-slot <?= $slot['is_booked'] ? 'booked' : 'available' ?>" 
+                     data-start="<?= $slot['start_time'] ?>" 
+                     data-end="<?= $slot['end_time'] ?>"
+                     <?= !$slot['is_booked'] ? 'onclick="selectSlot(this)"' : '' ?>>
+                    <div class="slot-time">
+                        <?= date('g:i A', strtotime($slot['start_time'])) ?> - <?= date('g:i A', strtotime($slot['end_time'])) ?>
+                    </div>
+                    
+                    <?php if ($slot['is_booked']): ?>
+                        <div class="slot-status booked-badge">
+                            <i class="fas fa-check-circle"></i> Booked
+                        </div>
+                        <div class="slot-info">
+                            <div class="booking-ref">Ref: <?= $slot['booking']['booking_reference'] ?></div>
+                            <div class="booking-user">
+                                <i class="fas fa-user"></i> <?= htmlspecialchars($slot['booking']['user_name']) ?>
+                            </div>
+                            <div class="booking-amount">
+                                <i class="fas fa-rupee-sign"></i> ₹<?= number_format($slot['booking']['total_amount']) ?>
+                            </div>
+                            <div class="slot-actions">
+                                <a href="/admin/bookings/show?id=<?= $slot['booking']['id'] ?>" class="btn-slot-action" title="View Details">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="slot-status available-badge">
+                            <i class="fas fa-circle"></i> Available
+                        </div>
+                        <div class="slot-price">₹<?= number_format($court['price_per_hour']) ?></div>
+                        <button class="btn-book-slot" onclick="bookSlotDirect(this); event.stopPropagation();">
+                            <i class="fas fa-plus-circle"></i> Book Now
+                        </button>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Selected Slot Action -->
+    <div class="selected-slot-action" id="selectedSlotAction" style="display: none;">
+        <div class="selected-info">
+            <div>
+                <strong>Selected Time:</strong>
+                <span id="selectedTime"></span>
+            </div>
+            <div>
+                <strong>Price:</strong>
+                <span id="selectedPrice">₹<?= number_format($court['price_per_hour']) ?></span>
+            </div>
+        </div>
+        <button class="btn btn-success btn-lg" onclick="bookSelectedSlot()">
+            <i class="fas fa-check"></i> Book This Slot → ₹<?= number_format($court['price_per_hour']) ?>
+        </button>
+    </div>
+    <?php else: ?>
+    <!-- No Selection State -->
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>Select Venue & Court</h3>
+                <p>Choose a venue and court from the options above to view available booking slots.</p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>
+
+<style>
+.slot-booking-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.card {
+    background: rgba(15, 25, 18, 0.95);
+    border: 1px solid rgba(134, 168, 146, 0.15);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(134, 168, 146, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f0fdf4;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.card-header h3 i {
+    color: #22c55e;
+}
+
+.card-body {
+    padding: 1.5rem;
+    background: transparent;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #d1e7d9;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: rgba(10, 15, 11, 0.7);
+    border: 1px solid rgba(134, 168, 146, 0.15);
+    border-radius: 8px;
+    color: #f0fdf4;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #22c55e;
+    background: rgba(10, 15, 11, 0.9);
+}
+
+.form-control option {
+    background: #0d1510;
+    color: #f0fdf4;
+}
+
+.btn {
+    padding: 0.65rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #22c55e;
+    color: #0a0f0b;
+}
+
+.btn-primary:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: rgba(134, 168, 146, 0.15);
+    color: #d1e7d9;
+    border: 1px solid rgba(134, 168, 146, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(134, 168, 146, 0.25);
+}
+
+.slot-filter-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat-card {
+    background: rgba(15, 25, 18, 0.95);
+    border: 1px solid rgba(134, 168, 146, 0.15);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-icon.available-color {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.stat-icon.booked-color {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.stat-icon.occupancy-color {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.stat-icon.revenue-color {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f0fdf4;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #a3c4af;
+    font-weight: 500;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #86a892;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+    color: #f0fdf4;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+    color: #a3c4af;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.venue-info-card {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.venue-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.venue-info-header h2 {
+    color: #f0fdf4;
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.venue-location {
+    color: #a3c4af;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.venue-date {
+    background: rgba(34, 197, 94, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.court-info-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.court-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d1e7d9;
+    font-size: 0.95rem;
+}
+
+.court-detail i {
+    color: #22c55e;
+    font-size: 1.1rem;
+}
+
+.date-picker-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    background: rgba(15, 25, 18, 0.95);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(134, 168, 146, 0.15);
+}
+
+.date-nav-btn {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.date-nav-btn:hover {
+    background: rgba(34, 197, 94, 0.2);
+    transform: scale(1.05);
+}
+
+.date-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.date-card {
+    background: rgba(15, 25, 18, 0.5);
+    border: 2px solid rgba(134, 168, 146, 0.15);
+    padding: 1rem 0.5rem;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: block;
+}
+
+.date-card:hover {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    transform: translateY(-2px);
+}
+
+.date-card.active {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+
+.date-day {
+    font-size: 0.85rem;
+    color: #a3c4af;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.date-card.active .date-day {
+    color: #0d1612;
+}
+
+.date-number {
+    font-size: 1.75rem;
+    color: #f0fdf4;
+    font-weight: 700;
+    margin: 0.25rem 0;
+}
+
+.date-card.active .date-number {
+    color: #0d1612;
+}
+
+.date-month {
+    font-size: 0.85rem;
+    color: #86a892;
+    text-transform: uppercase;
+}
+
+.date-card.active .date-month {
+    color: #0d1612;
+}
+
+.slot-legend {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #d1e7d9;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid;
+}
+
+.legend-box.available {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #22c55e;
+}
+
+.legend-box.booked {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+.legend-box.selected {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.time-slot {
+    background: rgba(15, 25, 18, 0.95);
+    border: 2px solid;
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.time-slot.available {
+    border-color: rgba(34, 197, 94, 0.3);
+    cursor: pointer;
+}
+
+.time-slot.available:hover {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.time-slot.available.selected {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.time-slot.booked {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.05);
+    cursor: not-allowed;
+}
+
+.slot-time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f0fdf4;
+    margin-bottom: 0.75rem;
+}
+
+.slot-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.available-badge {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.booked-badge {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.slot-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #22c55e;
+    margin-top: 0.5rem;
+}
+
+.btn-book-slot {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid #22c55e;
+    color: #22c55e;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-book-slot:hover {
+    background: #22c55e;
+    color: #0d1612;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.slot-info {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(134, 168, 146, 0.15);
+}
+
+.booking-ref {
+    font-size: 0.85rem;
+    color: #86a892;
+    margin-bottom: 0.5rem;
+    font-family: 'Courier New', monospace;
+}
+
+.booking-user,
+.booking-amount {
+    font-size: 0.9rem;
+    color: #d1e7d9;
+    margin: 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.booking-user i,
+.booking-amount i {
+    color: #22c55e;
+    width: 16px;
+}
+
+.slot-actions {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-slot-action {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.btn-slot-action:hover {
+    background: rgba(34, 197, 94, 0.25);
+    transform: translateY(-1px);
+}
+
+.selected-slot-action {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 25, 18, 0.98);
+    border-top: 2px solid #22c55e;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.selected-info {
+    display: flex;
+    gap: 2rem;
+    color: #f0fdf4;
+}
+
+.selected-info strong {
+    color: #a3c4af;
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .slot-filter-form .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .date-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .time-slots-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .selected-slot-action {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+
+<script>
+let selectedSlot = null;
+const venueId = '<?= $venue_id ?>';
+const courtId = '<?= $court_id ?>';
+const currentDate = '<?= $date ?>';
+
+function loadCourts(venueId) {
+    if (!venueId) {
+        document.getElementById('court_id').innerHTML = '<option value="">Select Court</option>';
+        return;
+    }
+    
+    // Show loading state
+    const courtSelect = document.getElementById('court_id');
+    courtSelect.innerHTML = '<option value="">Loading courts...</option>';
+    courtSelect.disabled = true;
+    
+    fetch(`/admin/public/api/get-courts.php?venue_id=${venueId}`)
+        .then(r => {
+            if (!r.ok) throw new Error('Failed to load courts');
+            return r.json();
+        })
+        .then(data => {
+            let options = '<option value="">Select Court</option>';
+            if (data.courts && data.courts.length > 0) {
+                data.courts.forEach(court => {
+                    options += `<option value="${court.id}">${court.name} (Court #${court.court_number})</option>`;
+                });
+            } else {
+                options = '<option value="">No courts available</option>';
+            }
+            courtSelect.innerHTML = options;
+            courtSelect.disabled = false;
+        })
+        .catch(err => {
+            console.error('Error loading courts:', err);
+            courtSelect.innerHTML = '<option value="">Error loading courts</option>';
+            courtSelect.disabled = false;
+        });
+}
+
+function selectSlot(element) {
+    // Remove previous selection
+    document.querySelectorAll('.time-slot.selected').forEach(slot => {
+        slot.classList.remove('selected');
+    });
+    
+    // Add selection
+    element.classList.add('selected');
+    selectedSlot = {
+        start: element.dataset.start,
+        end: element.dataset.end
+    };
+    
+    // Show action bar
+    document.getElementById('selectedTime').textContent = 
+        formatTime(selectedSlot.start) + ' - ' + formatTime(selectedSlot.end);
+    document.getElementById('selectedSlotAction').style.display = 'flex';
+}
+
+function bookSlotDirect(button) {
+    const slot = button.closest('.time-slot');
+    const start = slot.dataset.start;
+    const end = slot.dataset.end;
+    
+    if (!venueId || !courtId || !currentDate) {
+        alert('Please select venue and court first');
+        return;
+    }
+    
+    const url = `/admin/bookings/create-offline?venue_id=${venueId}&court_id=${courtId}&date=${currentDate}&start_time=${start}&end_time=${end}`;
+    window.location.href = url;
+}
+
+function formatTime(time) {
+    const [h, m] = time.split(':');
+    const hour = parseInt(h);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${m} ${ampm}`;
+}
+
+function bookSelectedSlot() {
+    if (!selectedSlot) {
+        alert('Please select a time slot first');
+        return;
+    }
+    
+    const url = `/admin/bookings/create-offline?venue_id=${venueId}&court_id=${courtId}&date=${currentDate}&start_time=${selectedSlot.start}&end_time=${selectedSlot.end}`;
+    window.location.href = url;
+}
+
+function changeDate(days) {
+    if (!venueId || !courtId) {
+        alert('Please select venue and court first');
+        return;
+    }
+    
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + days);
+    const dateStr = newDate.toISOString().split('T')[0];
+    window.location.href = `?venue_id=${venueId}&court_id=${courtId}&date=${dateStr}`;
+}
+
+// Auto-refresh every 2 minutes to show updated booking status
+if (venueId && courtId) {
+    setTimeout(() => {
+        window.location.reload();
+    }, 120000); // 2 minutes
+}
+</script>

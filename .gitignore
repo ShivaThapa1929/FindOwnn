@@ -1,0 +1,34 @@
+# Environment & secrets
+admin/.env
+.env
+.env.local
+*.pem
+
+# Dependencies
+**/node_modules/
+admin/vendor/
+
+# Runtime / generated
+admin/storage/logs/*
+!admin/storage/logs/.gitkeep
+admin/storage/backups/*
+cache/*
+!cache/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# IDE
+.cursor/
+.vscode/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Vendored OpenWA clone (use admin/deploy/openwa + Docker image for live)
+OpenWA/
+
+# Misc local
+cookies.txt
+_test_*.php

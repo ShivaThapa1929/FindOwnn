@@ -1,0 +1,235 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Findownn Admin — Database Migration CLI
+ *
+ * php migrate              Run all pending migrations
+ * php migrate fresh        Drop all + re-run
+ * php migrate rollback     Drop all tables
+ * php migrate db:seed      Run seeders only
+ * php migrate fresh:seed   Drop + migrate + seed
+ */
+
+define('ROOT_PATH', __DIR__);
+
+// ── Autoloader ───────────────────────────────────────────────────
+$composerAutoload = ROOT_PATH . '/vendor/autoload.php';
+if (file_exists($composerAutoload)) {
+    require $composerAutoload;
+} else {
+    spl_autoload_register(function (string $class): void {
+        $prefixes = [
+            'App\\'      => ROOT_PATH . '/app/',
+            'Database\\' => ROOT_PATH . '/database/',
+        ];
+        foreach ($prefixes as $prefix => $base) {
+            if (str_starts_with($class, $prefix)) {
+                $file = $base . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+                if (file_exists($file)) { require $file; return; }
+            }
+        }
+    });
+    require ROOT_PATH . '/app/Helpers/functions.php';
+}
+
+use App\Core\Config;
+use App\Core\Database;
+use App\Core\Logger;
+
+Config::load(ROOT_PATH . '/.env');
+date_default_timezone_set(Config::get('TIMEZONE', 'Asia/Kolkata'));
+Logger::init();
+
+$command = $argv[1] ?? '';
+$db      = Database::getInstance();
+
+// ── Helper: split SQL file into individual statements ────────────
+function splitSql(string $sql): array
+{
+    // Strip line comments and block comments
+    $sql = preg_replace('/--[^\n]*/', '', $sql);
+    $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+
+    $statements = [];
+    $current    = '';
+    $inString   = false;
+    $strChar    = '';
+    $len        = strlen($sql);
+
+    for ($i = 0; $i < $len; $i++) {
+        $ch = $sql[$i];
+
+        if ($inString) {
+            $current .= $ch;
+            // End of string — check it's not escaped
+            if ($ch === $strChar && ($i === 0 || $sql[$i - 1] !== '\\')) {
+                $inString = false;
+            }
+        } elseif ($ch === '"' || $ch === "'" || $ch === '`') {
+            $inString = true;
+            $strChar  = $ch;
+            $current .= $ch;
+        } elseif ($ch === ';') {
+            $stmt = trim($current);
+            if ($stmt !== '') {
+                $statements[] = $stmt;
+            }
+            $current = '';
+        } else {
+            $current .= $ch;
+        }
+    }
+
+    if (trim($current) !== '') {
+        $statements[] = trim($current);
+    }
+
+    return $statements;
+}
+
+// ── runMigrations ────────────────────────────────────────────────
+function runMigrations(Database $db): void
+{
+    $migDir = ROOT_PATH . '/database/migrations';
+    $files  = glob($migDir . '/*.sql');
+    sort($files);
+
+    if (empty($files)) {
+        echo "  No migration files found in {$migDir}\n";
+        return;
+    }
+
+    foreach ($files as $file) {
+        echo "▶ Running: " . basename($file) . "\n";
+        $sql        = file_get_contents($file);
+        $statements = splitSql($sql);
+        $count      = 0;
+        $errors     = 0;
+
+        foreach ($statements as $stmt) {
+            if (trim($stmt) === '') continue;
+            try {
+                $db->rawExec($stmt . ';');
+                $count++;
+            } catch (\Throwable $e) {
+                $msg = $e->getMessage();
+                // Ignore harmless warnings
+                if (str_contains($msg, 'already exists') || str_contains($msg, 'Duplicate key')) {
+                    continue;
+                }
+                echo "  ⚠  " . substr(preg_replace('/\s+/', ' ', $stmt), 0, 90) . "\n";
+                echo "     Error: {$msg}\n";
+                $errors++;
+            }
+        }
+
+        if ($errors === 0) {
+            echo "  ✓ Done ({$count} statements OK)\n";
+        } else {
+            echo "  ✓ Done ({$count} OK, {$errors} warnings)\n";
+        }
+    }
+}
+
+// ── dropAllTables ────────────────────────────────────────────────
+function dropAllTables(Database $db): void
+{
+    $db->rawExec('SET FOREIGN_KEY_CHECKS = 0');
+    $tables = $db->fetchAll('SHOW TABLES');
+    $count  = 0;
+    foreach ($tables as $row) {
+        $table = reset($row);
+        $db->rawExec("DROP TABLE IF EXISTS `{$table}`");
+        echo "  Dropped: {$table}\n";
+        $count++;
+    }
+    $db->rawExec('SET FOREIGN_KEY_CHECKS = 1');
+    if ($count === 0) echo "  (no tables to drop)\n";
+}
+
+// ── verifyTables ─────────────────────────────────────────────────
+function verifyTables(Database $db): bool
+{
+    $required = [
+        'users', 'venues', 'venue_images', 'subscription_plans',
+        'subscriptions', 'payments', 'bookings', 'reviews',
+        'notifications', 'support_tickets', 'audit_logs',
+        'activity_logs', 'settings',
+    ];
+
+    $rows     = $db->fetchAll('SHOW TABLES');
+    $existing = array_map(fn($r) => array_values($r)[0], $rows);
+    $missing  = array_diff($required, $existing);
+
+    if (!empty($missing)) {
+        echo "  ✗ Missing tables: " . implode(', ', $missing) . "\n";
+        return false;
+    }
+
+    echo "  ✓ All " . count($required) . " required tables exist\n";
+    return true;
+}
+
+// ── runSeeders ───────────────────────────────────────────────────
+function runSeeders(): void
+{
+    $seeder = new \Database\Seeders\DatabaseSeeder();
+    $seeder->run();
+}
+
+// ── Dispatch ─────────────────────────────────────────────────────
+switch ($command) {
+
+    case '':
+        echo "📦 Running migrations...\n";
+        runMigrations($db);
+        echo "✅ Migration complete.\n";
+        break;
+
+    case 'fresh':
+        echo "🗑  Dropping all tables...\n";
+        dropAllTables($db);
+        echo "📦 Running fresh migrations...\n";
+        runMigrations($db);
+        echo "✅ Fresh migration complete.\n";
+        break;
+
+    case 'rollback':
+        echo "🗑  Rolling back — dropping all tables...\n";
+        dropAllTables($db);
+        echo "✅ Rollback complete.\n";
+        break;
+
+    case 'db:seed':
+        echo "🔍 Verifying tables...\n";
+        if (!verifyTables($db)) {
+            echo "❌ Run 'php migrate' first to create the tables.\n";
+            exit(1);
+        }
+        echo "🌱 Running seeders...\n";
+        runSeeders();
+        break;
+
+    case 'fresh:seed':
+        echo "🗑  Dropping all tables...\n";
+        dropAllTables($db);
+        echo "📦 Running migrations...\n";
+        runMigrations($db);
+        echo "🔍 Verifying tables...\n";
+        if (!verifyTables($db)) {
+            echo "❌ Migration incomplete — seeder aborted.\n";
+            exit(1);
+        }
+        echo "🌱 Running seeders...\n";
+        runSeeders();
+        echo "🌱 Running enhanced seeder...\n";
+        $enhancedSeeder = new \Database\Seeders\EnhancedSeeder();
+        $enhancedSeeder->run();
+        echo "✅ All done.\n";
+        break;
+
+    default:
+        echo "Unknown command: '{$command}'\n";
+        echo "Available: (none) | fresh | rollback | db:seed | fresh:seed\n";
+        exit(1);
+}
