@@ -1,0 +1,13 @@
+# Render.com — New → Blueprint → paste this repo folder
+# Gives you https://YOUR-SERVICE.onrender.com (use as OpenWA Base URL in Findownn admin)
+services:
+  - type: web
+    name: findownn-openwa
+    runtime: docker
+    dockerfilePath: ./admin/deploy/openwa/Dockerfile
+    dockerContext: ./admin/deploy/openwa
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "2785"
