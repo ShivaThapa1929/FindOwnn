@@ -49,7 +49,50 @@ class OpenWAService
             $issues[] = 'On live sites use HTTPS for OpenWA Base URL (e.g. https://your-openwa.onrender.com).';
         }
 
+        if ($this->baseUrl !== '' && self::isInvalidOpenWaBaseUrl($this->baseUrl)) {
+            $issues[] = 'Base URL galat hai — yahan Findownn ya setup URL mat daalo. '
+                . 'Sirf OpenWA cloud server URL (e.g. https://findownn-openwa.onrender.com), bina ?key= ke.';
+        }
+
         return $issues;
+    }
+
+    /** Reject Findownn site URLs mistaken for OpenWA server URL */
+    public static function isInvalidOpenWaBaseUrl(string $url): bool
+    {
+        $lower = strtolower($url);
+
+        if (str_contains($lower, 'openwa-setup.php')
+            || str_contains($lower, '?key=')
+            || str_contains($lower, '/admin/public')
+            || str_contains($lower, 'hostingersite.com')) {
+            return true;
+        }
+
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $appHost = strtolower($_SERVER['HTTP_HOST'] ?? '');
+
+        return $appHost !== '' && $host !== '' && $host === $appHost;
+    }
+
+    public static function normalizeBaseUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+
+        $parts = parse_url($url);
+        if (empty($parts['scheme']) || empty($parts['host'])) {
+            return rtrim($url, '/');
+        }
+
+        $normalized = $parts['scheme'] . '://' . $parts['host'];
+        if (!empty($parts['port'])) {
+            $normalized .= ':' . $parts['port'];
+        }
+
+        return rtrim($normalized, '/');
     }
 
     public function isLocalhostUrl(string $url): bool

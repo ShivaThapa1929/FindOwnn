@@ -58,7 +58,16 @@ class OpenWAController extends Controller
 
     public function save(Request $request): void
     {
-        $baseUrl = trim((string) $request->input('openwa_base_url', ''));
+        $baseUrl = OpenWAService::normalizeBaseUrl(trim((string) $request->input('openwa_base_url', '')));
+
+        if ($baseUrl !== '' && OpenWAService::isInvalidOpenWaBaseUrl($baseUrl)) {
+            Session::flash(
+                'error',
+                'Galat Base URL — yahan setup URL ya Findownn site URL mat daalo. '
+                . 'Render/Railway se OpenWA server URL paste karo (example: https://findownn-openwa.onrender.com).'
+            );
+            $this->redirect(url('/openwa'));
+        }
 
         if ($baseUrl !== '' && is_live_site_host()) {
             $host = strtolower((string) parse_url($baseUrl, PHP_URL_HOST));
@@ -84,6 +93,9 @@ class OpenWAController extends Controller
 
         foreach ($keys as $key) {
             $val = $request->input($key);
+            if ($key === 'openwa_base_url' && is_string($val)) {
+                $val = OpenWAService::normalizeBaseUrl(trim($val));
+            }
             if (in_array($key, $secretKeys, true) && ($val === null || trim((string) $val) === '')) {
                 continue;
             }

@@ -232,7 +232,7 @@ $groupLabels = [
                  placeholder="<?= $isLiveSite ? 'https://findownn-openwa.onrender.com' : 'http://localhost:2785' ?>" required>
           <small class="text-muted">
             <?php if ($isLiveSite): ?>
-              Live: public HTTPS URL from Render/Railway (never localhost)
+              Live: Render/Railway OpenWA URL only — <strong>not</strong> setup URL, not hostingersite.com
             <?php else: ?>
               Local XAMPP: <code>http://localhost:2785</code> — save before Test Connection
             <?php endif; ?>
