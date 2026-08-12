@@ -58,16 +58,11 @@
                 </div>
             </div>
 
-            <!-- App Mockup — real FindOwnn home screen -->
-            <div class="col-lg-6 text-center mockup-wrapper mt-4 mt-lg-0 animate-on-scroll delay-200">
-                <div class="hero-phone-showcase">
+            <!-- iOS app mockup (full iPhone image — frame is in PNG) -->
+            <div class="col-lg-6 text-center mockup-wrapper hero-ios-showcase-wrap mt-4 mt-lg-0 animate-on-scroll delay-200">
+                <div class="hero-ios-showcase">
                     <div class="hero-phone-glow" aria-hidden="true"></div>
-                    <div class="phone-frame hero-phone-frame">
-                        <div class="phone-notch"></div>
-                        <div class="phone-screen hero-phone-screen">
-                            <?php include __DIR__ . '/../includes/app-screen-home.php'; ?>
-                        </div>
-                    </div>
+                    <?php include __DIR__ . '/../includes/app-screen-home.php'; ?>
                 </div>
             </div>
 

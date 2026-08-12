@@ -204,13 +204,15 @@
   color: var(--primary);
 }
 
-/* Phone mockup — static, product-style */
-.home-section--hero .mockup-wrapper {
+/* Phone mockup — iOS full device image (PNG includes iPhone frame) */
+.home-section--hero .mockup-wrapper,
+.home-section--hero .hero-ios-showcase-wrap {
   position: relative;
   padding: 8px 0 0;
   display: block !important;
 }
 
+.home-section--hero .hero-ios-showcase,
 .home-section--hero .hero-phone-showcase {
   position: relative;
   display: inline-flex;
@@ -220,6 +222,31 @@
   max-width: 320px;
   margin: 0 auto;
   padding-bottom: 12px;
+}
+
+.hero-ios-mockup {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  max-width: min(78vw, 300px);
+  height: auto;
+  margin: 0 auto;
+  animation: none !important;
+  transform: none !important;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45));
+}
+
+@media (min-width: 768px) {
+  .home-section--hero .hero-ios-showcase,
+  .home-section--hero .hero-phone-showcase { max-width: 380px; }
+  .hero-ios-mockup { max-width: min(42vw, 340px); }
+}
+
+@media (min-width: 1200px) {
+  .home-section--hero .hero-ios-showcase,
+  .home-section--hero .hero-phone-showcase { max-width: 440px; }
+  .hero-ios-mockup { max-width: min(36vw, 380px); }
 }
 
 .home-section--hero .hero-phone-glow {
@@ -1170,9 +1197,11 @@
 
 .home-section--hero .hero-phone-screen,
 .home-section--app .phone-screen {
-  padding: 10px 8px 8px;
+  padding: 8px 6px 6px;
   overflow: hidden;
   background: #050b07;
+  display: flex;
+  flex-direction: column;
 }
 
 .findownn-app-screen {
@@ -1199,9 +1228,15 @@
   padding: 0;
   overflow: hidden;
   border-radius: inherit;
+  height: 100%;
+  min-height: 0;
 }
 
+.findownn-app-screenshot,
 .findownn-app-screen--screenshot img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: top center;
 }

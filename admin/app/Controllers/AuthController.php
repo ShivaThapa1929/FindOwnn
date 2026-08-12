@@ -70,13 +70,9 @@ class AuthController extends Controller
 
     {
 
-        $this->render('auth.register-owner', [
-
-            'title'          => 'Register — Venue Owner',
-            'otpMode'        => \App\Services\FirebaseAuthService::otpMode(),
-            'firebaseConfig' => \App\Services\FirebaseAuthService::clientConfig(),
-
-        ], 'auth');
+        $this->render('auth.register-owner', array_merge([
+            'title' => 'Register — Venue Owner',
+        ], firebase_otp_context()), 'auth');
 
     }
 

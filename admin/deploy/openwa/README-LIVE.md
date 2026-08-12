@@ -64,7 +64,20 @@ curl -s "https://YOUR-DOMAIN.com/admin/cron/send-booking-reminders.php?key=YOUR_
 
 | Problem | Fix |
 |---------|-----|
+| **HTTP 502** on Sessions / QR stuck "Starting..." | Render **free tier RAM too low** for Chromium. Set `ENGINE_TYPE=baileys` in Render env → redeploy. Or upgrade to **Starter ($7/mo, 512MB+)** with more headroom. |
+| Session stuck "Starting..." / Preparing QR | Click **Kill Stuck** → **Delete** session → create new session after redeploy with `baileys`. |
 | Live admin shows localhost warning | Base URL me public HTTPS URL daalo, Save |
-| Test Connection fails | OpenWA service sleep (Render free) — pehli request slow; retry |
+| Test Connection fails | Render free sleeps — pehli request 30–60s wait; retry |
 | Webhook fails | Webhook URL HTTPS hona chahiye; Register Webhook dubara click |
-| QR disconnect | OpenWA volume persist karo (VPS/Railway disk) |
+| QR disconnect after redeploy | Enable **persistent disk** (`/app/data`) in render.yaml |
+| OOM / Chromium crash | Use `ENGINE_TYPE=baileys` OR min **2GB RAM** VPS for whatsapp-web.js engine |
+
+### Fix HTTP 502 now (Render dashboard)
+
+1. [Render Dashboard](https://dashboard.render.com/) → **findownn-openwa** → **Environment**
+2. Add variable: `ENGINE_TYPE` = `baileys`
+3. Add variable: `WWEBJS_AUTH_TIMEOUT_MS` = `120000`
+4. **Manual Deploy** → wait for green
+5. Open **Sessions** → **Kill Stuck** on `findownn` → **Delete**
+6. **+ New Session** → name `findownn` → scan QR
+7. Findownn Admin → OpenWA → Test Connection → Send test message

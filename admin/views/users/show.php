@@ -241,7 +241,17 @@ $venueCount = (int) $db->fetchColumn(
 
     <!-- Venues owned -->
     <?php if ($userItem['role'] === 'venue_owner' && $venueCount > 0): ?>
-    <?php $venues = $db->fetchAll("SELECT id, name, type, city, verification_status, is_verified FROM venues WHERE owner_id = ? AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 5", [$userItem['id']]); ?>
+    <?php $venues = $db->fetchAll(
+        "SELECT v.id, v.name, v.city, v.verification_status, v.is_verified,
+                GROUP_CONCAT(s.name SEPARATOR ', ') AS sports
+         FROM venues v
+         LEFT JOIN venue_sports vs ON v.id = vs.venue_id
+         LEFT JOIN sports s ON vs.sport_id = s.id
+         WHERE v.owner_id = ? AND v.deleted_at IS NULL
+         GROUP BY v.id
+         ORDER BY v.created_at DESC LIMIT 5",
+        [$userItem['id']]
+    ); ?>
     <div class="panel">
       <div class="panel-head">
         <h6 class="panel-title"><i class="bi bi-building me-2"></i>Venues (<?= $venueCount ?>)</h6>
@@ -249,12 +259,12 @@ $venueCount = (int) $db->fetchColumn(
       </div>
       <div class="panel-body p-0">
         <table class="table table-hover mb-0">
-          <thead><tr><th>Name</th><th>Type</th><th>City</th><th>Status</th><th>Badge</th></tr></thead>
+          <thead><tr><th>Name</th><th>Sports</th><th>City</th><th>Status</th><th>Badge</th></tr></thead>
           <tbody>
             <?php foreach ($venues as $v): ?>
             <tr>
               <td><a href="<?= url('/venues/'.$v['id']) ?>" class="fw-500 small text-decoration-none"><?= e($v['name']) ?></a></td>
-              <td><span class="badge bg-dark" style="font-size:.62rem;"><?= ucwords(str_replace('_',' ',$v['type'])) ?></span></td>
+              <td><span class="badge bg-dark" style="font-size:.62rem;"><?= e($v['sports'] ?? '—') ?></span></td>
               <td class="text-muted small"><?= e($v['city']) ?></td>
               <td><?= statusBadge($v['verification_status']) ?></td>
               <td>

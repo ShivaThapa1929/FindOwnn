@@ -215,12 +215,15 @@ class WhatsAppService
     }
     
     /**
-     * Send Booking Confirmation
+     * Send Booking Confirmation (Growth plan+ for venue owner)
      */
     public function sendBookingConfirmation(array $booking): array
     {
+        if (!$this->ownerAllowsWhatsApp($booking)) {
+            return $this->skippedPlanResponse('booking confirmation');
+        }
         $message = $this->formatBookingMessage($booking);
-        return $this->sendMessage($booking['user_phone'], $message);
+        return $this->sendMessage($booking['user_phone'], $message, ['skip_plan_check' => true]);
     }
     
     /**
@@ -228,8 +231,11 @@ class WhatsAppService
      */
     public function sendPaymentConfirmation(array $booking, array $payment): array
     {
+        if (!$this->ownerAllowsWhatsApp($booking)) {
+            return $this->skippedPlanResponse('payment confirmation');
+        }
         $message = $this->formatPaymentMessage($booking, $payment);
-        return $this->sendMessage($booking['user_phone'], $message);
+        return $this->sendMessage($booking['user_phone'], $message, ['skip_plan_check' => true]);
     }
     
     /**
@@ -237,8 +243,11 @@ class WhatsAppService
      */
     public function sendBookingReminder(array $booking): array
     {
+        if (!$this->ownerAllowsWhatsApp($booking)) {
+            return $this->skippedPlanResponse('booking reminder');
+        }
         $message = $this->formatReminderMessage($booking);
-        return $this->sendMessage($booking['user_phone'], $message);
+        return $this->sendMessage($booking['user_phone'], $message, ['skip_plan_check' => true]);
     }
     
     /**
@@ -465,5 +474,32 @@ class WhatsAppService
     public function getProvider(): string
     {
         return $this->provider;
+    }
+
+    private function ownerAllowsWhatsApp(array $booking): bool
+    {
+        require_once __DIR__ . '/PlatformFeeService.php';
+
+        $ownerId = (int) ($booking['owner_id'] ?? 0);
+        if ($ownerId <= 0 && !empty($booking['venue_id'])) {
+            $row = $this->db->fetch('SELECT owner_id FROM venues WHERE id = ?', [(int) $booking['venue_id']]);
+            $ownerId = (int) ($row['owner_id'] ?? 0);
+        }
+
+        if ($ownerId <= 0) {
+            return false;
+        }
+
+        return (new PlatformFeeService())->hasWhatsAppAccess($ownerId);
+    }
+
+    /** @return array{success: false, skipped: true, error: string} */
+    private function skippedPlanResponse(string $type): array
+    {
+        return [
+            'success' => false,
+            'skipped' => true,
+            'error'   => "WhatsApp {$type} requires Growth plan or higher for this venue owner.",
+        ];
     }
 }

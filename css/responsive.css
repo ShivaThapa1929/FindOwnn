@@ -28,11 +28,18 @@ canvas {
 .gallery-item img,
 .court-card img,
 .hero-phone-image,
-.mockup-wrapper img {
+.mockup-wrapper img:not(.hero-ios-mockup) {
   max-width: none;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.hero-ios-mockup {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .container {

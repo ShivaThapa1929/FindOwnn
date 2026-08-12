@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Model;
+use App\Services\SubscriptionNotificationService;
 
 class Subscription extends Model
 {
@@ -16,7 +17,8 @@ class Subscription extends Model
     public function getActiveByUser(int $userId): array|false
     {
         return $this->db->fetch(
-            "SELECT s.*, p.name AS plan_name, p.price, p.features, p.max_venues
+            "SELECT s.*, p.name AS plan_name, p.slug AS plan_slug, p.price, p.platform_fee_percent,
+                    p.features, p.max_venues, p.billing_cycle
              FROM subscriptions s
              LEFT JOIN subscription_plans p ON s.plan_id = p.id
              WHERE s.user_id = ? AND s.status = 'active' AND s.expires_at > NOW()
@@ -57,11 +59,17 @@ class Subscription extends Model
 
     public function expireOld(): int
     {
-        return $this->db->execute(
-            "UPDATE subscriptions SET status = 'expired', updated_at = ?
-             WHERE status = 'active' AND expires_at < NOW()",
-            [now()]
-        );
+        try {
+            $result = (new SubscriptionNotificationService())->expireAndNotify();
+            return (int) ($result['expired'] ?? 0);
+        } catch (\Throwable $e) {
+            error_log('[Findownn] expireAndNotify failed: ' . $e->getMessage());
+            return $this->db->execute(
+                "UPDATE subscriptions SET status = 'expired', updated_at = ?
+                 WHERE status = 'active' AND expires_at < NOW()",
+                [now()]
+            );
+        }
     }
 
     public function getStats(): array
@@ -114,7 +122,7 @@ class Subscription extends Model
             $expiresAt = date('Y-m-d H:i:s', strtotime("+{$months} months"));
         }
 
-        return $this->create([
+        $subId = $this->create([
             'user_id'        => $userId,
             'plan_id'        => $planId,
             'status'         => $status,
@@ -123,6 +131,12 @@ class Subscription extends Model
             'amount_paid'    => $amountPaid,
             'invoice_number' => $this->generateInvoiceNumber(),
         ]);
+
+        if ($subId && $status === 'active') {
+            $this->notifyPlanStart($userId, (int) $subId);
+        }
+
+        return $subId ? (int) $subId : null;
     }
 
     /** Assign a plan so venue owners can log in immediately */
@@ -153,7 +167,7 @@ class Subscription extends Model
             ? date('Y-m-d H:i:s', strtotime('+10 years'))
             : date('Y-m-d H:i:s', strtotime("+{$months} months"));
 
-        $this->create([
+        $subId = $this->create([
             'user_id'        => $userId,
             'plan_id'        => (int) $plan['id'],
             'status'         => 'active',
@@ -163,6 +177,19 @@ class Subscription extends Model
             'invoice_number' => $this->generateInvoiceNumber(),
         ]);
 
-        return true;
+        if ($subId) {
+            $this->notifyPlanStart($userId, (int) $subId);
+        }
+
+        return (bool) $subId;
+    }
+
+    private function notifyPlanStart(int $userId, int $subscriptionId): void
+    {
+        try {
+            (new SubscriptionNotificationService())->sendPlanStart($userId, $subscriptionId);
+        } catch (\Throwable $e) {
+            error_log('[Findownn] Plan start notification: ' . $e->getMessage());
+        }
     }
 }

@@ -7,6 +7,9 @@ services:
     restart: unless-stopped
     ports:
       - "2785:2785"
+    environment:
+      ENGINE_TYPE: baileys
+      WWEBJS_AUTH_TIMEOUT_MS: "120000"
     volumes:
       - openwa_data:/app/data
     healthcheck:

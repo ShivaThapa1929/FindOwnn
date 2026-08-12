@@ -100,7 +100,7 @@ class DashboardController extends Controller
 
         // Pending venues that need action
         $pendingVenues = $this->db->fetchAll(
-            "SELECT v.id, v.name, v.city, v.address, v.type,
+            "SELECT v.id, v.name, v.city, v.address,
                     u.name AS owner_name, v.created_at,
                     GROUP_CONCAT(s.name SEPARATOR ', ') AS sports
              FROM venues v 

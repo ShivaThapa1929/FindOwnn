@@ -386,7 +386,9 @@ if (!function_exists('actColor')) {
             <tr>
               <td>
                 <div class="fw-500 small"><?= e($v['name']) ?></div>
-                <span class="badge bg-dark" style="font-size:.62rem;"><?= ucwords(str_replace('_',' ',$v['type'])) ?></span>
+                <?php if (!empty($v['sports'])): ?>
+                <span class="badge bg-dark" style="font-size:.62rem;"><?= e($v['sports']) ?></span>
+                <?php endif; ?>
               </td>
               <td class="text-muted small"><?= e($v['owner_name']) ?></td>
               <td class="text-muted small"><?= e($v['city']) ?></td>

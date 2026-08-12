@@ -83,7 +83,7 @@ $site_user = site_user();
   <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=4.4">
   <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=1.0">
   <?php if (($route_name ?? '') === 'index'): ?>
-  <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=4.0">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=4.3">
   <?php endif; ?>
 </head>
 <body class="splash-active">

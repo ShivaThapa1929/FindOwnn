@@ -3,7 +3,9 @@
  * Upsert Findownn Marketplace subscription plans (Venue Owner model)
  * Run: php admin/setup-subscription-plans.php
  */
-define('ROOT_PATH', defined('ROOT_PATH') ? ROOT_PATH : __DIR__);
+if (!defined('ROOT_PATH')) {
+    define('ROOT_PATH', __DIR__);
+}
 
 require_once __DIR__ . '/app/Core/Config.php';
 require_once __DIR__ . '/app/Core/Logger.php';

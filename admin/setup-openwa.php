@@ -22,6 +22,10 @@ try {
         ['whatsapp', 'openwa_api_key', '', 'password', 'OpenWA API Key'],
         ['whatsapp', 'openwa_session_id', 'findownn', 'text', 'OpenWA Session ID'],
         ['whatsapp', 'openwa_webhook_secret', '', 'password', 'OpenWA Webhook HMAC Secret'],
+        ['whatsapp', 'send_subscription_start', '1', 'boolean', 'WhatsApp on plan activation'],
+        ['whatsapp', 'send_subscription_expiry_warning', '1', 'boolean', 'WhatsApp before plan expiry'],
+        ['whatsapp', 'send_subscription_expired', '1', 'boolean', 'WhatsApp when plan expires'],
+        ['whatsapp', 'subscription_warning_days', '7', 'number', 'Days before expiry to warn owners'],
     ];
 
     foreach ($settings as $s) {
@@ -50,6 +54,10 @@ try {
         'send_payment_confirmation' => '1',
         'send_reminder'             => '1',
         'reminder_hours_before'     => '24',
+        'send_subscription_start'           => '1',
+        'send_subscription_expiry_warning'  => '1',
+        'send_subscription_expired'         => '1',
+        'subscription_warning_days'         => '7',
     ];
 
     foreach ($defaults as $key => $value) {

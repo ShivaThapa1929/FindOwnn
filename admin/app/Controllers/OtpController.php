@@ -70,7 +70,9 @@ class OtpController extends Controller
             $idToken = trim($request->input('id_token', ''));
             $purpose = trim($request->input('purpose', 'registration'));
 
-            if (!FirebaseAuthService::isConfigured()) {
+            if (!class_exists(FirebaseAuthService::class)) {
+                $result = ['success' => false, 'message' => 'Firebase OTP is not available on this server. Use SMS OTP instead.'];
+            } elseif (!FirebaseAuthService::isConfigured()) {
                 $result = ['success' => false, 'message' => 'Firebase OTP is not configured on the server.'];
             } else {
                 $check = (new FirebaseAuthService())->verifyIdToken($idToken, $phone);

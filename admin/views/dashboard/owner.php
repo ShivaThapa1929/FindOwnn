@@ -65,8 +65,11 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
 <div class="alert d-flex align-items-center gap-3 mb-4 border-0" style="background:rgba(34,197,94,0.08);border-left:3px solid #22c55e!important;">
   <i class="bi bi-patch-check-fill text-success fs-5 flex-shrink-0"></i>
   <div class="small flex-grow-1">
-    <strong class="text-success"><?= e($mySub['plan_name'] ?? 'Subscription') ?> Plan</strong> active —
-    expires <strong><?= !empty($mySub['expires_at']) ? date('M j, Y', strtotime($mySub['expires_at'])) : '—' ?></strong>
+    <strong class="text-success"><?= e($mySub['plan_name'] ?? 'Subscription') ?> Plan</strong> active
+    <?php if (!empty($mySub['platform_fee_percent']) || ($mySub['plan_slug'] ?? '') === 'enterprise'): ?>
+      — platform fee: <strong><?= ($mySub['plan_slug'] ?? '') === 'enterprise' ? 'Negotiable' : e(rtrim(rtrim(number_format((float) $mySub['platform_fee_percent'], 2), '0'), '.') . '%') ?></strong>
+    <?php endif; ?>
+    — expires <strong><?= !empty($mySub['expires_at']) ? date('M j, Y', strtotime($mySub['expires_at'])) : '—' ?></strong>
   </div>
   <a href="<?= url('/subscriptions/my-plans') ?>" class="btn btn-xs btn-outline-success">
     <i class="bi bi-arrow-up-circle me-1"></i>Upgrade
@@ -460,11 +463,11 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
   </div>
 </div>
 
-<!-- ── Subscription Plans Showcase ─────────────────────────────── -->
+<!-- ── Subscription Plans ─────────────────────────────────────── -->
 <div class="panel mb-4">
   <div class="panel-head d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <h6 class="panel-title"><i class="bi bi-layers-fill me-2"></i>Subscription Plans</h6>
-    <a href="<?= url('/subscriptions/my-plans') ?>" class="btn btn-xs btn-outline-success">Manage Plans</a>
+    <h6 class="panel-title">Plans</h6>
+    <a href="<?= url('/subscriptions/my-plans') ?>" class="btn btn-xs btn-outline-secondary">View all</a>
   </div>
   <div class="panel-body">
     <?php
