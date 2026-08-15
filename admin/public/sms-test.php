@@ -50,38 +50,59 @@ try {
         exit;
     }
 
-    $apiKey = trim((string) Config::get('FAST2SMS_API_KEY', ''));
-    $mode   = strtolower(trim((string) ($_GET['mode'] ?? 'send')));
+    $provider = strtolower(trim((string) Config::get('SMS_PROVIDER', 'fast2sms')));
+    $apiKey   = match ($provider) {
+        'smsalert', 'sms_alert' => trim((string) Config::get('SMSALERT_API_KEY', '')),
+        default                 => trim((string) Config::get('FAST2SMS_API_KEY', '')),
+    };
+    $mode = strtolower(trim((string) ($_GET['mode'] ?? 'send')));
 
-    // Wallet check — validates API key without sending SMS
+    // Provider wallet / credit check — validates API key without sending SMS
     $wallet = null;
     if ($apiKey !== '') {
-        $ch = curl_init('https://www.fast2sms.com/dev/wallet');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_HTTPHEADER     => ['Authorization: ' . $apiKey, 'Accept: application/json'],
-            CURLOPT_TIMEOUT        => 15,
-        ]);
-        $walletRaw = curl_exec($ch);
-        $walletCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        $wallet = [
-            'http' => $walletCode,
-            'body' => json_decode($walletRaw ?: '{}', true),
-        ];
+        if (in_array($provider, ['smsalert', 'sms_alert'], true)) {
+            $url = 'https://www.smsalert.co.in/api/creditstatus.json?' . http_build_query(['apikey' => $apiKey]);
+            $ch  = curl_init($url);
+            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 15]);
+            $walletRaw  = curl_exec($ch);
+            $walletCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            $wallet = ['http' => $walletCode, 'body' => json_decode($walletRaw ?: '{}', true)];
+        } else {
+            $ch = curl_init('https://www.fast2sms.com/dev/wallet');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => ['Authorization: ' . $apiKey, 'Accept: application/json'],
+                CURLOPT_TIMEOUT        => 15,
+            ]);
+            $walletRaw = curl_exec($ch);
+            $walletCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            $wallet = [
+                'http' => $walletCode,
+                'body' => json_decode($walletRaw ?: '{}', true),
+            ];
+        }
     }
 
     if ($mode === 'check') {
-        $valid = is_array($wallet['body'] ?? null) && !empty($wallet['body']['return']);
+        $valid = false;
+        if (in_array($provider, ['smsalert', 'sms_alert'], true)) {
+            $valid = is_array($wallet['body'] ?? null)
+                && strtolower((string) ($wallet['body']['status'] ?? '')) === 'success';
+        } else {
+            $valid = is_array($wallet['body'] ?? null) && !empty($wallet['body']['return']);
+        }
         echo json_encode([
             'ok'           => $valid,
+            'provider'     => $provider,
             'api_key_set'  => $apiKey !== '',
-            'api_key_len'  => strlen($apiKey),
+            'sender_id'    => Config::get('SMSALERT_SENDER_ID', ''),
             'wallet'       => $wallet,
             'hint'         => $valid
-                ? 'API key is valid. Recharge wallet if balance is low, then test with ?phone='
-                : 'API key invalid or IP whitelist enabled on Fast2SMS. Regenerate key at fast2sms.com → Dev API.',
+                ? 'API key valid. Test OTP with ?phone=10digit'
+                : 'Check SMSALERT_API_KEY and SMSALERT_SENDER_ID in admin/.env',
         ], JSON_PRETTY_PRINT);
         exit;
     }
@@ -107,10 +128,11 @@ try {
     echo json_encode([
         'ok'          => $result['success'],
         'message'     => $result['message'] ?? '',
-        'provider'    => Config::get('SMS_PROVIDER', 'fast2sms'),
-        'route'       => Config::get('FAST2SMS_ROUTE', 'auto'),
+        'provider'    => $provider,
+        'route'       => Config::get('SMSALERT_ROUTE', Config::get('FAST2SMS_ROUTE', 'auto')),
         'configured'  => $sms->isConfigured(),
         'has_api_key' => $apiKey !== '',
+        'sender_id'   => Config::get('SMSALERT_SENDER_ID', ''),
         'wallet'      => $wallet,
         'db_ok'       => $dbOk,
         'curl'        => function_exists('curl_init'),

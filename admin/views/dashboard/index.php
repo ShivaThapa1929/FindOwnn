@@ -3,8 +3,7 @@
 /** @var array $stats @var array $bookStats @var array $subStats @var array $monthlyRev */
 /** @var array $recentUsers @var array $recentActivity @var array $venueStats */
 /** @var array $pendingVenues @var array $recentBookings @var array $planDist */
-/** @var array $sportStats @var array $topVenues @var array $whatsappStats */
-/** @var array $recentWhatsApp @var array $upcomingBookings @var array $notifications */
+/** @var array $sportStats @var array $topVenues @var array $upcomingBookings @var array $notifications */
 
 $stats            = $stats ?? [];
 $bookStats        = $bookStats ?? [];
@@ -18,8 +17,6 @@ $recentBookings   = $recentBookings ?? [];
 $planDist         = $planDist ?? [];
 $sportStats       = $sportStats ?? [];
 $topVenues        = $topVenues ?? [];
-$whatsappStats    = $whatsappStats ?? ['total_messages' => 0, 'messages_today' => 0, 'sent_messages' => 0];
-$recentWhatsApp   = $recentWhatsApp ?? [];
 $upcomingBookings = $upcomingBookings ?? [];
 $notifications    = $notifications ?? [];
 
@@ -108,6 +105,14 @@ if (!function_exists('actColor')) {
     <?php endif; ?>
   </div>
 </div>
+
+<?php if ($isSuper): ?>
+<div class="panel mb-3">
+  <div class="panel-body">
+    <?php $currentPortal = 'admin'; include __DIR__ . '/../partials/portal-switcher.php'; ?>
+  </div>
+</div>
+<?php endif; ?>
 
 <!-- ── KPI Cards ──────────────────────────────────────────── -->
 <div class="dashboard-kpi-grid mb-3">
@@ -217,19 +222,6 @@ if (!function_exists('actColor')) {
         </div>
       </div>
     </a>
-  </div>
-  <div class="col-6 col-xl-3 d-flex">
-    <div class="stat-card stat-card--indigo">
-      <div class="stat-card__icon"><i class="bi bi-whatsapp"></i></div>
-      <div class="stat-card__body">
-        <div class="stat-card__value"><?= number_format($whatsappStats['total_messages']) ?></div>
-        <div class="stat-card__label">WhatsApp Messages</div>
-        <div class="stat-card__trend trend-neutral">
-          <i class="bi bi-send-fill"></i>
-          <?= $whatsappStats['messages_today'] ?> today
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 </div>
@@ -445,7 +437,7 @@ if (!function_exists('actColor')) {
 <!-- ── Bottom Row ───────────────────────────────────────────────── -->
 <div class="row g-3 mb-3">
   <!-- Upcoming Bookings -->
-  <div class="col-lg-6">
+  <div class="col-lg-12">
     <div class="panel">
       <div class="panel-head">
         <h6 class="panel-title"><i class="bi bi-calendar-event me-2 text-info"></i>Upcoming Bookings (Next 7 Days)</h6>
@@ -486,52 +478,6 @@ if (!function_exists('actColor')) {
           <div class="text-center py-4 text-muted">
             <i class="bi bi-calendar-x d-block mb-2" style="font-size:2rem;opacity:0.3;"></i>
             <p class="mb-0">No upcoming bookings</p>
-          </div>
-        <?php endif; ?>
-      </div>
-    </div>
-  </div>
-
-  <!-- WhatsApp Messages -->
-  <div class="col-lg-6">
-    <div class="panel">
-      <div class="panel-head">
-        <h6 class="panel-title"><i class="bi bi-whatsapp me-2 text-success"></i>Recent WhatsApp Messages</h6>
-      </div>
-      <div class="panel-body p-0" style="max-height:320px;overflow-y:auto;">
-        <?php if (!empty($recentWhatsApp)): ?>
-          <ul class="list-group list-group-flush">
-            <?php foreach ($recentWhatsApp as $wm): ?>
-            <li class="list-group-item">
-              <div class="d-flex align-items-center gap-2">
-                <div class="flex-shrink-0">
-                  <div class="whatsapp-icon">
-                    <i class="bi bi-whatsapp"></i>
-                  </div>
-                </div>
-                <div class="flex-grow-1">
-                  <div class="d-flex align-items-center justify-content-between mb-1">
-                    <span class="fw-600 small"><?= e($wm['user_name']) ?></span>
-                    <span class="badge bg-<?= $wm['status'] === 'sent' ? 'success' : ($wm['status'] === 'failed' ? 'danger' : 'warning') ?>" style="font-size:.65rem;">
-                      <?= ucfirst($wm['status']) ?>
-                    </span>
-                  </div>
-                  <div class="text-muted" style="font-size:.72rem;">
-                    <span class="badge bg-secondary me-1"><?= ucfirst(str_replace('_', ' ', $wm['message_type'])) ?></span>
-                    <?= e($wm['user_phone']) ?>
-                  </div>
-                  <div class="text-muted" style="font-size:.7rem;margin-top:.25rem;">
-                    <i class="bi bi-clock"></i> <?= timeAgo($wm['created_at']) ?>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <?php endforeach; ?>
-          </ul>
-        <?php else: ?>
-          <div class="text-center py-4 text-muted">
-            <i class="bi bi-chat-dots d-block mb-2" style="font-size:2rem;opacity:0.3;"></i>
-            <p class="mb-0">No messages sent yet</p>
           </div>
         <?php endif; ?>
       </div>
@@ -887,25 +833,4 @@ if (!function_exists('actColor')) {
   color: #22c55e;
 }
 
-.whatsapp-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(37,211,102,0.15);
-  color: #25d366;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-}
-
-/* Indigo color for WhatsApp stats card */
-.stat-card--indigo .stat-card__icon {
-  background: rgba(99,102,241,0.15);
-  color: #6366f1;
-}
-
-.stat-card--indigo .stat-card__value {
-  color: #818cf8;
-}
 </style>

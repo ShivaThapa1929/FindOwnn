@@ -148,9 +148,9 @@ $site_user = site_user();
           </li>
           <?php else: ?>
           <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
-            <button type="button" class="btn btn-premium-outline btn-sm w-100" data-auth-open="login">
+            <a href="login" class="btn btn-premium-outline btn-sm w-100">
               <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
-            </button>
+            </a>
           </li>
           <?php endif; ?>
           <li class="nav-item ms-lg-2 mt-2 mt-lg-0">

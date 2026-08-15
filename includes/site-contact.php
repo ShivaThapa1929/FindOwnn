@@ -1,6 +1,6 @@
 <?php
 /**
- * Findownn — public site contact / WhatsApp (OpenWA)
+ * Findownn — public site contact / WhatsApp (CRM)
  */
 $site_whatsapp_display = '+91 95583 46768';
 $site_whatsapp_digits  = '919558346768';

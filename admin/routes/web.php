@@ -133,15 +133,6 @@ $router->group(['middleware' => ['auth', 'csrf']], function (Router $r) {
         $r->post('/{id}/reminder',        ['BookingController', 'sendReminder'])->name('bookings.reminder');
     });
 
-    // ---- OPENWA (WhatsApp Gateway) — admin / super only ------
-    $r->group(['prefix' => '/openwa', 'middleware' => ['role.admin']], function (Router $r) {
-        $r->get('/',              ['OpenWAController', 'index'])->name('openwa');
-        $r->post('/save',         ['OpenWAController', 'save'])->name('openwa.save');
-        $r->post('/test',         ['OpenWAController', 'testConnection'])->name('openwa.test');
-        $r->post('/webhook',      ['OpenWAController', 'setupWebhook'])->name('openwa.webhook.setup');
-        $r->post('/test-message', ['OpenWAController', 'sendTest'])->name('openwa.test.message');
-    });
-
     // ---- REPORTS (admin / super only) --------------------------
     $r->group(['prefix' => '/reports', 'middleware' => ['role.admin']], function (Router $r) {
         $r->get('/',           ['ReportController', 'index'])->name('reports');

@@ -28,6 +28,9 @@ class WhatsAppService
         }
         
         $this->provider = $this->config['whatsapp_provider'] ?? 'twilio';
+        if (in_array($this->provider, ['openwa', 'wacrm'], true)) {
+            $this->provider = 'twilio';
+        }
     }
     
     /**
@@ -46,8 +49,6 @@ class WhatsAppService
                 $result = $this->sendViaTwilio($to, $message);
             } elseif ($this->provider === 'meta') {
                 $result = $this->sendViaMeta($to, $message, $params);
-            } elseif ($this->provider === 'openwa') {
-                $result = $this->sendViaOpenWA($to, $message, $params);
             } else {
                 throw new Exception("Invalid WhatsApp provider: {$this->provider}");
             }
@@ -186,34 +187,6 @@ class WhatsAppService
         ];
     }
 
-    /**
-     * Send via OpenWA self-hosted gateway
-     */
-    private function sendViaOpenWA(string $to, string $message, array $params = []): array
-    {
-        $openwa = new OpenWAService($this->config);
-
-        if (!$openwa->isConfigured()) {
-            throw new Exception('OpenWA credentials not configured (base URL + API key required)');
-        }
-
-        if (!empty($params['media_url'])) {
-            $result = $openwa->sendMedia(
-                $to,
-                $params['media_url'],
-                $message,
-                $params['media_type'] ?? 'image'
-            );
-        } elseif (!empty($params['bulk']) && is_array($params['bulk'])) {
-            $result = $openwa->sendBulk($params['bulk'], $message);
-            return ['message_id' => $result['jobId'] ?? null];
-        } else {
-            $result = $openwa->sendText($to, $message);
-        }
-
-        return ['message_id' => $result['message_id'] ?? null];
-    }
-    
     /**
      * Send Booking Confirmation (Growth plan+ for venue owner)
      */
@@ -460,9 +433,6 @@ class WhatsAppService
         } elseif ($this->provider === 'meta') {
             return !empty($this->config['meta_access_token']) && 
                    !empty($this->config['meta_phone_number_id']);
-        } elseif ($this->provider === 'openwa') {
-            $openwa = new OpenWAService($this->config);
-            return $openwa->isConfigured();
         }
         
         return false;

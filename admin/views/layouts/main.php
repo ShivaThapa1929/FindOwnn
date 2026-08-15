@@ -234,17 +234,25 @@ body.splash-active { overflow: hidden; }
     </a>
     <?php endif; ?>
 
-    <?php if (in_array($role, ['super_admin','admin'])): ?>
-    <!-- OpenWA -->
-    <a href="<?= url('/openwa') ?>" class="sidebar-link <?= str_contains($_SERVER['REQUEST_URI'], '/openwa') ? 'active' : '' ?>">
-      <i class="bi bi-whatsapp"></i><span>OpenWA</span>
-    </a>
-    <?php endif; ?>
-
     <?php if ($role === 'super_admin'): ?>
     <a href="<?= url('/settings') ?>" class="sidebar-link <?= str_contains($_SERVER['REQUEST_URI'], '/settings') ? 'active' : '' ?>">
       <i class="bi bi-gear-fill"></i><span>Settings</span>
     </a>
+    <?php endif; ?>
+
+    <?php if (in_array($role, ['super_admin', 'admin'], true)): ?>
+    <div class="sidebar-portals mt-2">
+      <div class="sidebar-portals-label">Switch Portal</div>
+      <a href="<?= e(site_login_url('player')) ?>" class="sidebar-portal-link" target="_blank" rel="noopener">
+        <i class="bi bi-person-fill"></i> Player login
+      </a>
+      <a href="<?= e(site_login_url('venue_owner')) ?>" class="sidebar-portal-link" target="_blank" rel="noopener">
+        <i class="bi bi-building"></i> Owner login
+      </a>
+      <a href="<?= e(site_login_url('admin')) ?>" class="sidebar-portal-link" target="_blank" rel="noopener">
+        <i class="bi bi-shield-lock"></i> Admin login
+      </a>
+    </div>
     <?php endif; ?>
 
     <!-- Profile -->
@@ -280,7 +288,12 @@ body.splash-active { overflow: hidden; }
       <i class="bi bi-list"></i>
     </button>
     <div class="topbar-title"><?= e($title ?? 'Dashboard') ?></div>
-    <div class="ms-auto d-flex align-items-center gap-3">
+    <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
+      <?php if (in_array($role, ['super_admin', 'admin'], true)): ?>
+      <a href="<?= e(site_login_url()) ?>" class="btn btn-sm btn-outline-success" target="_blank" rel="noopener" title="Role-based login">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Portals
+      </a>
+      <?php endif; ?>
       <span class="badge bg-success"><?= ucwords(str_replace('_', ' ', $role)) ?></span>
     </div>
   </header>

@@ -45,7 +45,7 @@
         <?php if ($plan['features']): ?>
         <ul class="plan-features text-start small">
           <?php foreach (explode("\n", $plan['features']) as $f): ?>
-            <?php if (trim($f)): ?>
+            <?php if (trim($f) && !preg_match('/\b(unlimited\s+)?(images?|time\s*slots?)\b/i', trim($f))): ?>
             <li><i class="bi bi-check-lg text-success me-1"></i><?= e(trim($f)) ?></li>
             <?php endif; ?>
           <?php endforeach; ?>

@@ -75,10 +75,6 @@ class ApiController
                 require_once __DIR__ . '/LocationController.php';
                 return LocationController::handleCities($query);
 
-            case 'openwa':
-                require_once __DIR__ . '/OpenWAController.php';
-                return OpenWAController::handle($method, $action, $body);
-                
             default:
                 return self::error('Resource not found: ' . $resource, 404, 'RESOURCE_NOT_FOUND');
         }

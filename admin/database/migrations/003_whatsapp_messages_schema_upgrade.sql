@@ -1,10 +1,10 @@
--- Upgrade whatsapp_messages to new OpenWA schema (run once on Hostinger via phpMyAdmin)
+-- Upgrade whatsapp_messages provider column (run once on Hostinger via phpMyAdmin)
 -- Safe to run: skips if recipient_number already exists
 
 ALTER TABLE `whatsapp_messages`
   ADD COLUMN IF NOT EXISTS `recipient_number` VARCHAR(20) NULL AFTER `user_id`,
   ADD COLUMN IF NOT EXISTS `message_content` TEXT NULL AFTER `message_type`,
-  ADD COLUMN IF NOT EXISTS `provider` VARCHAR(20) NOT NULL DEFAULT 'openwa' AFTER `message_content`,
+  ADD COLUMN IF NOT EXISTS `provider` VARCHAR(20) NOT NULL DEFAULT 'twilio' AFTER `message_content`,
   ADD COLUMN IF NOT EXISTS `provider_message_id` VARCHAR(100) NULL AFTER `provider`,
   ADD COLUMN IF NOT EXISTS `updated_at` DATETIME NULL AFTER `created_at`;
 

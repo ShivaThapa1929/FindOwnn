@@ -203,10 +203,8 @@ select.form-select.glass-input option {
                     'billing_cycle' => 'monthly',
                     'description' => 'Best for new venue owners starting with Findownn',
                     'max_venues' => 1,
-                    'max_images' => 999,
-                    'max_slots' => 999,
                     'is_featured' => 0,
-                    'features' => "1 Playground Listing\nOnline Booking Management\nOnline Payment Collection\nBooking Calendar\nUnlimited Time Slots\nEmail Support"
+                    'features' => "1 Playground Listing\nOnline Booking Management\nOnline Payment Collection\nBooking Calendar\nEmail Support"
                 ],
                 [
                     'name' => 'Growth',
@@ -216,8 +214,6 @@ select.form-select.glass-input option {
                     'billing_cycle' => 'monthly',
                     'description' => 'Best for growing sports venues',
                     'max_venues' => 3,
-                    'max_images' => 999,
-                    'max_slots' => 999,
                     'is_featured' => 0,
                     'features' => "Everything in Starter\nWhatsApp Booking Confirmation\nWeekday & Weekend Pricing\nCustomer Database\nBooking Reports\nEmail & Chat Support"
                 ],
@@ -229,8 +225,6 @@ select.form-select.glass-input option {
                     'billing_cycle' => 'monthly',
                     'description' => 'Best for professional venue owners who want to automate and grow',
                     'max_venues' => 10,
-                    'max_images' => 999,
-                    'max_slots' => 999,
                     'is_featured' => 1,
                     'features' => "Everything in Growth\nPartial Payment Support\nQR Code Check-in\nStaff Accounts\nVerified Venue Badge\nFeatured Listing\nPriority Support"
                 ],
@@ -242,8 +236,6 @@ select.form-select.glass-input option {
                     'billing_cycle' => 'monthly',
                     'description' => 'Best for clubs, academies & multi-location businesses',
                     'max_venues' => 999,
-                    'max_images' => 999,
-                    'max_slots' => 999,
                     'is_featured' => 0,
                     'features' => "Everything in Professional\nUnlimited Venue Management\nMulti-location Dashboard\nDedicated Account Manager\nCustom Reports\nCustom Pricing"
                 ]
@@ -268,11 +260,11 @@ select.form-select.glass-input option {
                     : (($p['platform_fee_percent'] ?? '') !== '' && $p['platform_fee_percent'] !== null
                         ? rtrim(rtrim(number_format((float)$p['platform_fee_percent'], 2), '0'), '.') . '% platform fee per booking'
                         : '');
-                $featuresArr = array_filter(array_map('trim', explode("\n", $p['features'] ?? '')));
+                $featuresArr = array_values(array_filter(array_map('trim', explode("\n", $p['features'] ?? '')), function ($feat) {
+                    return $feat !== '' && !preg_match('/\b(unlimited\s+)?(images?|time\s*slots?)\b/i', $feat);
+                }));
                 
                 $venueTxt = ($p['max_venues'] >= 999) ? 'Unlimited Playgrounds' : $p['max_venues'] . ' Playground' . ($p['max_venues'] > 1 ? 's' : '');
-                $imgTxt = ($p['max_images'] >= 999) ? 'Unlimited Images' : $p['max_images'] . ' Images';
-                $slotTxt = ($p['max_slots'] >= 999) ? 'Unlimited Time Slots' : $p['max_slots'] . ' Time Slots';
                 ?>
                 <div class="col-lg-3 col-md-6 animate-on-scroll">
                     <div class="glass-card p-4 h-100 position-relative d-flex flex-column" 
@@ -302,17 +294,9 @@ select.form-select.glass-input option {
 
                         <!-- Highlights list -->
                         <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
-                            <div class="d-flex align-items-center gap-2 text-secondary small mb-2">
+                            <div class="d-flex align-items-center gap-2 text-secondary small">
                                 <i class="bi bi-building text-success"></i>
                                 <span class="text-white fw-semibold"><?= $venueTxt ?></span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 text-secondary small mb-2">
-                                <i class="bi bi-images text-success"></i>
-                                <span class="text-white fw-semibold"><?= $imgTxt ?></span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 text-secondary small">
-                                <i class="bi bi-clock-history text-success"></i>
-                                <span class="text-white fw-semibold"><?= $slotTxt ?></span>
                             </div>
                         </div>
 

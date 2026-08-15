@@ -341,7 +341,7 @@ class AuthController extends Controller
 
             }
 
-            if ($user['role'] === 'venue_owner') {
+        if ($user['role'] === 'venue_owner') {
 
                 Session::flash('error', 'Venue owner account — sign in at the <a href="' . url('/owner/login') . '?email=' . urlencode($email) . '" class="alert-link">Owner portal</a>.');
 

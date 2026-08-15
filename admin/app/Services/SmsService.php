@@ -1,6 +1,6 @@
 <?php
 /**
- * SMS delivery for OTP (Fast2SMS, Twilio, MSG91).
+ * SMS delivery for OTP (SMS Alert, Fast2SMS, Twilio, MSG91).
  */
 namespace App\Services;
 
@@ -20,6 +20,8 @@ class SmsService
     public function isConfigured(): bool
     {
         return match ($this->provider) {
+            'smsalert', 'sms_alert' => trim((string) Config::get('SMSALERT_API_KEY', '')) !== ''
+                && trim((string) Config::get('SMSALERT_SENDER_ID', '')) !== '',
             'fast2sms' => trim((string) Config::get('FAST2SMS_API_KEY', '')) !== '',
             'twilio'   => $this->twilioCredentials()['ok'],
             'msg91'    => trim((string) Config::get('MSG91_AUTH_KEY', '')) !== '',
@@ -38,7 +40,7 @@ class SmsService
         if (!$this->isConfigured()) {
             return [
                 'success' => false,
-                'message' => 'SMS gateway not configured. Set FAST2SMS_API_KEY in admin/.env on the server.',
+                'message' => 'SMS gateway not configured. Set SMS_PROVIDER and API keys in admin/.env.',
             ];
         }
 
@@ -46,6 +48,7 @@ class SmsService
 
         try {
             $result = match ($this->provider) {
+                'smsalert', 'sms_alert' => $this->sendSmsAlert($digits, $text),
                 'fast2sms' => $this->sendFast2Sms($digits, $otp, $text),
                 'twilio'   => $this->sendTwilioSms($phone, $text),
                 'msg91'    => $this->sendMsg91($digits, $otp, $text),
@@ -85,6 +88,83 @@ class SmsService
         }
 
         return $digits;
+    }
+
+    /** @return array{ok:bool,error?:string} */
+    private function sendSmsAlert(string $digits10, string $text): array
+    {
+        $apiKey = trim((string) Config::get('SMSALERT_API_KEY', ''));
+        $sender = trim((string) Config::get('SMSALERT_SENDER_ID', ''));
+
+        if ($apiKey === '') {
+            return ['ok' => false, 'error' => 'SMSALERT_API_KEY is empty'];
+        }
+        if ($sender === '') {
+            return ['ok' => false, 'error' => 'SMSALERT_SENDER_ID is required (SMS Alert dashboard → Quick SMS)'];
+        }
+
+        $params = [
+            'apikey'   => $apiKey,
+            'sender'   => $sender,
+            'mobileno' => '91' . $digits10,
+            'text'     => $text,
+        ];
+
+        $route = trim((string) Config::get('SMSALERT_ROUTE', ''));
+        if ($route !== '') {
+            $params['route'] = $route;
+        }
+
+        $templateId = trim((string) Config::get('SMSALERT_DLT_TEMPLATE_ID', ''));
+        if ($templateId !== '') {
+            $params['templateid'] = $templateId;
+        }
+
+        $url = 'https://www.smsalert.co.in/api/push.json?' . http_build_query($params);
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_TIMEOUT        => 25,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlErr) {
+            return ['ok' => false, 'error' => 'SMS Alert network error: ' . $curlErr];
+        }
+
+        $body = json_decode($response ?: '{}', true);
+        if (!is_array($body)) {
+            $raw = trim((string) $response);
+            if ($raw !== '' && stripos($raw, 'success') !== false) {
+                return ['ok' => true];
+            }
+            return ['ok' => false, 'error' => 'Invalid response from SMS Alert'];
+        }
+
+        $status = strtolower((string) ($body['status'] ?? ''));
+        if ($status === 'success' || !empty($body['batch_id']) || !empty($body['messageid'])) {
+            return ['ok' => true];
+        }
+
+        $error = $body['description'] ?? $body['message'] ?? $body['errormsg'] ?? null;
+        if (is_array($error)) {
+            $error = implode(' ', $error);
+        }
+
+        error_log('[Findownn SMS Alert] HTTP ' . $httpCode . ' ' . ($response ?: ''));
+
+        return [
+            'ok'    => false,
+            'error' => $error ? (string) $error : 'SMS Alert failed (HTTP ' . $httpCode . ')',
+        ];
     }
 
     /** @return array{ok:bool,error?:string} */

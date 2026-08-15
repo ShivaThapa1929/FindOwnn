@@ -163,29 +163,6 @@ class DashboardController extends Controller
              LIMIT 5"
         );
 
-        // NEW: WhatsApp message statistics
-        $whatsappStats = $this->db->fetch(
-            "SELECT 
-                COUNT(*) as total_messages,
-                COUNT(CASE WHEN status='sent' THEN 1 END) as sent_messages,
-                COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN 1 END) as messages_today
-             FROM whatsapp_messages"
-        ) ?: ['total_messages' => 0, 'sent_messages' => 0, 'messages_today' => 0];
-
-        // NEW: Recent WhatsApp messages
-        $recentWhatsApp = $this->db->fetchAll(
-            "SELECT 
-                wm.message_type,
-                wm.status,
-                wm.created_at,
-                u.name as user_name,
-                u.phone as user_phone
-             FROM whatsapp_messages wm
-             JOIN users u ON wm.user_id = u.id
-             ORDER BY wm.created_at DESC
-             LIMIT 5"
-        );
-
         // NEW: Upcoming bookings (next 7 days)
         $upcomingBookings = $this->db->fetchAll(
             "SELECT 
@@ -264,8 +241,6 @@ class DashboardController extends Controller
             'planDist'         => $planDist,
             'sportStats'       => $sportStats,
             'topVenues'        => $topVenues,
-            'whatsappStats'    => $whatsappStats,
-            'recentWhatsApp'   => $recentWhatsApp,
             'upcomingBookings' => $upcomingBookings,
             'notifications'    => $notifications,
         ]);

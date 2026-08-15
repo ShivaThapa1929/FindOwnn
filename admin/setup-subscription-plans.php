@@ -38,8 +38,6 @@ try {
             'billing_cycle'         => 'monthly',
             'description'           => 'Best for new venue owners starting with Findownn',
             'max_venues'            => 1,
-            'max_images'            => 999,
-            'max_slots'             => 999,
             'is_featured'           => 0,
             'sort_order'            => 1,
             'features'              => implode("\n", [
@@ -47,8 +45,6 @@ try {
                 'Online Booking Management',
                 'Online Payment Collection',
                 'Booking Calendar',
-                'Unlimited Time Slots',
-                'Unlimited Images',
                 'Venue Profile',
                 'Booking History',
                 'Customer Reviews & Ratings',
@@ -66,8 +62,6 @@ try {
             'billing_cycle'         => 'monthly',
             'description'           => 'Best for growing sports venues',
             'max_venues'            => 3,
-            'max_images'            => 999,
-            'max_slots'             => 999,
             'is_featured'           => 0,
             'sort_order'            => 2,
             'features'              => implode("\n", [
@@ -92,8 +86,6 @@ try {
             'billing_cycle'         => 'monthly',
             'description'           => 'Best for professional venue owners who want to automate and grow',
             'max_venues'            => 10,
-            'max_images'            => 999,
-            'max_slots'             => 999,
             'is_featured'           => 1,
             'sort_order'            => 3,
             'features'              => implode("\n", [
@@ -120,8 +112,6 @@ try {
             'billing_cycle'         => 'monthly',
             'description'           => 'Best for sports clubs, academies, schools & multi-location businesses',
             'max_venues'            => 999,
-            'max_images'            => 999,
-            'max_slots'             => 999,
             'is_featured'           => 0,
             'sort_order'            => 4,
             'features'              => implode("\n", [
@@ -155,14 +145,14 @@ try {
         $existing = $db->fetch('SELECT id FROM subscription_plans WHERE slug = ?', [$p['slug']]);
         if ($existing) {
             $db->execute(
-                'UPDATE subscription_plans SET name=?, price=?, platform_fee_percent=?, billing_cycle=?, description=?, features=?, max_venues=?, max_images=?, max_slots=?, is_active=1, is_featured=?, sort_order=?, updated_at=NOW() WHERE slug=?',
-                [$p['name'], $p['price'], $p['platform_fee_percent'], $p['billing_cycle'], $p['description'], $p['features'], $p['max_venues'], $p['max_images'], $p['max_slots'], $p['is_featured'], $p['sort_order'], $p['slug']]
+                'UPDATE subscription_plans SET name=?, price=?, platform_fee_percent=?, billing_cycle=?, description=?, features=?, max_venues=?, is_active=1, is_featured=?, sort_order=?, updated_at=NOW() WHERE slug=?',
+                [$p['name'], $p['price'], $p['platform_fee_percent'], $p['billing_cycle'], $p['description'], $p['features'], $p['max_venues'], $p['is_featured'], $p['sort_order'], $p['slug']]
             );
             echo "  ✓ Updated {$p['name']}\n";
         } else {
             $db->execute(
-                'INSERT INTO subscription_plans (name, slug, price, platform_fee_percent, billing_cycle, description, features, max_venues, max_images, max_slots, is_active, is_featured, sort_order, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,1,?,?,NOW(),NOW())',
-                [$p['name'], $p['slug'], $p['price'], $p['platform_fee_percent'], $p['billing_cycle'], $p['description'], $p['features'], $p['max_venues'], $p['max_images'], $p['max_slots'], $p['is_featured'], $p['sort_order']]
+                'INSERT INTO subscription_plans (name, slug, price, platform_fee_percent, billing_cycle, description, features, max_venues, is_active, is_featured, sort_order, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,1,?,?,NOW(),NOW())',
+                [$p['name'], $p['slug'], $p['price'], $p['platform_fee_percent'], $p['billing_cycle'], $p['description'], $p['features'], $p['max_venues'], $p['is_featured'], $p['sort_order']]
             );
             echo "  ✓ Inserted {$p['name']}\n";
         }

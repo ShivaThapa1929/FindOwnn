@@ -30,17 +30,13 @@ try {
         ['payment', 'auto_capture', '1', 'checkbox', 'Auto Capture Payments'],
         
         // WhatsApp Settings  
-        ['whatsapp', 'whatsapp_provider', 'openwa', 'select', 'WhatsApp Provider (twilio/meta/openwa)'],
+        ['whatsapp', 'whatsapp_provider', 'meta', 'select', 'WhatsApp Provider (twilio/meta)'],
         ['whatsapp', 'twilio_account_sid', '', 'text', 'Twilio Account SID'],
         ['whatsapp', 'twilio_auth_token', '', 'password', 'Twilio Auth Token'],
         ['whatsapp', 'twilio_whatsapp_number', '', 'text', 'Twilio WhatsApp Number'],
         ['whatsapp', 'meta_access_token', '', 'password', 'Meta Access Token'],
         ['whatsapp', 'meta_phone_number_id', '', 'text', 'Meta Phone Number ID'],
         ['whatsapp', 'meta_business_account_id', '', 'text', 'Meta Business Account ID'],
-        ['whatsapp', 'openwa_base_url', '', 'text', 'OpenWA Base URL'],
-        ['whatsapp', 'openwa_api_key', '', 'password', 'OpenWA API Key'],
-        ['whatsapp', 'openwa_session_id', 'findownn', 'text', 'OpenWA Session ID'],
-        ['whatsapp', 'openwa_webhook_secret', '', 'password', 'OpenWA Webhook Secret'],
         ['whatsapp', 'send_booking_confirmation', '1', 'checkbox', 'Send Booking Confirmation'],
         ['whatsapp', 'send_payment_confirmation', '1', 'checkbox', 'Send Payment Confirmation'],
         ['whatsapp', 'send_reminder', '1', 'checkbox', 'Send Booking Reminders'],

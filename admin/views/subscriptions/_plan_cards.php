@@ -51,6 +51,9 @@ if (!function_exists('plan_highlight_features')) {
             if (preg_match('/^everything in /i', $feat)) {
                 continue;
             }
+            if (preg_match('/\b(unlimited\s+)?(images?|time\s*slots?)\b/i', $feat)) {
+                continue;
+            }
             $out[] = $feat;
             if (count($out) >= $limit) {
                 break;

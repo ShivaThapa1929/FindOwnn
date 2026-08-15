@@ -5,11 +5,11 @@
  * CLI:
  *   php admin/test-subscription-flow.php
  *   php admin/test-subscription-flow.php --notify --phone=9876543210
- *   php admin/test-subscription-flow.php --openwa-test --phone=9876543210
+ *   php admin/test-subscription-flow.php --whatsapp-test --phone=9876543210
  *
  * Web:
  *   /admin/public/test-subscription-flow.php?key=CRON_SECRET
- *   &notify=1&phone=9876543210&openwa_test=1
+ *   &notify=1&phone=9876543210&whatsapp_test=1
  */
 declare(strict_types=1);
 
@@ -47,7 +47,6 @@ use App\Models\User;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Services\SubscriptionNotificationService;
-use App\Services\OpenWAService;
 use App\Services\WhatsAppService;
 
 $isCli = PHP_SAPI === 'cli';
@@ -92,7 +91,7 @@ function hr(): void
 
 try {
     $db = Database::getInstance();
-    out('Findownn — Subscription & OpenWA Test Harness');
+    out('Findownn — Subscription & Notification Test Harness');
     out('Time: ' . date('c'));
     hr();
 
@@ -118,47 +117,21 @@ try {
     }
     hr();
 
-    // 2. OpenWA status
-    out('[2] OpenWA / WhatsApp gateway');
+    // 2. WhatsApp gateway (Twilio/Meta — optional)
+    out('[2] WhatsApp gateway (optional)');
     $wa       = new WhatsAppService();
     $provider = $wa->getProvider();
     out("  Provider: {$provider}");
-
-    $settings = $db->fetchAll("SELECT `key`, value FROM settings WHERE `group` = 'whatsapp'");
-    $cfg = [];
-    foreach ($settings as $s) {
-        $cfg[$s['key']] = $s['value'];
-    }
-
-    $baseUrl = trim((string) ($cfg['openwa_base_url'] ?? ''));
-    $hasKey  = trim((string) ($cfg['openwa_api_key'] ?? '')) !== '';
-    out('  Base URL: ' . ($baseUrl !== '' ? $baseUrl : '(not set)'));
-    out('  API key: ' . ($hasKey ? 'configured' : 'missing'));
-
-    if ($provider === 'openwa' && $baseUrl !== '') {
-        $openwa = new OpenWAService($cfg);
-        $health = $openwa->healthCheck();
-        out('  Server reachable: ' . (!empty($health['ok']) ? 'yes' : 'no'));
-        if (!empty($health['error'])) {
-            out('  Health error: ' . $health['error']);
-        }
-        $session = $openwa->ensureSession();
-        out('  Session status: ' . ($session['status'] ?? 'unknown'));
-        if (!empty($session)) {
-            out('  Hint: ' . $openwa->sessionStatusHint($session));
-        }
-    }
-
     out('  WhatsApp configured: ' . ($wa->isConfigured() ? 'yes' : 'no'));
 
     $testPhone = (string) arg('phone', '');
-    if (arg('openwa_test') || arg('openwa-test')) {
+    if (arg('whatsapp_test') || arg('whatsapp-test')) {
         if ($testPhone === '') {
-            out('  ⚠ Pass --phone=10digit for OpenWA send test');
+            out('  ⚠ Pass --phone=10digit for WhatsApp send test');
         } else {
             $notifier = new SubscriptionNotificationService();
-            $testWa   = $notifier->testWhatsApp($testPhone, 'Findownn OpenWA test — subscription notifications ready.');
-            out('  OpenWA test send: ' . ($testWa['success'] ? 'SUCCESS' : 'FAILED'));
+            $testWa   = $notifier->testWhatsApp($testPhone, 'Findownn WhatsApp test — subscription notifications ready.');
+            out('  WhatsApp test send: ' . ($testWa['success'] ? 'SUCCESS' : 'FAILED'));
             if (!empty($testWa['error'])) {
                 out('  Error: ' . $testWa['error']);
             }
@@ -329,7 +302,7 @@ try {
     out('[6] Manual checks');
     out('  Admin → Users → assign/change plan → verify plan start notification');
     out('  Owner login → Dashboard → subscription banner');
-    out('  Admin → OpenWA → Test connection + Send test message');
+    out('  Admin → Settings → configure Twilio/Meta WhatsApp (optional)');
     out('  Cron: php admin/cron/send-subscription-notifications.php --expire');
     out('  Web cron: /admin/cron/send-subscription-notifications.php?key=CRON_SECRET&expire=1');
     out('');

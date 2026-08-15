@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Core\Database;
 
 /**
- * Subscription lifecycle notifications — in-app + WhatsApp (OpenWA).
+ * Subscription lifecycle notifications — in-app + optional WhatsApp (Twilio/Meta).
  */
 class SubscriptionNotificationService
 {
@@ -183,10 +183,10 @@ class SubscriptionNotificationService
     public function testWhatsApp(string $phone, string $message = ''): array
     {
         if (!$this->whatsapp->isConfigured()) {
-            return ['success' => false, 'error' => 'WhatsApp/OpenWA is not configured'];
+            return ['success' => false, 'error' => 'WhatsApp is not configured'];
         }
 
-        $message = $message !== '' ? $message : 'Findownn test — OpenWA gateway is working.';
+        $message = $message !== '' ? $message : 'Findownn test — WhatsApp gateway is working.';
 
         return $this->whatsapp->sendMessage($phone, $message, ['skip_plan_check' => true]);
     }

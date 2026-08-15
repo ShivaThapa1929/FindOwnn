@@ -98,7 +98,7 @@ if (!isset($site_user) && function_exists('site_user')) {
         </div>
     </footer>
 
-    <!-- OpenWA — Floating WhatsApp -->
+    <!-- Floating WhatsApp -->
     <a href="<?= e($site_whatsapp_url) ?>"
        class="whatsapp-float"
        target="_blank"

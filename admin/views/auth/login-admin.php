@@ -33,7 +33,8 @@ include __DIR__ . '/_auth-split-open.php';
       </form>
 
       <p class="auth-split-foot text-center text-muted small">
-        Not staff? <a href="<?= e(site_home_url()) ?>" class="text-secondary">Back to website</a>
+        <a href="<?= e(site_login_url()) ?>" class="text-success fw-600 text-decoration-none">Choose portal</a>
+        · <a href="<?= e(site_home_url()) ?>" class="text-secondary text-decoration-none">Website</a>
       </p>
 
 <?php

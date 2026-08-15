@@ -40,6 +40,19 @@ if (!function_exists('site_home_url')) {
     }
 }
 
+if (!function_exists('site_login_url')) {
+    /** Public role-based login hub (/login?role=...) */
+    function site_login_url(?string $role = null): string
+    {
+        $base = rtrim(site_home_url(), '/') . '/login';
+        if ($role !== null && $role !== '') {
+            return $base . '?role=' . rawurlencode($role);
+        }
+
+        return $base;
+    }
+}
+
 if (!function_exists('is_live_site_host')) {
     /** True when app runs on public hosting (not local XAMPP) */
     function is_live_site_host(): bool
@@ -50,14 +63,6 @@ if (!function_exists('is_live_site_host')) {
             && !str_contains($host, '127.0.0.1')
             && !str_starts_with($host, '192.168.')
             && !str_starts_with($host, '10.');
-    }
-}
-
-if (!function_exists('openwa_webhook_url')) {
-    /** Public webhook URL OpenWA must call (works on local + live) */
-    function openwa_webhook_url(): string
-    {
-        return rtrim(site_home_url(), '/') . '/api/v1/openwa/webhook';
     }
 }
 

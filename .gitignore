@@ -26,8 +26,9 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-# Vendored OpenWA clone at repo root (use admin/deploy/openwa + Docker image for live)
+# Optional local clones (not used by Findownn)
 /OpenWA/
+/wacrm/
 
 # Misc local
 cookies.txt

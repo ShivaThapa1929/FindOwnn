@@ -1,11 +1,13 @@
       <?php if (!empty($isOwner)): ?>
         <p class="auth-split-switch text-center text-muted small mb-0">
-          Findownn staff?
+          <a href="<?= e(site_login_url()) ?>" class="text-success fw-600 text-decoration-none">All portals</a>
+          · Staff?
           <a href="<?= url('/login') ?>" class="text-success fw-600 text-decoration-none">Admin login</a>
         </p>
       <?php else: ?>
         <p class="auth-split-switch text-center text-muted small mb-0">
-          Venue owner?
+          <a href="<?= e(site_login_url()) ?>" class="text-success fw-600 text-decoration-none">All portals</a>
+          · Venue owner?
           <a href="<?= url('/owner/login') ?>" class="text-success fw-600 text-decoration-none">Owner portal</a>
         </p>
       <?php endif; ?>

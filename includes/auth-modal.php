@@ -55,6 +55,9 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
                 <option value="player">Player — Book playgrounds</option>
                 <option value="venue_owner">Venue Owner — Manage venues</option>
               </select>
+              <p class="text-secondary small mt-2 mb-0">
+                Staff? <a href="<?= e(rtrim($asset_base, '/')) ?>/login?role=admin" class="text-success text-decoration-none">Admin login</a>
+              </p>
             </div>
 
             <div id="authOwnerLoginNote" class="alert py-2 px-3 small d-none mb-3" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#bbf7d0;">

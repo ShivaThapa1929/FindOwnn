@@ -189,7 +189,7 @@ class OtpService implements RecordsPhoneVerification
 
         return [
             'success' => false,
-            'message' => 'SMS is not set up. Add a valid FAST2SMS_API_KEY in admin/.env (Fast2SMS → Developer → API Key).',
+            'message' => 'SMS is not set up. Configure SMS_PROVIDER and API keys in admin/.env (e.g. SMS Alert).',
         ];
     }
 
