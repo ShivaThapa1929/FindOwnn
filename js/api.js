@@ -4,38 +4,16 @@
  */
 
 const FindownnAPI = {
-    baseURL: (() => {
-        let path = window.location.pathname;
+    /** Known public page path segments (for resolving API base URL) */
+    _pageRoutes: [
+        '/venue-details', '/booking-payment', '/venues', '/sports',
+        '/partner', '/about', '/contact', '/home', '/login', '/register',
+        '/dashboard', '/account', '/index.php', '/index'
+    ],
 
-        // Strip known page routes from the end to find the subfolder base path
-        const routes = [
-            '/venue-details', '/booking-payment', '/venues',
-            '/sports', '/partner', '/about', '/contact', '/home',
-            '/index.php', '/index'
-        ];
-        for (const route of routes) {
-            if (path.endsWith(route)) {
-                path = path.slice(0, -route.length);
-                break;
-            }
-        }
-
-        // Normalise — remove trailing slashes
-        path = path.replace(/\/+$/, '');
-        return path + '/api/v1';
-    })(),
-
-    /**
-     * Resolve playground upload paths to a browser-loadable URL
-     */
     getSiteBase() {
         let path = window.location.pathname;
-        const routes = [
-            '/venue-details', '/booking-payment', '/venues',
-            '/sports', '/partner', '/about', '/contact', '/home',
-            '/index.php', '/index'
-        ];
-        for (const route of routes) {
+        for (const route of this._pageRoutes) {
             if (path.endsWith(route)) {
                 path = path.slice(0, -route.length);
                 break;
@@ -43,6 +21,23 @@ const FindownnAPI = {
         }
         return path.replace(/\/+$/, '') || '';
     },
+
+    baseURL: (() => {
+        let path = window.location.pathname;
+        const routes = [
+            '/venue-details', '/booking-payment', '/venues', '/sports',
+            '/partner', '/about', '/contact', '/home', '/login', '/register',
+            '/dashboard', '/account', '/index.php', '/index'
+        ];
+        for (const route of routes) {
+            if (path.endsWith(route)) {
+                path = path.slice(0, -route.length);
+                break;
+            }
+        }
+        path = path.replace(/\/+$/, '');
+        return path + '/api/v1';
+    })(),
 
     resolveImageUrl(path, fallback = null) {
         if (!path) return fallback;
@@ -101,7 +96,7 @@ const FindownnAPI = {
             }
 
             if (!response.ok) {
-                const err = new Error(data.message || 'API request failed');
+                const err = new Error(data.message || 'Request failed');
                 err.code = data.code || null;
                 err.status = response.status;
                 throw err;
@@ -124,10 +119,14 @@ const FindownnAPI = {
                     return cached;
                 }
 
-                const offlineErr = new Error('You are offline. Please check your internet connection.');
+                const offlineErr = new Error('Offline');
                 offlineErr.code = 'OFFLINE';
                 offlineErr.offline = true;
                 throw offlineErr;
+            }
+
+            if (window.FindownnUI) {
+                error.userMessage = FindownnUI.friendlyApiMessage(error);
             }
 
             console.error('API Error:', error);

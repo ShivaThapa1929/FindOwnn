@@ -36,7 +36,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Error loading venue:', error);
-            showError('Database connection error. Please try again.');
+            const msg = window.FindownnUI
+                ? FindownnUI.friendlyApiMessage(error)
+                : "We're unavailable right now. Please try again in a few minutes.";
+            showError(msg);
         } finally {
             hideLoading();
         }

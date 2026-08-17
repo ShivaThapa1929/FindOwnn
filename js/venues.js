@@ -5,6 +5,12 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
 
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str ?? '';
+        return div.innerHTML;
+    }
+
     // ==================== STATE ====================
     let currentFilters = {
         page: 1,
@@ -86,8 +92,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Error loading venues:', error);
-            const msg = (error.offline || error.code === 'OFFLINE')
-                ? 'You are offline. Showing cached playgrounds if available.'
+            const msg = window.FindownnUI
+                ? FindownnUI.friendlyApiMessage(error)
                 : 'Network error. Please try again.';
             showError(msg);
         } finally {
@@ -262,7 +268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             venuesContainer.innerHTML = `
                 <div class="col-12 text-center py-5">
                     <i class="bi bi-exclamation-triangle display-4 text-danger mb-3 d-block"></i>
-                    <h5 class="text-white">${message}</h5>
+                    <h5 class="text-white">${escapeHtml(message)}</h5>
                     <button class="btn btn-premium mt-3" onclick="location.reload()">
                         <i class="bi bi-arrow-clockwise me-1"></i>Try Again
                     </button>

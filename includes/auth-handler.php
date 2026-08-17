@@ -3,6 +3,7 @@
  * AJAX auth endpoints for site auth modal (JSON responses)
  */
 
+require_once __DIR__ . '/site-errors.php';
 require_once __DIR__ . '/user-auth.php';
 
 function auth_json(array $data, int $code = 200): never
@@ -23,7 +24,8 @@ function auth_handle_login(): void
         $loginAs = trim($_POST['login_as'] ?? 'player');
         $result  = site_auth_login($_POST['email'] ?? '', $_POST['password'] ?? '', $loginAs);
     } catch (\Throwable $e) {
-        auth_json(['ok' => false, 'error' => 'Login failed. Please try again.'], 500);
+        site_log_error('Login error: ' . $e->getMessage());
+        auth_json(['ok' => false, 'error' => 'We\'re unavailable right now. Please try again in a few minutes.'], 503);
     }
 
     if ($result['ok']) {
@@ -54,7 +56,8 @@ function auth_handle_register(): void
     try {
         $result = site_auth_register($_POST);
     } catch (\Throwable $e) {
-        auth_json(['ok' => false, 'error' => 'Registration failed. Please try again.'], 500);
+        site_log_error('Register error: ' . $e->getMessage());
+        auth_json(['ok' => false, 'error' => 'We\'re unavailable right now. Please try again in a few minutes.'], 503);
     }
 
     if ($result['ok']) {

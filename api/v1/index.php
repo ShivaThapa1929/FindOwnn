@@ -105,23 +105,29 @@ try {
     }
     
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Internal server error',
-        'error' => $e->getMessage(),
-        'file' => basename($e->getFile()),
-        'line' => $e->getLine(),
-        'code' => 'SERVER_ERROR'
-    ], JSON_PRETTY_PRINT);
+    $isDebug = filter_var(\App\Core\Config::get('APP_DEBUG', false), FILTER_VALIDATE_BOOLEAN);
+    if ($isDebug) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage(),
+            'code' => 'SERVER_ERROR',
+        ], JSON_PRETTY_PRINT);
+    } else {
+        error_log('[Findownn API] ' . $e->getMessage());
+        http_response_code(503);
+        echo json_encode([
+            'success' => false,
+            'message' => "We're unavailable right now. Please try again in a few minutes.",
+            'code' => 'SERVER_ERROR',
+        ]);
+    }
 } catch (Error $e) {
-    http_response_code(500);
+    error_log('[Findownn API Fatal] ' . $e->getMessage());
+    http_response_code(503);
     echo json_encode([
         'success' => false,
-        'message' => 'Fatal error',
-        'error' => $e->getMessage(),
-        'file' => basename($e->getFile()),
-        'line' => $e->getLine(),
-        'code' => 'FATAL_ERROR'
-    ], JSON_PRETTY_PRINT);
+        'message' => "We're unavailable right now. Please try again in a few minutes.",
+        'code' => 'FATAL_ERROR',
+    ]);
 }

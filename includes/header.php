@@ -5,7 +5,10 @@ $asset_base = $asset_base ?? (($script_dir === '') ? '/' : $script_dir . '/');
 $current_page = $route_name ?? basename($_SERVER['PHP_SELF'], '.php');
 require_once __DIR__ . '/site-contact.php';
 require_once __DIR__ . '/user-auth.php';
+require_once __DIR__ . '/seo.php';
 $site_user = site_user();
+$seo = site_seo_meta($route_name ?? 'index');
+$canonical = site_canonical_url();
 ?>
 <!DOCTYPE html>
 <html lang="en" data-site-base="<?= htmlspecialchars($asset_base, ENT_QUOTES, 'UTF-8') ?>">
@@ -44,11 +47,23 @@ $site_user = site_user();
   </script>
 
   <!-- SEO -->
-  <title>Findownn — Bhuj's Sports Playground Booking Platform</title>
-  <meta name="description" content="Discover and book Box Cricket & Pickleball playgrounds across Bhuj instantly. No calls, no waiting — just book and play.">
-  <meta name="keywords" content="Findownn, Box Cricket Bhuj, Pickleball Bhuj, Sports Booking, Book Turfs, Gujarat">
+  <title><?= e($seo['title']) ?></title>
+  <meta name="description" content="<?= e($seo['description']) ?>">
+  <meta name="keywords" content="<?= e($seo['keywords']) ?>">
   <meta name="author" content="Findownn">
+  <meta name="robots" content="<?= e($seo['robots']) ?>">
+  <link rel="canonical" href="<?= e($canonical) ?>">
+  <meta property="og:type" content="<?= e($seo['og_type']) ?>">
+  <meta property="og:site_name" content="Findownn">
+  <meta property="og:title" content="<?= e($seo['title']) ?>">
+  <meta property="og:description" content="<?= e($seo['description']) ?>">
+  <meta property="og:url" content="<?= e($canonical) ?>">
+  <meta property="og:image" content="<?= e(rtrim($asset_base, '/') . '/assets/images/logo.png') ?>">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="<?= e($seo['title']) ?>">
+  <meta name="twitter:description" content="<?= e($seo['description']) ?>">
   <meta name="theme-color" content="#080c09">
+  <script type="application/ld+json"><?= site_json_ld_organization($asset_base) ?></script>
   <?php if (!$site_user): ?>
   <meta name="csrf-token" content="<?= e(site_csrf_token()) ?>">
   <?php endif; ?>
@@ -70,8 +85,9 @@ $site_user = site_user();
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Fonts (non-blocking) -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -80,8 +96,8 @@ $site_user = site_user();
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=4.4">
-  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=1.0">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=4.5">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=1.1">
   <?php if (($route_name ?? '') === 'index'): ?>
   <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=4.3">
   <?php endif; ?>

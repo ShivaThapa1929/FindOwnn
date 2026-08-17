@@ -235,6 +235,9 @@ body.splash-active { overflow: hidden; }
     <?php endif; ?>
 
     <?php if ($role === 'super_admin'): ?>
+    <a href="<?= url('/contact-messages') ?>" class="sidebar-link <?= str_contains($_SERVER['REQUEST_URI'], '/contact-messages') ? 'active' : '' ?>">
+      <i class="bi bi-envelope-fill"></i><span>Contact Messages</span>
+    </a>
     <a href="<?= url('/settings') ?>" class="sidebar-link <?= str_contains($_SERVER['REQUEST_URI'], '/settings') ? 'active' : '' ?>">
       <i class="bi bi-gear-fill"></i><span>Settings</span>
     </a>

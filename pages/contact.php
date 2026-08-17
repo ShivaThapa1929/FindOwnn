@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/site-contact.php';
+require_once __DIR__ . '/../includes/user-auth.php';
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -93,33 +94,36 @@ include __DIR__ . '/../includes/header.php';
                     
                     <h3 class="text-white fw-bold mb-4">Send Us a Message</h3>
                     
-                    <form onsubmit="event.preventDefault(); alert('Message sent successfully! Our support representative will email you shortly.'); this.reset();" class="row g-4">
+                    <div id="contactAlert" class="alert d-none small py-2"></div>
+
+                    <form id="contactForm" class="row g-4" novalidate>
+                        <?= site_csrf_field() ?>
                         
                         <!-- Name -->
                         <div class="col-md-6">
-                            <label class="glass-input-label">Your Name</label>
-                            <input type="text" class="form-control glass-input" placeholder="Rajesh Patel" required>
+                            <label class="glass-input-label" for="contact-name">Your Name</label>
+                            <input type="text" id="contact-name" name="name" class="form-control glass-input" placeholder="Rajesh Patel" required maxlength="120">
                         </div>
 
                         <!-- Email -->
                         <div class="col-md-6">
-                            <label class="glass-input-label">Email Address</label>
-                            <input type="email" class="form-control glass-input" placeholder="rajesh@example.com" required>
+                            <label class="glass-input-label" for="contact-email">Email Address</label>
+                            <input type="email" id="contact-email" name="email" class="form-control glass-input" placeholder="rajesh@example.com" required>
                         </div>
 
                         <!-- Phone -->
                         <div class="col-md-6">
-                            <label class="glass-input-label">Phone Number (Optional)</label>
-                            <input type="tel" class="form-control glass-input" placeholder="<?= e($site_whatsapp_display) ?>" pattern="[0-9]{10}">
+                            <label class="glass-input-label" for="contact-phone">Phone Number (Optional)</label>
+                            <input type="tel" id="contact-phone" name="phone" class="form-control glass-input" placeholder="<?= e($site_whatsapp_display) ?>" pattern="[0-9]{10}" maxlength="10">
                         </div>
 
                         <!-- Subject -->
                         <div class="col-md-6">
-                            <label class="glass-input-label">Subject</label>
-                            <select class="form-select glass-input" style="cursor: pointer;" required>
+                            <label class="glass-input-label" for="contact-subject">Subject</label>
+                            <select id="contact-subject" name="subject" class="form-select glass-input" style="cursor: pointer;" required>
                                 <option value="" disabled selected>Select an option</option>
-                                <option value="General">General Inquiry</option>
-                                <option value="Booking">Booking Assistance</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Booking Assistance">Booking Assistance</option>
                                 <option value="Playground Listing">Playground Listing Inquiry</option>
                                 <option value="Careers">Careers / Hiring</option>
                             </select>
@@ -127,8 +131,8 @@ include __DIR__ . '/../includes/header.php';
 
                         <!-- Message -->
                         <div class="col-12">
-                            <label class="glass-input-label">Message Details</label>
-                            <textarea class="form-control glass-input" rows="5" placeholder="Tell us how we can help you..." required></textarea>
+                            <label class="glass-input-label" for="contact-message">Message Details</label>
+                            <textarea id="contact-message" name="message" class="form-control glass-input" rows="5" placeholder="Tell us how we can help you..." required minlength="10"></textarea>
                         </div>
 
                         <!-- Submit -->

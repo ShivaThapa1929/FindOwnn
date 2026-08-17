@@ -4,7 +4,8 @@
  * Dynamically routes requests to corresponding view files.
  */
 
-// Session — configured in includes/user-auth.php when needed
+require_once __DIR__ . '/includes/site-errors.php';
+site_register_error_handlers();
 
 $request_uri = $_SERVER['REQUEST_URI'] ?? '';
 $path = parse_url($request_uri, PHP_URL_PATH);
@@ -33,6 +34,12 @@ if ($path === '/favicon.ico') {
     }
 }
 
+// Sitemap
+if ($path === '/sitemap.xml') {
+    require_once __DIR__ . '/includes/sitemap.php';
+    exit;
+}
+
 // Intercept admin requests and dispatch to admin application
 if ($path === '/admin' || strpos($path, '/admin/') === 0) {
     require_once __DIR__ . '/admin/public/index.php';
@@ -43,6 +50,11 @@ if ($path === '/admin' || strpos($path, '/admin/') === 0) {
 if ($path === '/api/v1' || strpos($path, '/api/v1/') === 0) {
     require_once __DIR__ . '/api/v1/index.php';
     exit;
+}
+
+if ($path === '/contact/submit' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    require_once __DIR__ . '/includes/contact-handler.php';
+    contact_handle_submit();
 }
 
 // Site auth AJAX (modal login/register)
@@ -84,6 +96,22 @@ $routes = [
     '/contact.php' => [
         'file' => 'pages/contact.php',
         'name' => 'contact'
+    ],
+    '/privacy' => [
+        'file' => 'pages/privacy.php',
+        'name' => 'privacy'
+    ],
+    '/privacy.php' => [
+        'file' => 'pages/privacy.php',
+        'name' => 'privacy'
+    ],
+    '/terms' => [
+        'file' => 'pages/terms.php',
+        'name' => 'terms'
+    ],
+    '/terms.php' => [
+        'file' => 'pages/terms.php',
+        'name' => 'terms'
     ],
     '/partner' => [
         'file' => 'pages/partner.php',
@@ -184,23 +212,7 @@ if (!empty($clean_path) && file_exists(__DIR__ . '/pages/' . $clean_path . '.php
 }
 
 // 404 Page Not Found
-http_response_code(404);
+$error_code = 404;
 $route_name = '404';
-include __DIR__ . '/includes/header.php';
-?>
-<section class="py-5 text-center min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="margin-top:75px;">
-    <div class="glow-orb glow-orb-bottom-left"></div>
-    <div class="container position-relative z-1 animate-on-scroll">
-        <span class="badge-premium mb-3">Error 404</span>
-        <h1 class="display-1 fw-bold text-white mb-2">Page Not Found</h1>
-        <p class="text-secondary lead mx-auto mb-5" style="max-width: 500px;">
-            The page you are looking for does not exist or has been moved to a new address.
-        </p>
-        <a href="./" class="btn btn-premium btn-shimmer">
-            <i class="bi bi-house-door me-2"></i><span>Back to Home</span>
-        </a>
-    </div>
-</section>
-<?php
-include __DIR__ . '/includes/footer.php';
-?>
+include __DIR__ . '/includes/error-page.php';
+exit;

@@ -148,6 +148,12 @@ $router->group(['middleware' => ['auth', 'csrf']], function (Router $r) {
         $r->post('/setup-payment', ['SettingsController', 'setupPayment'])->name('settings.setup-payment');
     });
 
+    // ---- CONTACT MESSAGES (super admin) ------------------------
+    $r->group(['prefix' => '/contact-messages', 'middleware' => ['role.super']], function (Router $r) {
+        $r->get('/',              ['ContactMessageController', 'index'])->name('contact-messages');
+        $r->post('/{id}/read',    ['ContactMessageController', 'markRead'])->name('contact-messages.read');
+    });
+
     // ---- API ---------------------------------------------------
     $r->get('/api/courts', ['CourtController', 'apiGetCourts'])->name('api.courts');
 

@@ -90,9 +90,9 @@ if (!isset($site_user) && function_exists('site_user')) {
                     &copy; <?php echo date('Y'); ?> Findownn. Made with <span style="color: var(--primary);">♥</span> in Bhuj, Gujarat.
                 </p>
                 <div class="d-flex gap-4">
-                    <a href="#" class="footer-link" style="font-size: 0.82rem; padding: 0;">Privacy</a>
-                    <a href="#" class="footer-link" style="font-size: 0.82rem; padding: 0;">Terms</a>
-                    <a href="#" class="footer-link" style="font-size: 0.82rem; padding: 0;">Support</a>
+                    <a href="privacy" class="footer-link" style="font-size: 0.82rem; padding: 0;">Privacy</a>
+                    <a href="terms" class="footer-link" style="font-size: 0.82rem; padding: 0;">Terms</a>
+                    <a href="contact" class="footer-link" style="font-size: 0.82rem; padding: 0;">Support</a>
                 </div>
             </div>
         </div>
@@ -110,19 +110,20 @@ if (!isset($site_user) && function_exists('site_user')) {
     </a>
 
     <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     
-    <!-- Offline support (register before API calls) -->
-    <script src="<?= $asset_base ?>js/offline.js"></script>
+    <!-- Error toasts & offline support -->
+    <script src="<?= $asset_base ?>js/errors.js?v=1.0" defer></script>
+    <script src="<?= $asset_base ?>js/offline.js" defer></script>
     
     <!-- API Service -->
-    <script src="<?= $asset_base ?>js/api.js?v=1.1"></script>
+    <script src="<?= $asset_base ?>js/api.js?v=1.2" defer></script>
     
     <!-- Custom Scripts -->
-    <script src="<?= $asset_base ?>js/script.js?v=4.3"></script>
+    <script src="<?= $asset_base ?>js/script.js?v=4.4" defer></script>
 
     <?php if (empty($site_user)): ?>
-    <script src="<?= $asset_base ?>js/auth-modal.js?v=1.2"></script>
+    <script src="<?= $asset_base ?>js/auth-modal.js?v=1.3" defer></script>
     <?php endif; ?>
     
     <!-- Page-specific Scripts -->
@@ -131,12 +132,18 @@ if (!isset($site_user) && function_exists('site_user')) {
     $page_scripts = [
         'index' => 'js/home-api.js',
         'venues' => 'js/venues.js',
-        'venue-details' => 'js/venue-details.js'
+        'venue-details' => 'js/venue-details.js',
+        'contact' => 'js/contact.js',
     ];
     
     if (isset($page_scripts[$page_name])) {
-        $pageScriptVersion = ($page_name === 'index') ? '?v=3.7' : '';
-        echo '<script src="' . $asset_base . $page_scripts[$page_name] . $pageScriptVersion . '"></script>';
+        $pageScriptVersion = match ($page_name) {
+            'index' => '?v=3.8',
+            'venues' => '?v=1.1',
+            'venue-details' => '?v=1.1',
+            default => '',
+        };
+        echo '<script src="' . $asset_base . $page_scripts[$page_name] . $pageScriptVersion . '" defer></script>';
     }
     ?>
 

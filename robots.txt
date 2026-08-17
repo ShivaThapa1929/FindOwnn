@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /account
+Disallow: /logout
+Disallow: /booking-payment
+
+Sitemap: /sitemap.xml

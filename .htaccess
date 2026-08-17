@@ -11,8 +11,8 @@
     Allow from all
 </IfModule>
 
-# Enable directory listing fallback
-Options +Indexes
+# Disable directory listing (security)
+Options -Indexes
 
 # Default document
 DirectoryIndex index.php index.html
@@ -59,4 +59,12 @@ DirectoryIndex index.php index.html
     ExpiresByType image/webp "access plus 1 year"
     ExpiresByType text/css "access plus 1 month"
     ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Cache-Control for static assets
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
 </IfModule>
