@@ -147,8 +147,32 @@ abstract class Model
 
     private function filterFillable(array $data): array
     {
-        if (empty($this->fillable)) return $data;
-        return array_intersect_key($data, array_flip($this->fillable));
+        if (!empty($this->fillable)) {
+            $data = array_intersect_key($data, array_flip($this->fillable));
+        }
+
+        return $this->filterExistingColumns($data);
+    }
+
+    /** Drop keys that are not real table columns (handles older DB schemas). */
+    protected function filterExistingColumns(array $data): array
+    {
+        if ($this->table === '') {
+            return $data;
+        }
+
+        static $tableColumns = [];
+
+        if (!isset($tableColumns[$this->table])) {
+            try {
+                $cols = $this->db->fetchAll("SHOW COLUMNS FROM `{$this->table}`");
+                $tableColumns[$this->table] = array_column($cols, 'Field');
+            } catch (\Throwable) {
+                return $data;
+            }
+        }
+
+        return array_intersect_key($data, array_flip($tableColumns[$this->table]));
     }
 
     protected function hideFields(array $record): array

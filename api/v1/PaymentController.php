@@ -201,6 +201,12 @@ class PaymentController extends ApiController
             );
 
             self::$db->commit();
+
+            error_log(sprintf(
+                '[Findownn Payment] Verified booking_id=%d user_id=%d payment_status=paid booking_status=confirmed',
+                $bookingId,
+                $userId
+            ));
         } catch (\Exception $e) {
             self::$db->rollback();
             return self::error('Failed to update payment records', 500, 'PAYMENT_009');
@@ -243,6 +249,11 @@ class PaymentController extends ApiController
             'payment_id'        => $paymentId,
             'payment_status'    => 'paid',
             'booking_status'    => $bookingDetails['status'] ?? 'confirmed',
+            'amount'            => (float) ($bookingDetails['amount'] ?? $booking['amount'] ?? 0),
+            'venue_name'        => $bookingDetails['venue_name'] ?? null,
+            'booking_date'      => $bookingDetails['booking_date'] ?? null,
+            'start_time'        => $bookingDetails['start_time'] ?? null,
+            'end_time'          => $bookingDetails['end_time'] ?? null,
         ], 'Payment verified successfully');
     }
 

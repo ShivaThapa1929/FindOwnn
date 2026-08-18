@@ -36,10 +36,14 @@ canvas {
 }
 
 .hero-ios-mockup {
+  display: block;
   width: auto;
   height: auto;
-  max-width: 100%;
+  max-width: min(62vw, 220px);
+  max-height: min(50vh, 400px);
   object-fit: contain;
+  object-position: center bottom;
+  margin: 0 auto;
 }
 
 .container {

@@ -130,12 +130,6 @@ class AuthController extends Controller
 
         }
 
-        $otpService = new \App\Services\OtpService();
-        if (!$otpService->isVerifiedRecently($phone, 'registration')) {
-            Session::flash('error', 'Please verify your mobile number with OTP before registering.');
-            $this->redirect(url('/owner/register'));
-        }
-
         $cleanPhone = preg_replace('/\D/', '', $phone);
 
         if (strlen($cleanPhone) === 10) {

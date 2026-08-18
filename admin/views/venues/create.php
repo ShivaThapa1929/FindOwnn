@@ -55,7 +55,7 @@ $err    = fn(string $k) => isset($errors[$k])
             <input type="number" name="price_per_hour"
                    class="form-control <?= isset($errors['price_per_hour']) ? 'is-invalid' : '' ?>"
                    value="<?= e($old_v('price_per_hour')) ?>"
-                   placeholder="1000" min="1" max="100000" step="50" required>
+                   placeholder="1000" min="1" max="100000" step="1" required>
           </div>
           <?= $err('price_per_hour') ?>
         </div>

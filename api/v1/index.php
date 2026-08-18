@@ -19,6 +19,11 @@ $allowedOrigins = array_filter(array_map('trim', explode(',', $corsOrigins)));
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
+// Dynamic booking/payment data must never be cached by browsers or CDNs
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key');
 

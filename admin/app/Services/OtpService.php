@@ -156,19 +156,7 @@ class OtpService implements RecordsPhoneVerification
     /** @return array{success:bool,message:string} */
     private function deliverOtp(string $phone, string $otp): array
     {
-        $sms = new SmsService();
-        $smsError = '';
-
-        if ($sms->isConfigured()) {
-            $result = $sms->sendOtp($phone, $otp);
-            if ($result['success']) {
-                return $result;
-            }
-            $smsError = $result['message'] ?? 'SMS delivery failed';
-            error_log('[Findownn OTP] SMS failed for ' . $phone . ': ' . $smsError);
-        }
-
-        // WhatsApp fallback when SMS is not configured or delivery failed
+        // SMS disabled — WhatsApp fallback only when configured
         try {
             $wa = new WhatsAppService();
             if ($wa->isConfigured()) {
@@ -183,13 +171,9 @@ class OtpService implements RecordsPhoneVerification
             error_log('[Findownn OTP WhatsApp fallback] ' . $e->getMessage());
         }
 
-        if ($smsError !== '') {
-            return ['success' => false, 'message' => $smsError];
-        }
-
         return [
             'success' => false,
-            'message' => 'SMS is not set up. Configure SMS_PROVIDER and API keys in admin/.env (e.g. SMS Alert).',
+            'message' => 'Mobile OTP is temporarily unavailable. You can still register without OTP verification.',
         ];
     }
 

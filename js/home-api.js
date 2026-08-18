@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return div.innerHTML;
     }
 
+    function normalizeLiveSports(sports) {
+        const live = (sports ?? []).filter(s => (s.total_venues ?? 0) > 0);
+        const seen = new Set();
+
+        return live.filter(sport => {
+            const key = (sport.name || sport.slug || '').toLowerCase().trim();
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
     // ==================== SPORTS ====================
 
     async function loadSports() {
@@ -45,8 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!container) return;
 
         try {
-            const response = await FindownnAPI.getSports();
-            const sports = response?.data?.sports ?? [];
+            const response = await FindownnAPI.getSports({ live: 1 });
+            const sports = normalizeLiveSports(response?.data?.sports ?? []);
 
             if (!sports.length) {
                 container.innerHTML = renderSportsEmpty();
@@ -135,10 +147,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderSportsFallback() {
         const fallbackSports = [
-            { name: 'Box Cricket', slug: 'box-cricket', total_venues: 1, total_courts: 1, is_featured: true, icon: 'bi-trophy-fill' },
+            { name: 'Box Cricket', slug: 'box-cricket', total_venues: 1, total_courts: 3, is_featured: false, icon: 'bi-trophy' },
             { name: 'Pickleball', slug: 'pickleball', total_venues: 1, total_courts: 1, is_featured: false, icon: 'bi-circle' },
-            { name: 'Football', slug: 'football', total_venues: 0, total_courts: 0, is_featured: false, icon: 'bi-hexagon' },
-            { name: 'Badminton', slug: 'badminton', total_venues: 0, total_courts: 0, is_featured: false, icon: 'bi-star' },
         ];
         return fallbackSports.map((s, i) => createSportCard(s, i)).join('');
     }

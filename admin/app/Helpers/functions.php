@@ -252,13 +252,6 @@ if (!function_exists('firebase_otp_context')) {
     /** OTP mode + Firebase client config for registration views (safe if service file missing on server). */
     function firebase_otp_context(): array
     {
-        if (!class_exists(\App\Services\FirebaseAuthService::class)) {
-            return ['otpMode' => 'sms', 'firebaseConfig' => []];
-        }
-
-        return [
-            'otpMode'        => \App\Services\FirebaseAuthService::otpMode(),
-            'firebaseConfig' => \App\Services\FirebaseAuthService::clientConfig(),
-        ];
+        return ['otpMode' => 'disabled', 'firebaseConfig' => []];
     }
 }

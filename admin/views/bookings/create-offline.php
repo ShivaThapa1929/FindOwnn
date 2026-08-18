@@ -1,6 +1,16 @@
 <?php
-$old    = $old    ?? [];
-$errors = $errors ?? [];
+/**
+ * @var array $myVenues    Owner/admin venues for the offline booking form
+ * @var array $venueCourts Courts for the pre-selected venue
+ * @var array $old         Previous form input after validation errors
+ * @var array $errors      Field validation errors
+ * @var bool  $noVenues    True when owner has no venues yet
+ */
+$old         = $old         ?? [];
+$errors      = $errors      ?? [];
+$myVenues    = $myVenues    ?? [];
+$venueCourts = $venueCourts ?? [];
+$noVenues    = $noVenues    ?? empty($myVenues);
 $old_v  = fn(string $k, mixed $d = '') => $old[$k] ?? $d;
 $err    = fn(string $k) => isset($errors[$k])
     ? '<div class="invalid-feedback d-block mt-1">'.e($errors[$k]).'</div>' : '';
@@ -111,11 +121,22 @@ $err    = fn(string $k) => isset($errors[$k])
   </div>
   <div class="panel-body">
 
+    <?php if ($noVenues): ?>
+      <div class="alert alert-warning mb-4">
+        <div class="fw-600 mb-1"><i class="bi bi-building me-1"></i>No venue found</div>
+        <p class="small mb-2">Offline booking ke liye pehle ek venue add karna hoga.</p>
+        <a href="<?= url('/venues/create') ?>" class="btn btn-sm btn-success me-2">
+          <i class="bi bi-plus-lg me-1"></i>Add Venue
+        </a>
+        <a href="<?= url('/venues') ?>" class="btn btn-sm btn-outline-secondary">My Venues</a>
+      </div>
+    <?php endif; ?>
+
     <?php if ($flash = flash('error')): ?>
       <div class="alert alert-danger py-2 small mb-3"><i class="bi bi-exclamation-circle me-1"></i><?= e($flash) ?></div>
     <?php endif; ?>
 
-    <form action="<?= url('/bookings/offline/store') ?>" method="POST" novalidate id="offlineBookingForm">
+    <form action="<?= url('/bookings/offline/store') ?>" method="POST" novalidate id="offlineBookingForm"<?= $noVenues ? ' class="pe-none opacity-50"' : '' ?>>
       <?= csrf_field() ?>
 
       <!-- ── Venue ───────────────────────────────────────────────── -->
@@ -139,11 +160,25 @@ $err    = fn(string $k) => isset($errors[$k])
 
         <div class="col-md-6">
           <label class="form-label-sm">Court *</label>
-          <select name="court_id" id="courtSelect" class="form-select <?= isset($errors['court_id']) ? 'is-invalid' : '' ?>" required disabled>
-            <option value="">— First select a venue —</option>
+          <select name="court_id" id="courtSelect" class="form-select <?= isset($errors['court_id']) ? 'is-invalid' : '' ?>" required>
+            <?php if (!$old_v('venue_id')): ?>
+              <option value="">— First select a venue —</option>
+            <?php elseif (empty($venueCourts)): ?>
+              <option value="">— No courts found for this venue —</option>
+            <?php else: ?>
+              <option value="">— Select a court —</option>
+              <?php foreach ($venueCourts as $c): ?>
+              <option value="<?= (int) $c['id'] ?>"
+                      data-price="<?= e((string) ($c['price_per_hour'] ?? 0)) ?>"
+                      data-name="<?= e($c['name']) ?>"
+                      <?= $old_v('court_id') == $c['id'] ? 'selected' : '' ?>>
+                Court <?= e($c['court_number'] ?: '1') ?> — <?= e($c['name']) ?>
+              </option>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </select>
           <?= $err('court_id') ?>
-          <small class="text-muted">Select venue first to load courts</small>
+          <small class="text-muted">Courts load automatically when you pick a venue</small>
         </div>
 
         <div class="col-md-4">
@@ -199,7 +234,7 @@ $err    = fn(string $k) => isset($errors[$k])
             <span class="input-group-text">₹</span>
             <input type="number" name="custom_amount" id="customAmount"
                    class="form-control" placeholder="Leave blank to use calculated"
-                   min="0" step="50"
+                   min="0" step="1"
                    value="<?= e($old_v('custom_amount', '')) ?>">
           </div>
         </div>
@@ -301,35 +336,43 @@ $err    = fn(string $k) => isset($errors[$k])
 
   // Load courts for venue with optional target court auto-selection
   function loadCourtsForVenue(venueId, targetCourtId) {
-    courtSelect.disabled = true;
+    courtSelect.classList.add('is-loading');
     courtSelect.innerHTML = '<option value="">Loading courts...</option>';
-    
+
     if (!venueId) {
       courtSelect.innerHTML = '<option value="">— First select a venue —</option>';
+      courtSelect.classList.remove('is-loading');
       update();
       return;
     }
-    
-    fetch(`<?= url('/api/courts') ?>?venue_id=${venueId}`)
-      .then(res => res.json())
+
+    fetch(`<?= url('/api/courts') ?>?venue_id=${venueId}`, {
+      headers: { 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(res => {
         const courts = res.courts || res;
         if (!Array.isArray(courts) || courts.length === 0) {
-          courtSelect.innerHTML = '<option value="">No courts available</option>';
+          courtSelect.innerHTML = '<option value="">No courts available — add a court first</option>';
         } else {
           let html = '<option value="">— Select a court —</option>';
           courts.forEach(court => {
-            const selected = (targetCourtId && targetCourtId == court.id) ? 'selected' : '';
-            html += `<option value="${court.id}" ${selected} data-price="${court.price_per_hour || 1000}" data-name="${court.name}">Court ${court.court_number || '1'} - ${court.name}</option>`;
+            const selected = (targetCourtId && String(targetCourtId) === String(court.id)) ? 'selected' : '';
+            html += `<option value="${court.id}" ${selected} data-price="${court.price_per_hour || 1000}" data-name="${court.name}">Court ${court.court_number || '1'} — ${court.name}</option>`;
           });
           courtSelect.innerHTML = html;
-          courtSelect.disabled = false;
         }
+        courtSelect.classList.remove('is-loading');
         update();
       })
       .catch(err => {
         console.error('Error loading courts:', err);
-        courtSelect.innerHTML = '<option value="">Error loading courts</option>';
+        courtSelect.innerHTML = '<option value="">Could not load courts — refresh and try again</option>';
+        courtSelect.classList.remove('is-loading');
       });
   }
 
@@ -337,12 +380,24 @@ $err    = fn(string $k) => isset($errors[$k])
     loadCourtsForVenue(this.value, null);
   });
 
-  // Auto-fetch courts on load if venue is pre-selected
+  // Auto-fetch courts on load if venue is pre-selected (skip if server already rendered courts)
   const preVenueId = venueSelect.value;
   const preCourtId = '<?= e($old_v("court_id")) ?>';
-  if (preVenueId) {
+  if (preVenueId && courtSelect.options.length <= 2) {
     loadCourtsForVenue(preVenueId, preCourtId);
   }
+
+  document.getElementById('offlineBookingForm').addEventListener('submit', function(e) {
+    if (!venueSelect.value) {
+      e.preventDefault();
+      alert('Please select a venue.');
+      return;
+    }
+    if (!courtSelect.value) {
+      e.preventDefault();
+      alert('Please select a court. If none appear, add courts to your venue first.');
+    }
+  });
 
   function pad(n){ return String(n).padStart(2,'0'); }
 

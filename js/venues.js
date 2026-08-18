@@ -120,9 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        venues.forEach(venue => {
-            venuesContainer.innerHTML += createVenueCard(venue);
-        });
+        venuesContainer.innerHTML = venues.map(venue => createVenueCard(venue)).join('');
 
         // Bind Book Now buttons
         document.querySelectorAll('.btn-book-trigger').forEach(btn => {

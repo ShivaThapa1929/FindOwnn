@@ -1,3 +1,15 @@
+<?php
+/**
+ * @var array       $court   Court record from CourtController::edit()
+ * @var array       $sports  Active sports list
+ * @var string|null $success Flash success message
+ * @var string|null $error   Flash error message
+ */
+$court   = $court ?? [];
+$sports  = $sports ?? [];
+$success = $success ?? null;
+$error   = $error ?? null;
+?>
 <div class="mb-4">
   <div class="d-flex justify-content-between align-items-center">
     <div>
@@ -57,7 +69,7 @@
         
         <div class="col-md-6">
           <label class="form-label">Price per Hour (₹) *</label>
-          <input type="number" name="price_per_hour" class="form-control" value="<?= $court['price_per_hour'] ?>" min="1" step="50" required>
+          <input type="number" name="price_per_hour" class="form-control" value="<?= $court['price_per_hour'] ?>" min="1" step="1" required>
         </div>
         
         <div class="col-12">

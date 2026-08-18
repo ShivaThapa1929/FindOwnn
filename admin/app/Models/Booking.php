@@ -77,6 +77,26 @@ class Booking extends Model
         ) ?: [];
     }
 
+    /** Booking KPIs scoped to one venue owner's venues. */
+    public function getStatsForOwner(int $ownerId): array
+    {
+        return $this->db->fetch(
+            "SELECT
+                COUNT(*) AS total,
+                SUM(b.status = 'confirmed') AS confirmed,
+                SUM(b.status = 'cancelled') AS cancelled,
+                SUM(b.payment_status = 'paid') AS paid_count,
+                SUM(CASE WHEN b.payment_status = 'paid' THEN b.amount ELSE 0 END) AS total_revenue
+             FROM bookings b
+             JOIN venues v ON b.venue_id = v.id
+             WHERE v.owner_id = ? AND v.deleted_at IS NULL",
+            [$ownerId]
+        ) ?: [
+            'total' => 0, 'confirmed' => 0, 'cancelled' => 0,
+            'paid_count' => 0, 'total_revenue' => 0,
+        ];
+    }
+
     public function getMonthlyRevenue(int $months = 12): array
     {
         $rawData = $this->db->fetchAll(

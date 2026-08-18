@@ -6,6 +6,7 @@
 require_once __DIR__ . '/site-errors.php';
 require_once __DIR__ . '/user-auth.php';
 require_once __DIR__ . '/site-contact.php';
+require_once __DIR__ . '/site-mail.php';
 
 function contact_json(array $data, int $code = 200): never
 {
@@ -67,7 +68,7 @@ function contact_handle_submit(): void
 
         site_db()->execute(
             'INSERT INTO contact_messages (name, email, phone, subject, message, ip_address, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())',
+            VALUES (?, ?, ?, ?, ?, ?, NOW())',
             [$name, $email, $phone ?: null, $subject, $message, $_SERVER['REMOTE_ADDR'] ?? null]
         );
 
@@ -78,13 +79,16 @@ function contact_handle_submit(): void
             . "Subject: {$subject}\r\n\r\n"
             . $message;
 
-        @mail(
-            $site_contact_email,
+        $mailResult = site_contact_notify(
             '[Findownn Contact] ' . $subject,
             $body,
-            'From: Findownn Website <noreply@findownn.com>' . "\r\n"
-            . 'Reply-To: ' . $email
+            $email,
+            $name
         );
+
+        if (!$mailResult['success']) {
+            site_log_error('Contact email failed: ' . ($mailResult['message'] ?? 'unknown'));
+        }
     } catch (\Throwable $e) {
         site_log_error('Contact form error: ' . $e->getMessage());
         contact_json([

@@ -61,7 +61,7 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
             </div>
 
             <div id="authOwnerLoginNote" class="alert py-2 px-3 small d-none mb-3" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#bbf7d0;">
-              Venue owners use a separate dashboard. Continue to owner login — mobile OTP is required when registering a new owner account.
+              Venue owners use a separate dashboard. Continue to owner login to manage your playgrounds.
             </div>
 
             <div class="mb-3">
@@ -146,7 +146,7 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
             </button>
             <p class="text-center text-secondary small mt-3 mb-0">
               Venue owner?
-              <a href="<?= e(rtrim($asset_base, '/')) ?>/admin/owner/register" class="text-success text-decoration-none fw-600">Register with mobile OTP</a>
+              <a href="<?= e(rtrim($asset_base, '/')) ?>/admin/owner/register" class="text-success text-decoration-none fw-600">Register as venue owner</a>
             </p>
           </form>
         </div>

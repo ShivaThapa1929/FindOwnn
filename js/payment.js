@@ -8,7 +8,7 @@ const FindownnPayment = {
     getBasePath() {
         let path = window.location.pathname;
         const routes = [
-            '/venue-details', '/booking-payment', '/venues',
+            '/venue-details', '/booking-payment', '/booking-success', '/venues',
             '/sports', '/partner', '/about', '/contact', '/home',
             '/index.php', '/index'
         ];
@@ -192,8 +192,15 @@ const FindownnPayment = {
             }
 
             if (result.success) {
-                const ref = bookingData.booking_reference || result.data?.booking_reference;
-                window.location.href = `${base}/booking-success?ref=${encodeURIComponent(ref)}`;
+                if (typeof FindownnAPI !== 'undefined') {
+                    FindownnAPI.invalidateBookingCache(bookingData.booking_id);
+                }
+
+                const ref = bookingData.booking_reference || result.data?.booking_reference || result.booking_reference || '';
+                const bookingId = bookingData.booking_id || result.data?.booking_id || '';
+                const qs = new URLSearchParams({ ref });
+                if (bookingId) qs.set('booking_id', String(bookingId));
+                window.location.replace(`${base}/booking-success?${qs.toString()}`);
             } else {
                 throw new Error(result.message || 'Payment verification failed');
             }

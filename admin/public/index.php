@@ -89,6 +89,13 @@ header('X-Content-Type-Options: nosniff');
 header('X-XSS-Protection: 1; mode=block');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
+// Booking/dashboard pages must never be served from browser cache
+if (preg_match('#/(bookings|dashboard)(/|$)#', $reqPath)) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+}
+
 // ----------------------------------------------------------------
 // 5. Auto-expire subscriptions (runs 5% of requests)
 // ----------------------------------------------------------------

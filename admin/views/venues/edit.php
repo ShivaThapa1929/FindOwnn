@@ -1,3 +1,13 @@
+<?php
+/**
+ * @var array $venue  Venue record from VenueController::edit()
+ * @var array $old    Previous input after validation errors
+ * @var array $errors Field validation errors
+ */
+$venue  = $venue ?? [];
+$old    = $old ?? [];
+$errors = $errors ?? [];
+?>
 <div class="row justify-content-center">
 <div class="col-lg-9">
 <div class="panel">
@@ -43,7 +53,7 @@
         <div class="col-md-4">
           <label class="form-label-sm">Price per Hour (₹)</label>
           <input type="number" name="price_per_hour" class="form-control"
-                 value="<?= $venue['price_per_hour'] ?>" min="0" step="50">
+                 value="<?= $venue['price_per_hour'] ?>" min="1" step="1">
         </div>
         <div class="col-12">
           <label class="form-label-sm">Amenities</label>

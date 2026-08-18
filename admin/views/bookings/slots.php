@@ -13,7 +13,7 @@
  */
 $venues   = $venues ?? [];
 $courts   = $courts ?? [];
-$venue    = $venue ?? null;
+$venue    = $venue ?? null; 
 $court    = $court ?? null;
 $slots    = $slots ?? [];
 $venue_id = $venue_id ?? '';
@@ -410,10 +410,15 @@ function loadCourts(venueId) {
 
     const courtSelect = document.getElementById('court_id');
     courtSelect.innerHTML = '<option value="">Loading...</option>';
-    courtSelect.disabled = true;
 
-    fetch(`<?= url('/api/courts') ?>?venue_id=${venueId}`)
-        .then(r => r.json())
+    fetch(`<?= url('/api/courts') ?>?venue_id=${venueId}`, {
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
         .then(res => {
             const courts = res.courts || res;
             let options = '<option value="">Select Court</option>';
@@ -426,12 +431,10 @@ function loadCourts(venueId) {
                 options = '<option value="">No courts available</option>';
             }
             courtSelect.innerHTML = options;
-            courtSelect.disabled = false;
         })
         .catch(err => {
             console.error('Error:', err);
             courtSelect.innerHTML = '<option value="">Error loading courts</option>';
-            courtSelect.disabled = false;
         });
 }
 </script>

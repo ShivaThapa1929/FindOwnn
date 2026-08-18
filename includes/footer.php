@@ -117,10 +117,10 @@ if (!isset($site_user) && function_exists('site_user')) {
     <script src="<?= $asset_base ?>js/offline.js" defer></script>
     
     <!-- API Service -->
-    <script src="<?= $asset_base ?>js/api.js?v=1.2" defer></script>
+    <script src="<?= $asset_base ?>js/api.js?v=1.4" defer></script>
     
     <!-- Custom Scripts -->
-    <script src="<?= $asset_base ?>js/script.js?v=4.4" defer></script>
+    <script src="<?= $asset_base ?>js/script.js?v=4.5" defer></script>
 
     <?php if (empty($site_user)): ?>
     <script src="<?= $asset_base ?>js/auth-modal.js?v=1.3" defer></script>
@@ -138,14 +138,24 @@ if (!isset($site_user) && function_exists('site_user')) {
     
     if (isset($page_scripts[$page_name])) {
         $pageScriptVersion = match ($page_name) {
-            'index' => '?v=3.8',
-            'venues' => '?v=1.1',
-            'venue-details' => '?v=1.1',
+            'index' => '?v=3.9',
+            'venues' => '?v=1.2',
+            'venue-details' => '?v=1.2',
             default => '',
         };
         echo '<script src="' . $asset_base . $page_scripts[$page_name] . $pageScriptVersion . '" defer></script>';
     }
     ?>
+
+    <?php if (!empty($invalidate_booking_cache)): ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof FindownnAPI !== 'undefined') {
+            FindownnAPI.invalidateBookingCache();
+        }
+    });
+    </script>
+    <?php endif; ?>
 
 </body>
 </html>

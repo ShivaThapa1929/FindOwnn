@@ -9,7 +9,7 @@ site_register_error_handlers();
 
 $request_uri = $_SERVER['REQUEST_URI'] ?? '';
 $path = parse_url($request_uri, PHP_URL_PATH);
-
+    
 // Dynamically compute base path from SCRIPT_NAME
 // e.g. /findownn_website/index.php  → base is /findownn_website
 // e.g. /index.php (root deploy)     → base is ''
@@ -152,6 +152,14 @@ $routes = [
     '/booking-payment.php' => [
         'file' => 'pages/booking-payment.php',
         'name' => 'booking-payment'
+    ],
+    '/booking-success' => [
+        'file' => 'pages/booking-success.php',
+        'name' => 'booking-success'
+    ],
+    '/booking-success.php' => [
+        'file' => 'pages/booking-success.php',
+        'name' => 'booking-success'
     ],
     '/login' => [
         'file' => 'pages/login.php',

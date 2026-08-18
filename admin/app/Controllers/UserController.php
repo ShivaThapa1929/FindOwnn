@@ -99,12 +99,6 @@ class UserController extends Controller
             $this->redirect(url('/users/create'));
         }
 
-        $otpService = new \App\Services\OtpService();
-        if (!$otpService->isVerifiedRecently($phone, 'registration')) {
-            Session::flash('error', 'Phone OTP verification required. Send and verify OTP first.');
-            $this->redirect(url('/users/create'));
-        }
-
         if ($this->userModel->findByEmail($email)) {
             Session::flash('error', 'Email already exists.');
             $this->redirect(url('/users/create'));

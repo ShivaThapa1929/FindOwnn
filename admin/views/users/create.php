@@ -13,7 +13,6 @@ $plans    = $plans ?? [];
   <div class="panel-body">
     <form action="<?= url('/users/store') ?>" method="POST" novalidate id="createUserForm">
       <?= csrf_field() ?>
-      <input type="hidden" name="phone_verified" id="phoneVerified" value="0">
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label-sm">Full Name *</label>
@@ -25,18 +24,7 @@ $plans    = $plans ?? [];
         </div>
         <div class="col-md-6">
           <label class="form-label-sm">Phone *</label>
-          <div class="input-group">
-            <input type="text" name="phone" id="userPhone" class="form-control" placeholder="9876543210" maxlength="10" pattern="[6-9][0-9]{9}" required>
-            <button type="button" class="btn btn-outline-success" id="sendOtpBtn">Send OTP</button>
-          </div>
-          <small class="text-muted" id="otpStatus"></small>
-        </div>
-        <div class="col-md-6" id="otpFieldWrap" style="display:none;">
-          <label class="form-label-sm">OTP *</label>
-          <div class="input-group">
-            <input type="text" name="otp" id="userOtp" class="form-control" placeholder="6-digit code" maxlength="6" inputmode="numeric">
-            <button type="button" class="btn btn-outline-primary" id="verifyOtpBtn">Verify</button>
-          </div>
+          <input type="text" name="phone" id="userPhone" class="form-control" placeholder="9876543210" maxlength="10" pattern="[6-9][0-9]{9}" required>
         </div>
         <div class="col-md-6">
           <label class="form-label-sm">Role *</label>
@@ -106,70 +94,10 @@ $plans    = $plans ?? [];
 (function () {
   const form = document.getElementById('createUserForm');
   const roleSelect = document.getElementById('userRole');
-  const phoneInput = document.getElementById('userPhone');
-  const otpWrap = document.getElementById('otpFieldWrap');
-  const otpStatus = document.getElementById('otpStatus');
-  const phoneVerified = document.getElementById('phoneVerified');
-  const csrf = form.querySelector('input[name="_csrf"]')?.value || '';
   let freePlanConfirmed = false;
   const freePlanModal = document.getElementById('freePlanModal') ? new bootstrap.Modal(document.getElementById('freePlanModal')) : null;
 
-  document.getElementById('sendOtpBtn')?.addEventListener('click', async function () {
-    const phone = phoneInput.value.trim();
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      otpStatus.textContent = 'Enter valid 10-digit mobile.';
-      otpStatus.className = 'text-danger small';
-      return;
-    }
-    this.disabled = true;
-    otpStatus.textContent = 'Sending OTP...';
-    otpStatus.className = 'text-muted small';
-    try {
-      const res = await fetch('<?= url('/otp/send') ?>', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
-        body: new URLSearchParams({ _csrf: csrf, phone, purpose: 'registration' })
-      });
-      const data = await res.json();
-      otpWrap.style.display = '';
-      otpStatus.textContent = data.message || (data.success ? 'OTP sent to mobile.' : 'Could not send OTP.');
-      otpStatus.className = data.success ? 'text-success small' : 'text-danger small';
-    } catch (e) {
-      otpStatus.textContent = 'Failed to send OTP.';
-      otpStatus.className = 'text-danger small';
-    }
-    this.disabled = false;
-  });
-
-  document.getElementById('verifyOtpBtn')?.addEventListener('click', async function () {
-    const phone = phoneInput.value.trim();
-    const otp = document.getElementById('userOtp').value.trim();
-    try {
-      const res = await fetch('<?= url('/otp/verify') ?>', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
-        body: new URLSearchParams({ _csrf: csrf, phone, otp, purpose: 'registration' })
-      });
-      const data = await res.json();
-      otpStatus.textContent = data.message;
-      otpStatus.className = data.success ? 'text-success small' : 'text-danger small';
-      if (data.success) {
-        phoneVerified.value = '1';
-        phoneInput.readOnly = true;
-      }
-    } catch (e) {
-      otpStatus.textContent = 'Verification failed.';
-      otpStatus.className = 'text-danger small';
-    }
-  });
-
   form?.addEventListener('submit', function (e) {
-    if (phoneVerified.value !== '1') {
-      e.preventDefault();
-      otpStatus.textContent = 'Please verify phone number with OTP first.';
-      otpStatus.className = 'text-danger small';
-      return;
-    }
     if (roleSelect.value === 'venue_owner' && !freePlanConfirmed) {
       e.preventDefault();
       freePlanModal?.show();

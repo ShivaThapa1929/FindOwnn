@@ -418,7 +418,7 @@ class CourtController extends Controller
         ]);
     }
 
-    // Dynamic API to retrieve active courts by venue ID
+    // Dynamic API to retrieve courts by venue ID (offline booking / slot picker)
     public function apiGetCourts(Request $request): void
     {
         $venueId = (int) $request->query('venue_id', 0);
@@ -426,10 +426,24 @@ class CourtController extends Controller
             $this->json(['error' => 'Venue ID required'], 400);
         }
 
+        $venue = $this->db->fetch(
+            "SELECT id, owner_id, status FROM venues WHERE id = ? AND deleted_at IS NULL",
+            [$venueId]
+        );
+
+        if (!$venue) {
+            $this->json(['error' => 'Venue not found'], 404);
+        }
+
+        if ($this->hasRole('venue_owner') && (int) $venue['owner_id'] !== (int) $this->user()['id']) {
+            $this->json(['error' => 'Access denied'], 403);
+        }
+
         $courts = $this->db->fetchAll(
-            "SELECT id, name, court_number FROM courts 
-             WHERE venue_id = ? AND deleted_at IS NULL AND status = 'active'
-             ORDER BY court_number ASC",
+            "SELECT id, name, court_number, price_per_hour, sport_id, status
+             FROM courts
+             WHERE venue_id = ? AND deleted_at IS NULL
+             ORDER BY court_number ASC, name ASC",
             [$venueId]
         );
 

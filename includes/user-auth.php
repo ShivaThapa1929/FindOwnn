@@ -86,6 +86,17 @@ function site_flash(string $key, ?string $message = null): ?string
     return $value;
 }
 
+/** Prevent browser/CDN caching of pages with live booking/payment data */
+function site_send_no_cache_headers(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+}
+
 function site_csrf_token(): string
 {
     if (empty($_SESSION['site_csrf'])) {

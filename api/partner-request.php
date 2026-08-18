@@ -26,6 +26,10 @@ try {
     require_once __DIR__ . '/../admin/app/Core/Config.php';
     require_once __DIR__ . '/../admin/app/Core/Logger.php';
     require_once __DIR__ . '/../admin/app/Core/Database.php';
+    require_once __DIR__ . '/../includes/site-mail.php';
+    require_once __DIR__ . '/../includes/site-contact.php';
+
+    \App\Core\Config::load(ROOT_PATH . '/.env');
 
     $db = \App\Core\Database::getInstance();
 
@@ -131,6 +135,27 @@ try {
             $comments
         ]
     );
+
+    $partnerBody = "New partner / playground listing request\r\n\r\n"
+        . "Owner: {$ownerName}\r\n"
+        . "Phone: {$cleanPhone}\r\n"
+        . "Playground: {$venueName}\r\n"
+        . "Location: {$area}, {$city}, {$state}\r\n"
+        . "Sports: {$sportsString}\r\n"
+        . "Map: " . ($mapAddress ?: '—') . "\r\n"
+        . "Comments: " . ($comments ?: '—') . "\r\n"
+        . "Request ID: {$requestId}";
+
+    $mailResult = site_contact_notify(
+        '[Findownn Partner] ' . $venueName,
+        $partnerBody,
+        null,
+        $ownerName
+    );
+
+    if (!$mailResult['success']) {
+        \App\Core\Logger::error('Partner request email failed: ' . ($mailResult['message'] ?? 'unknown'));
+    }
 
     http_response_code(201);
     echo json_encode([

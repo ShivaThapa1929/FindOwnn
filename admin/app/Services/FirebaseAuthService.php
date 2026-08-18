@@ -34,16 +34,7 @@ class FirebaseAuthService
     /** Preferred OTP channel: firebase | sms | auto */
     public static function otpMode(): string
     {
-        $mode = strtolower(trim((string) Config::get('OTP_PROVIDER', 'auto')));
-
-        if ($mode === 'firebase' && self::isConfigured()) {
-            return 'firebase';
-        }
-        if ($mode === 'sms') {
-            return 'sms';
-        }
-
-        return self::isConfigured() ? 'firebase' : 'sms';
+        return 'disabled';
     }
 
     /**

@@ -4,9 +4,71 @@
  */
 
 const FindownnAPI = {
+    /** In-memory GET cache — only for static-ish data (venues list, sports, cities) */
+    _memoryCache: {},
+    _memoryCacheTtlMs: 60000,
+
+    /** Endpoints that must always reflect live server state */
+    _dynamicPatterns: [
+        /\/bookings/i,
+        /\/availability/i,
+        /\/payments/i,
+        /\/user\/stats/i,
+        /\/user\/profile/i,
+    ],
+
+    _isDynamicEndpoint(endpoint) {
+        return this._dynamicPatterns.some((re) => re.test(endpoint));
+    },
+
+    _getMemoryCache(endpoint) {
+        if (this._isDynamicEndpoint(endpoint)) return null;
+        const entry = this._memoryCache[endpoint];
+        if (!entry || Date.now() - entry.ts > this._memoryCacheTtlMs) return null;
+        return entry.data;
+    },
+
+    _setMemoryCache(endpoint, data) {
+        if (this._isDynamicEndpoint(endpoint)) return;
+        this._memoryCache[endpoint] = { ts: Date.now(), data };
+    },
+
+    /**
+     * Clear cached booking/payment/availability data after mutations.
+     * Call after payment verify, booking create/cancel, etc.
+     */
+    invalidateBookingCache(bookingId = null) {
+        const patterns = ['/bookings', '/availability', '/payments', '/user/stats', '/user/profile'];
+
+        Object.keys(this._memoryCache).forEach((key) => {
+            if (patterns.some((p) => key.includes(p))) {
+                delete this._memoryCache[key];
+            }
+        });
+
+        try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (!key || !key.startsWith('findownn_api_')) continue;
+                const normalized = key.replace('findownn_api_', '').replace(/_/g, '/');
+                if (patterns.some((p) => normalized.includes(p.replace(/^\//, '')))) {
+                    localStorage.removeItem(key);
+                }
+            }
+        } catch (_) { /* ignore */ }
+
+        if (bookingId) {
+            const single = `/bookings/${bookingId}`;
+            delete this._memoryCache[single];
+            try {
+                localStorage.removeItem(this.cacheKey(single));
+            } catch (_) { /* ignore */ }
+        }
+    },
+
     /** Known public page path segments (for resolving API base URL) */
     _pageRoutes: [
-        '/venue-details', '/booking-payment', '/venues', '/sports',
+        '/venue-details', '/booking-payment', '/booking-success', '/venues', '/sports',
         '/partner', '/about', '/contact', '/home', '/login', '/register',
         '/dashboard', '/account', '/index.php', '/index'
     ],
@@ -25,7 +87,7 @@ const FindownnAPI = {
     baseURL: (() => {
         let path = window.location.pathname;
         const routes = [
-            '/venue-details', '/booking-payment', '/venues', '/sports',
+            '/venue-details', '/booking-payment', '/booking-success', '/venues', '/sports',
             '/partner', '/about', '/contact', '/home', '/login', '/register',
             '/dashboard', '/account', '/index.php', '/index'
         ];
@@ -63,13 +125,22 @@ const FindownnAPI = {
      * Generic API request handler
      */
     async request(endpoint, options = {}) {
+        const method = options.method || 'GET';
+
+        if (method === 'GET') {
+            const memoryHit = this._getMemoryCache(endpoint);
+            if (memoryHit) return memoryHit;
+        }
+
         const url = `${this.baseURL}${endpoint}`;
+        const isDynamicGet = method === 'GET' && this._isDynamicEndpoint(endpoint);
         const config = {
             method: options.method || 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers
-            }
+            },
+            cache: isDynamicGet ? 'no-store' : 'default',
         };
         
         // Add auth token if available
@@ -102,7 +173,8 @@ const FindownnAPI = {
                 throw err;
             }
 
-            if ((config.method || 'GET') === 'GET') {
+            if (method === 'GET' && !this._isDynamicEndpoint(endpoint)) {
+                this._setMemoryCache(endpoint, data);
                 this.setCached(endpoint, data);
             }
 
@@ -112,7 +184,7 @@ const FindownnAPI = {
                 || error.name === 'TypeError'
                 || error.message === 'Failed to fetch';
 
-            if (isOffline && (options.method || 'GET') === 'GET') {
+            if (isOffline && (options.method || 'GET') === 'GET' && !this._isDynamicEndpoint(endpoint)) {
                 const cached = this.getCached(endpoint);
                 if (cached) {
                     cached._fromCache = true;
@@ -232,8 +304,9 @@ const FindownnAPI = {
     /**
      * Get all sports
      */
-    async getSports() {
-        return await this.request('?resource=sports');
+    async getSports(params = {}) {
+        const query = new URLSearchParams({ resource: 'sports', ...params });
+        return await this.request(`?${query.toString()}`);
     },
     
     /**
@@ -265,10 +338,12 @@ const FindownnAPI = {
      * Create new booking
      */
     async createBooking(bookingData) {
-        return await this.request('/bookings', {
+        const result = await this.request('/bookings', {
             method: 'POST',
             body: bookingData
         });
+        this.invalidateBookingCache();
+        return result;
     },
     
     /**
@@ -290,9 +365,11 @@ const FindownnAPI = {
      * Cancel booking
      */
     async cancelBooking(bookingId) {
-        return await this.request(`/bookings/${bookingId}/cancel`, {
+        const result = await this.request(`/bookings/${bookingId}/cancel`, {
             method: 'POST'
         });
+        this.invalidateBookingCache(bookingId);
+        return result;
     },
     
     // ==================== AUTH ====================
@@ -397,17 +474,19 @@ const FindownnAPI = {
      * Initiate Razorpay payment for a booking
      */
     async initiatePayment(bookingId) {
-        return await this.request('/payments/initiate', {
+        const result = await this.request('/payments/initiate', {
             method: 'POST',
             body: { booking_id: bookingId }
         });
+        this.invalidateBookingCache(bookingId);
+        return result;
     },
 
     /**
      * Verify Razorpay payment after checkout
      */
     async verifyPayment({ booking_id, razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
-        return await this.request('/payments/verify', {
+        const result = await this.request('/payments/verify', {
             method: 'POST',
             body: {
                 booking_id,
@@ -416,6 +495,8 @@ const FindownnAPI = {
                 razorpay_signature
             }
         });
+        this.invalidateBookingCache(booking_id);
+        return result;
     },
     
     // ==================== CITIES ====================

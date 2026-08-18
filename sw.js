@@ -1,7 +1,7 @@
 /**
  * Findownn Service Worker — offline-safe static caching
  */
-const CACHE_NAME = 'findownn-v1';
+const CACHE_NAME = 'findownn-v2';
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -31,6 +31,21 @@ self.addEventListener('fetch', (event) => {
         || url.pathname.endsWith('/manifest.json');
 
     if (isStatic) {
+        const isJs = /\.js$/i.test(url.pathname);
+
+        // JS: network-first so API client updates deploy without stale SW cache
+        if (isJs) {
+            event.respondWith(
+                fetch(req).then((response) => {
+                    if (response.ok) {
+                        caches.open(CACHE_NAME).then((cache) => cache.put(req, response.clone()));
+                    }
+                    return response;
+                }).catch(() => caches.match(req))
+            );
+            return;
+        }
+
         event.respondWith(
             caches.open(CACHE_NAME).then(async (cache) => {
                 const cached = await cache.match(req);

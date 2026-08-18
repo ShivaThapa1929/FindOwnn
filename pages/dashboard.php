@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/user-auth.php';
+site_send_no_cache_headers();
 site_require_user();
 
 $user = site_user();
@@ -8,6 +9,10 @@ $venues = site_user_venues($user['id']);
 $bookingGroups = site_user_bookings_split($user['id']);
 $upcoming = $bookingGroups['upcoming'];
 $past = $bookingGroups['past'];
+
+if (!empty($_GET['paid'])) {
+    site_flash('success', 'Payment successful! Your latest booking is shown below.');
+}
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -38,6 +43,9 @@ include __DIR__ . '/../includes/header.php';
 
         <?php if ($success = site_flash('success')): ?>
             <div class="alert alert-success py-2 small mb-4"><i class="bi bi-check-circle me-1"></i><?= e($success) ?></div>
+        <?php endif; ?>
+        <?php if ($error = site_flash('error')): ?>
+            <div class="alert alert-danger py-2 small mb-4"><i class="bi bi-exclamation-circle me-1"></i><?= e($error) ?></div>
         <?php endif; ?>
 
         <div class="row g-4 mb-5 animate-on-scroll">
@@ -77,7 +85,14 @@ include __DIR__ . '/../includes/header.php';
                                     <div class="text-white fw-600"><?= e($b['venue_name']) ?></div>
                                     <div class="text-secondary small"><?= e($b['venue_city'] ?? '') ?></div>
                                 </div>
-                                <span class="badge bg-<?= e($badge) ?>"><?= e(ucfirst($b['status'])) ?></span>
+                                <div class="text-end">
+                                    <span class="badge bg-<?= e($badge) ?>"><?= e(ucfirst($b['status'])) ?></span>
+                                    <?php if (($b['payment_status'] ?? '') === 'paid'): ?>
+                                    <span class="badge bg-success ms-1">Paid</span>
+                                    <?php elseif (($b['payment_status'] ?? '') === 'pending'): ?>
+                                    <span class="badge bg-warning text-dark ms-1">Payment Pending</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="text-secondary small mb-1">
                                 <i class="bi bi-calendar3 me-1"></i><?= e(date('D, M j, Y', strtotime($b['booking_date']))) ?>
@@ -169,7 +184,12 @@ include __DIR__ . '/../includes/header.php';
                                         <?= e(substr($b['start_time'] ?? '', 0, 5)) ?> – <?= e(substr($b['end_time'] ?? '', 0, 5)) ?>
                                     </td>
                                     <td class="text-white">₹<?= number_format((int) ($b['amount'] ?? 0)) ?></td>
-                                    <td><span class="badge bg-<?= e($badge) ?>"><?= e(ucfirst($b['status'])) ?></span></td>
+                                    <td>
+                                        <span class="badge bg-<?= e($badge) ?>"><?= e(ucfirst($b['status'])) ?></span>
+                                        <?php if (($b['payment_status'] ?? '') === 'paid'): ?>
+                                        <span class="badge bg-success ms-1">Paid</span>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -194,4 +214,7 @@ include __DIR__ . '/../includes/header.php';
 })();
 </script>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php
+$invalidate_booking_cache = true;
+include __DIR__ . '/../includes/footer.php';
+?>

@@ -1,3 +1,17 @@
+<?php
+/**
+ * @var array       $venue   Venue record from CourtController::index()
+ * @var array       $courts  Courts for this venue
+ * @var array       $sports  Active sports for add-court form
+ * @var string|null $success Flash success message
+ * @var string|null $error   Flash error message
+ */
+$venue   = $venue ?? [];
+$courts  = $courts ?? [];
+$sports  = $sports ?? [];
+$success = $success ?? null;
+$error   = $error ?? null;
+?>
 <div class="mb-4">
   <div class="d-flex justify-content-between align-items-center">
     <div>
@@ -162,7 +176,7 @@
             
             <div class="col-md-6">
               <label class="form-label">Price per Hour (₹) *</label>
-              <input type="number" name="price_per_hour" class="form-control" min="1" step="50" required>
+              <input type="number" name="price_per_hour" class="form-control" min="1" step="1" required>
             </div>
             
             <div class="col-12">

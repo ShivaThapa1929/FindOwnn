@@ -36,7 +36,7 @@
         
         // Mark splash as shown for this session
         sessionStorage.setItem('splashShown', 'true');
-      }, 2500);
+      }, 900);
     });
   } else {
     // Splash already shown, remove it immediately if it exists
@@ -86,12 +86,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   const navbar = document.querySelector('#main-navbar');
 
+  let scrollTicking = false;
+
   const onScroll = () => {
-    const scrolled = window.scrollY;
-    const total = document.documentElement.scrollHeight - window.innerHeight;
-    if (total > 0) progressBar.style.width = `${(scrolled / total) * 100}%`;
-    if (navbar) navbar.classList.toggle('scrolled', scrolled > 60);
-    backToTop.classList.toggle('visible', scrolled > 420);
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      if (total > 0) progressBar.style.width = `${(scrolled / total) * 100}%`;
+      if (navbar) navbar.classList.toggle('scrolled', scrolled > 60);
+      backToTop.classList.toggle('visible', scrolled > 420);
+      scrollTicking = false;
+    });
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });

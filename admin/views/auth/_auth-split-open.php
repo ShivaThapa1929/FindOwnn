@@ -41,7 +41,7 @@ if ($authVariant !== '') {
         <ul class="auth-split-points">
           <li><i class="bi bi-check2"></i> Venues &amp; users</li>
           <li><i class="bi bi-check2"></i> Reports &amp; settings</li>
-          <li><i class="bi bi-check2"></i> SMS OTP &amp; subscriptions</li>
+          <li><i class="bi bi-check2"></i> Online bookings &amp; subscriptions</li>
         </ul>
       <?php endif; ?>
     </div>

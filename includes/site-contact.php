@@ -9,6 +9,15 @@ $site_contact_email    = 'findownn@gmail.com';
 $site_whatsapp_message = 'Hi Findownn! I need help with playground booking.';
 $site_whatsapp_url     = 'https://wa.me/' . $site_whatsapp_digits . '?text=' . rawurlencode($site_whatsapp_message);
 
+if (!function_exists('site_contact_email')) {
+    function site_contact_email(): string
+    {
+        global $site_contact_email;
+
+        return $site_contact_email ?? 'findownn@gmail.com';
+    }
+}
+
 if (!function_exists('e')) {
     function e(mixed $value): string
     {

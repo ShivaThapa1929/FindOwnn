@@ -47,7 +47,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // ==================== RENDER DYNAMIC VENUE DETAILS ====================
     function renderVenueDetails(venue) {
-        document.title = `${venue.name} - Findownn`;
+        const sportsLabel = Array.isArray(venue.sports) && venue.sports.length
+            ? venue.sports.map(s => (typeof s === 'string' ? s : s.name)).join(', ')
+            : 'Sports';
+        const city = venue.city || 'Bhuj';
+        const price = venue.price_per_hour ? `₹${Number(venue.price_per_hour).toLocaleString('en-IN')}/hr` : '';
+
+        document.title = `${venue.name} — Book Online | Findownn ${city}`;
+
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+            metaDesc.content = `Book ${venue.name} in ${city}. ${sportsLabel}${price ? ' from ' + price : ''}. Verified playground with live slots on Findownn.`;
+        }
+
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.content = document.title;
+
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.content = metaDesc?.content || '';
+
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) {
+            canonical.href = `${window.location.origin}${window.location.pathname}?id=${venue.id}`;
+        }
         
         // Venue Name
         const nameElement = document.getElementById('venue-name');

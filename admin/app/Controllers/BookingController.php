@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Config;
 use App\Core\Request;
 use App\Core\Session;
 use App\Models\Booking;
@@ -29,19 +30,23 @@ class BookingController extends Controller
             $where   = 'v.owner_id = ?';
             $params  = [$ownerId];
             if ($filter !== 'all') { $where .= ' AND b.status = ?'; $params[] = $filter; }
-            if ($search !== '')    { $where .= ' AND (u.name LIKE ? OR b.booking_reference LIKE ?)'; $params[] = "%{$search}%"; $params[] = "%{$search}%"; }
+            if ($search !== '')    { $where .= ' AND (u.name LIKE ? OR b.booking_reference LIKE ? OR v.name LIKE ?)'; $params[] = "%{$search}%"; $params[] = "%{$search}%"; $params[] = "%{$search}%"; }
 
             $total   = (int) $this->db->fetchColumn(
-                "SELECT COUNT(*) FROM bookings b JOIN venues v ON b.venue_id = v.id JOIN users u ON b.user_id = u.id WHERE {$where}", $params
+                "SELECT COUNT(*) FROM bookings b
+                 JOIN venues v ON b.venue_id = v.id
+                 LEFT JOIN users u ON b.user_id = u.id
+                 WHERE {$where}", $params
             );
             $perPage = 20;
             $offset  = ($page - 1) * $perPage;
             $pages   = (int) ceil($total / $perPage);
             $data    = $this->db->fetchAll(
-                "SELECT b.*, v.name AS venue_name, u.name AS user_name, u.email AS user_email, u.phone AS user_phone
+                "SELECT b.*, v.name AS venue_name,
+                        u.name AS user_name, u.email AS user_email, u.phone AS user_phone
                  FROM bookings b
                  JOIN venues v ON b.venue_id = v.id
-                 JOIN users u  ON b.user_id  = u.id
+                 LEFT JOIN users u ON b.user_id = u.id
                  WHERE {$where}
                  ORDER BY b.booking_date DESC, b.start_time DESC
                  LIMIT {$perPage} OFFSET {$offset}",
@@ -52,16 +57,15 @@ class BookingController extends Controller
             $result = $bookModel->getAllWithDetails($page, 20, $filter, $search);
         }
 
-        // My venues (for owner's create-booking dropdown)
+        // My venues (for owner's offline booking)
         $myVenues = [];
         if ($role === 'venue_owner') {
-            $myVenues = $this->db->fetchAll(
-                "SELECT id, name, price_per_hour FROM venues WHERE owner_id = ? AND status = 'active' AND deleted_at IS NULL",
-                [$this->user()['id']]
-            );
+            $myVenues = $this->ownerBookableVenues((int) $this->user()['id']);
         }
 
-        $stats = $bookModel->getStats();
+        $stats = $role === 'venue_owner'
+            ? $bookModel->getStatsForOwner((int) $this->user()['id'])
+            : $bookModel->getStats();
 
         $this->render('bookings.index', [
             'title'    => 'Bookings',
@@ -244,21 +248,11 @@ class BookingController extends Controller
         $role = $this->user()['role'];
         if (in_array($role, ['super_admin', 'admin'])) {
             $myVenues = $this->db->fetchAll(
-                "SELECT id, name, price_per_hour FROM venues
-                 WHERE status = 'active' AND deleted_at IS NULL ORDER BY name"
+                "SELECT id, name, price_per_hour, status, verification_status FROM venues
+                 WHERE deleted_at IS NULL AND status != 'suspended' ORDER BY name"
             );
         } else {
-            $ownerId  = $this->user()['id'];
-            $myVenues = $this->db->fetchAll(
-                "SELECT id, name, price_per_hour FROM venues
-                 WHERE owner_id = ? AND status = 'active' AND deleted_at IS NULL ORDER BY name",
-                [$ownerId]
-            );
-        }
-
-        if (empty($myVenues)) {
-            Session::flash('error', 'No active venues available to create bookings for.');
-            $this->redirect(url('/bookings'));
+            $myVenues = $this->ownerBookableVenues((int) $this->user()['id']);
         }
 
         $venueId   = $request->query('venue_id');
@@ -278,11 +272,25 @@ class BookingController extends Controller
         if (!isset($old['start_time']) && $startTime) $old['start_time'] = substr($startTime, 0, 5);
         if (!isset($old['end_time']) && $endTime)     $old['end_time'] = substr($endTime, 0, 5);
 
+        $venueCourts = [];
+        $selectedVenueId = (int) ($old['venue_id'] ?? 0);
+        if ($selectedVenueId > 0) {
+            $venueCourts = $this->db->fetchAll(
+                "SELECT id, name, court_number, price_per_hour, sport_id, status
+                 FROM courts
+                 WHERE venue_id = ? AND deleted_at IS NULL
+                 ORDER BY court_number ASC, name ASC",
+                [$selectedVenueId]
+            );
+        }
+
         $this->render('bookings.create-offline', [
-            'title'    => 'Add Offline Booking',
-            'myVenues' => $myVenues,
-            'old'      => $old,
-            'errors'   => $errors,
+            'title'       => 'Add Offline Booking',
+            'myVenues'    => $myVenues,
+            'venueCourts' => $venueCourts,
+            'noVenues'    => empty($myVenues),
+            'old'         => $old,
+            'errors'      => $errors,
         ]);
     }
 
@@ -294,15 +302,15 @@ class BookingController extends Controller
         $venueId  = (int) $request->input('venue_id', 0);
         $courtId  = (int) $request->input('court_id', 0);
 
-        // Confirm venue exists & active (filtered by owner if venue_owner)
+        // Confirm venue belongs to owner (active not required — owners record walk-ins at their venues)
         if (in_array($role, ['super_admin', 'admin'])) {
             $venue = $this->db->fetch(
-                "SELECT * FROM venues WHERE id = ? AND status = 'active' AND deleted_at IS NULL",
+                "SELECT * FROM venues WHERE id = ? AND deleted_at IS NULL AND status != 'suspended'",
                 [$venueId]
             );
         } else {
             $venue = $this->db->fetch(
-                "SELECT * FROM venues WHERE id = ? AND owner_id = ? AND status = 'active' AND deleted_at IS NULL",
+                "SELECT * FROM venues WHERE id = ? AND owner_id = ? AND deleted_at IS NULL AND status != 'suspended'",
                 [$venueId, $ownerId]
             );
         }
@@ -316,9 +324,12 @@ class BookingController extends Controller
             );
         }
 
+        $startTime = BookingSlotHelper::normalizeTime($request->input('start_time', ''));
+        $endTime   = BookingSlotHelper::normalizeTime($request->input('end_time', ''));
+
         $v = new ValidationService();
-        $v->custom($venue !== false && $venue !== null, 'venue_id', 'Invalid or inactive venue.')
-          ->custom(!empty($court), 'court_id', 'Invalid court for the selected venue.')
+        $v->custom($venue !== false && $venue !== null, 'venue_id', 'Invalid venue or you do not have access to it.')
+          ->custom(!empty($court), 'court_id', 'Please select a valid court for the selected venue.')
           ->required($request->input('booking_date'), 'booking_date', 'Booking date')
           ->date($request->input('booking_date', ''), 'booking_date', 'Booking date')
           ->custom(
@@ -326,20 +337,17 @@ class BookingController extends Controller
               strtotime($request->input('booking_date')) >= strtotime(date('Y-m-d')),
               'booking_date', 'Booking date cannot be in the past.'
           )
-          ->required($request->input('start_time'), 'start_time', 'Start time')
-          ->time($request->input('start_time', ''), 'start_time', 'Start time')
-          ->required($request->input('end_time'), 'end_time', 'End time')
-          ->time($request->input('end_time', ''), 'end_time', 'End time')
+          ->required($startTime, 'start_time', 'Start time')
+          ->time($startTime, 'start_time', 'Start time')
+          ->required($endTime, 'end_time', 'End time')
+          ->time($endTime, 'end_time', 'End time')
           ->required($request->input('customer_name'), 'customer_name', 'Customer name')
           ->minLength($request->input('customer_name', ''), 'customer_name', 2, 'Customer name');
 
-        // Validate times are on the hour (no minutes like 5:30)
-        $startTime = $request->input('start_time', '');
-        $endTime = $request->input('end_time', '');
         if ($startTime) {
             $startParts = explode(':', $startTime);
             $v->custom(
-                isset($startParts[1]) && $startParts[1] === '00',
+                isset($startParts[1]) && (int) $startParts[1] === 0,
                 'start_time',
                 'Start time must be on the hour (e.g., 5:00, 6:00). Half-hour bookings are not allowed.'
             );
@@ -347,15 +355,14 @@ class BookingController extends Controller
         if ($endTime) {
             $endParts = explode(':', $endTime);
             $v->custom(
-                isset($endParts[1]) && $endParts[1] === '00',
+                isset($endParts[1]) && (int) $endParts[1] === 0,
                 'end_time',
                 'End time must be on the hour (e.g., 6:00, 7:00). Half-hour bookings are not allowed.'
             );
         }
 
-        // Start < End check
-        $startTs = strtotime($request->input('booking_date') . ' ' . $request->input('start_time'));
-        $endTs   = strtotime($request->input('booking_date') . ' ' . $request->input('end_time'));
+        $startTs = strtotime($request->input('booking_date') . ' ' . $startTime);
+        $endTs   = strtotime($request->input('booking_date') . ' ' . $endTime);
         $v->custom($endTs > $startTs, 'end_time', 'End time must be after start time.');
 
         if ($v->fails()) {
@@ -365,95 +372,192 @@ class BookingController extends Controller
             $this->redirect(url('/bookings/offline/create'));
         }
 
-        // Conflict check — no overlapping confirmed/pending bookings for this court
-        $conflict = $this->db->fetchColumn(
-            "SELECT COUNT(*) FROM bookings
-             WHERE court_id = ?
-               AND booking_date = ?
-               AND status NOT IN ('cancelled')
-               AND start_time < ? AND end_time > ?",
-            [
-                $courtId,
-                $request->input('booking_date'),
-                $request->input('end_time') . ':00',
-                $request->input('start_time') . ':00',
-            ]
-        );
-
-        if ($conflict > 0) {
-            Session::flash('error', 'This court is already booked for this time slot. Please choose a different time or court.');
-            $_SESSION['old_input'] = $_POST;
-            $this->redirect(url('/bookings/offline/create'));
-        }
-
-        // Calculate hours and amount using COURT price (not venue price)
-        $hours  = round(($endTs - $startTs) / 3600, 2);
-        $amount = $court ? round($hours * (float)$court['price_per_hour'], 2) : 0;
-
-        // Custom amount override
-        $customAmount = $request->input('custom_amount', '');
-        if ($customAmount !== '' && is_numeric($customAmount)) {
-            $amount = round((float)$customAmount, 2);
-        }
-
-        // Find or create a guest user record for the customer
-        $custName  = trim($request->input('customer_name'));
-        $custPhone = trim($request->input('customer_phone', ''));
-        $custEmail = trim($request->input('customer_email', ''));
-
-        // Try to find existing user by phone or email
-        $userId = null;
-        if ($custEmail) {
-            $existing = $this->db->fetch("SELECT id FROM users WHERE email = ?", [$custEmail]);
-            $userId   = $existing ? $existing['id'] : null;
-        }
-        if (!$userId && $custPhone) {
-            $existing = $this->db->fetch("SELECT id FROM users WHERE phone = ?", [$custPhone]);
-            $userId   = $existing ? $existing['id'] : null;
-        }
-        // Create a walk-in user if not found
-        if (!$userId) {
-            $fakeEmail = $custPhone
-                ? 'walkin_' . preg_replace('/\D/', '', $custPhone) . '@offline.findownn'
-                : 'walkin_' . time() . '@offline.findownn';
-            $userId = $this->db->insert(
-                "INSERT INTO users (name, email, password, phone, whatsapp_number, whatsapp_opt_in, role, status, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, 1, 'player', 'active', NOW(), NOW())",
-                [$custName, $fakeEmail, password_hash(bin2hex(random_bytes(8)), PASSWORD_BCRYPT), $custPhone, $custPhone ?: null]
+        try {
+            $conflict = $this->db->fetchColumn(
+                "SELECT COUNT(*) FROM bookings
+                 WHERE court_id = ?
+                   AND booking_date = ?
+                   AND status NOT IN ('cancelled')
+                   AND start_time < ? AND end_time > ?",
+                [
+                    $courtId,
+                    $request->input('booking_date'),
+                    $endTime . ':00',
+                    $startTime . ':00',
+                ]
             );
-        }
 
-        $ref = 'OFL-' . strtoupper(substr(uniqid(), -7));
+            if ($conflict > 0) {
+                Session::flash('error', 'This court is already booked for this time slot. Please choose a different time or court.');
+                $_SESSION['old_input'] = $_POST;
+                $this->redirect(url('/bookings/offline/create'));
+            }
 
-        $bookingId = $this->db->insert(
-            "INSERT INTO bookings
-             (venue_id, court_id, user_id, booking_date, start_time, end_time, total_hours, amount,
-              status, payment_status, booking_reference, notes, created_at, updated_at)
-             VALUES (?,?,?,?,?,?,?,?,'confirmed',?,?,?,NOW(),NOW())",
-            [
+            $hours        = round(($endTs - $startTs) / 3600, 2);
+            $pricePerHour = (float) ($court['price_per_hour'] ?? 0);
+            $subtotal     = round($hours * $pricePerHour, 2);
+            $amount       = $subtotal;
+
+            $customAmount = $request->input('custom_amount', '');
+            if ($customAmount !== '' && is_numeric($customAmount)) {
+                $amount = round((float) $customAmount, 2);
+            }
+
+            $custName  = trim($request->input('customer_name'));
+            $custPhone = trim($request->input('customer_phone', ''));
+            $custEmail = trim($request->input('customer_email', ''));
+
+            $userId = $this->findOrCreateWalkInCustomer($custName, $custPhone, $custEmail);
+
+            $ref = 'OFL-' . strtoupper(substr(uniqid(), -7));
+
+            $bookingId = $this->insertOfflineBooking(
                 $venueId,
                 $courtId,
+                $court,
                 $userId,
                 $request->input('booking_date'),
-                $request->input('start_time') . ':00',
-                $request->input('end_time') . ':00',
+                $startTime,
+                $endTime,
                 $hours,
+                $pricePerHour,
+                $subtotal,
                 $amount,
                 $request->input('payment_status', 'pending'),
                 $ref,
-                '[OFFLINE] ' . trim($request->input('notes', '')),
-            ]
-        );
+                '[OFFLINE] ' . trim($request->input('notes', ''))
+            );
 
-        ActivityLog::record(
-            "Created booking {$ref} for {$custName}",
-            'booking', 'Booking', (int) $bookingId
-        );
-        AuditLog::log('OFFLINE_BOOKING_CREATED', 'Booking', (int) $bookingId, [],
-            ['venue_id' => $venueId, 'court_id' => $courtId, 'date' => $request->input('booking_date'), 'ref' => $ref]);
+            try {
+                ActivityLog::record(
+                    "Created booking {$ref} for {$custName}",
+                    'booking', 'Booking', (int) $bookingId
+                );
+                AuditLog::log('OFFLINE_BOOKING_CREATED', 'Booking', (int) $bookingId, [],
+                    ['venue_id' => $venueId, 'court_id' => $courtId, 'date' => $request->input('booking_date'), 'ref' => $ref]);
+            } catch (\Throwable $logError) {
+                error_log('[Findownn Offline Booking] Log failed: ' . $logError->getMessage());
+            }
 
-        Session::flash('success', "Offline booking {$ref} created successfully.");
-        $this->redirect(url('/bookings/' . $bookingId));
+            Session::flash('success', "Offline booking {$ref} created successfully.");
+            $this->redirect(url('/bookings/' . $bookingId));
+        } catch (\Throwable $e) {
+            error_log('[Findownn Offline Booking] ' . $e->getMessage());
+            $_SESSION['old_input'] = $_POST;
+            Session::flash(
+                'error',
+                Config::get('APP_DEBUG') === 'true'
+                    ? 'Could not create booking: ' . $e->getMessage()
+                    : 'Could not create booking. Please check court selection and try again.'
+            );
+            $this->redirect(url('/bookings/offline/create'));
+        }
+    }
+
+    /** Venues an owner can use for offline / walk-in bookings. */
+    private function ownerBookableVenues(int $ownerId): array
+    {
+        return $this->db->fetchAll(
+            "SELECT id, name, price_per_hour, status, verification_status
+             FROM venues
+             WHERE owner_id = ? AND deleted_at IS NULL AND status != 'suspended'
+             ORDER BY name",
+            [$ownerId]
+        );
+    }
+
+    /**
+     * Insert offline booking — tries full row first, falls back for older DB schemas.
+     */
+    private function insertOfflineBooking(
+        int $venueId,
+        int $courtId,
+        array $court,
+        int $userId,
+        string $bookingDate,
+        string $startTime,
+        string $endTime,
+        float $hours,
+        float $pricePerHour,
+        float $subtotal,
+        float $amount,
+        string $paymentStatus,
+        string $ref,
+        string $notes
+    ): int {
+        $sportId = (int) ($court['sport_id'] ?? 0) ?: null;
+
+        try {
+            return (int) $this->db->insert(
+                "INSERT INTO bookings
+                 (venue_id, court_id, sport_id, user_id, booking_date, start_time, end_time,
+                  total_hours, price_per_hour, subtotal, amount,
+                  status, payment_status, booking_reference, notes, created_at, updated_at)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,'confirmed',?,?,?,NOW(),NOW())",
+                [
+                    $venueId, $courtId, $sportId, $userId, $bookingDate,
+                    $startTime . ':00', $endTime . ':00',
+                    $hours, $pricePerHour, $subtotal, $amount,
+                    $paymentStatus, $ref, $notes,
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log('[Findownn Offline Booking] Extended insert failed, using fallback: ' . $e->getMessage());
+
+            return (int) $this->db->insert(
+                "INSERT INTO bookings
+                 (venue_id, court_id, user_id, booking_date, start_time, end_time, total_hours, amount,
+                  status, payment_status, booking_reference, notes, created_at, updated_at)
+                 VALUES (?,?,?,?,?,?,?,?,'confirmed',?,?,?,NOW(),NOW())",
+                [
+                    $venueId, $courtId, $userId, $bookingDate,
+                    $startTime . ':00', $endTime . ':00',
+                    $hours, $amount, $paymentStatus, $ref, $notes,
+                ]
+            );
+        }
+    }
+
+    /** Find existing player/walk-in or create a guest user for offline bookings. */
+    private function findOrCreateWalkInCustomer(string $name, string $phone, string $email): int
+    {
+        if ($email !== '') {
+            $existing = $this->db->fetch("SELECT id FROM users WHERE email = ? AND deleted_at IS NULL", [$email]);
+            if ($existing) {
+                return (int) $existing['id'];
+            }
+        }
+
+        if ($phone !== '') {
+            $digits = preg_replace('/\D/', '', $phone);
+            $existing = $this->db->fetch(
+                "SELECT id FROM users WHERE REPLACE(REPLACE(REPLACE(phone, '+', ''), ' ', ''), '-', '') = ? AND deleted_at IS NULL",
+                [$digits]
+            );
+            if ($existing) {
+                return (int) $existing['id'];
+            }
+        }
+
+        $walkInEmail = $phone !== ''
+            ? 'walkin_' . preg_replace('/\D/', '', $phone) . '@offline.findownn'
+            : 'walkin_' . time() . '_' . bin2hex(random_bytes(3)) . '@offline.findownn';
+
+        $password = password_hash(bin2hex(random_bytes(8)), PASSWORD_BCRYPT);
+
+        try {
+            return (int) $this->db->insert(
+                "INSERT INTO users (name, email, password, phone, whatsapp_number, whatsapp_opt_in, role, status, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, 1, 'player', 'active', NOW(), NOW())",
+                [$name, $walkInEmail, $password, $phone ?: null, $phone ?: null]
+            );
+        } catch (\Throwable $e) {
+            return (int) $this->db->insert(
+                "INSERT INTO users (name, email, password, phone, role, status, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, 'player', 'active', NOW(), NOW())",
+                [$name, $walkInEmail, $password, $phone ?: null]
+            );
+        }
     }
 
     // ── Admin / Owner: Update Status ──────────────────────────────

@@ -4,6 +4,9 @@
  */
 
 header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -86,7 +89,7 @@ try {
                  razorpay_signature = ?,
                  payment_method = ?,
                  gateway_txn_id = ?,
-                 status = 'success',
+                 status = 'paid',
                  paid_at = NOW(),
                  updated_at = NOW()
              WHERE razorpay_order_id = ?",
@@ -149,10 +152,17 @@ try {
             error_log("WhatsApp Error: " . $e->getMessage());
         }
         
-        // Return success response
+        // Return success response with latest booking state
         echo json_encode([
             'success' => true,
             'message' => 'Payment verified successfully',
+            'data' => [
+                'booking_id'        => $bookingId,
+                'booking_reference' => $booking['booking_reference'],
+                'payment_id'        => $paymentId,
+                'payment_status'    => 'paid',
+                'booking_status'    => $booking['status'] ?? 'confirmed',
+            ],
             'booking_reference' => $booking['booking_reference'],
             'payment_id' => $paymentId
         ]);

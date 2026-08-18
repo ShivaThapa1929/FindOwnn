@@ -11,7 +11,7 @@
     </div>
 
     <div class="container position-relative z-1">
-        <div class="row align-items-center min-vh-100">
+        <div class="row align-items-center hero-row min-vh-100 py-4 py-lg-0">
 
             <!-- Hero Content -->
             <div class="col-lg-6 text-center text-lg-start">
@@ -58,11 +58,16 @@
                 </div>
             </div>
 
-            <!-- iOS app mockup (full iPhone image — frame is in PNG) -->
+            <!-- App mockup — HTML screen inside phone frame -->
             <div class="col-lg-6 text-center mockup-wrapper hero-ios-showcase-wrap mt-4 mt-lg-0 animate-on-scroll delay-200">
-                <div class="hero-ios-showcase">
+                <div class="hero-phone-showcase">
                     <div class="hero-phone-glow" aria-hidden="true"></div>
-                    <?php include __DIR__ . '/../includes/app-screen-home.php'; ?>
+                    <div class="phone-frame hero-phone-frame">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen hero-phone-screen">
+                            <?php include __DIR__ . '/../includes/app-screen-home.php'; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -193,10 +198,8 @@
         </div>
 
         <div id="home-sports-container" class="home-sports-grid">
-            <!-- Loading skeleton -->
+            <!-- Loading skeleton (live sports: Box Cricket + Pickleball) -->
             <div class="home-sports-skeleton">
-                <div class="skeleton-sport-card"></div>
-                <div class="skeleton-sport-card"></div>
                 <div class="skeleton-sport-card"></div>
                 <div class="skeleton-sport-card"></div>
             </div>

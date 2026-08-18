@@ -13,17 +13,10 @@ class OtpController extends Controller
 {
     public function send(Request $request): void
     {
-        try {
-            $phone   = trim($request->input('phone', ''));
-            $purpose = trim($request->input('purpose', 'registration'));
-            $result  = (new OtpService())->send($phone, $purpose);
-        } catch (\Throwable $e) {
-            $result = [
-                'success' => false,
-                'message' => 'OTP service unavailable. Please try again later.',
-            ];
-            error_log('[Findownn OTP] ' . $e->getMessage());
-        }
+        $result = [
+            'success' => false,
+            'message' => 'Mobile OTP is temporarily unavailable.',
+        ];
 
         unset($result['dev_otp'], $result['debug']);
 
@@ -65,39 +58,10 @@ class OtpController extends Controller
     /** Verify OTP after Firebase Phone Auth (Google sends SMS). */
     public function firebaseVerify(Request $request): void
     {
-        $phone = trim($request->input('phone', ''));
-        try {
-            $idToken = trim($request->input('id_token', ''));
-            $purpose = trim($request->input('purpose', 'registration'));
-
-            if (!class_exists(FirebaseAuthService::class)) {
-                $result = ['success' => false, 'message' => 'Firebase OTP is not available on this server. Use SMS OTP instead.'];
-            } elseif (!FirebaseAuthService::isConfigured()) {
-                $result = ['success' => false, 'message' => 'Firebase OTP is not configured on the server.'];
-            } else {
-                $check = (new FirebaseAuthService())->verifyIdToken($idToken, $phone);
-                if (!$check['success']) {
-                    $result = ['success' => false, 'message' => $check['message'] ?? 'Verification failed.'];
-                } else {
-                    /** @var RecordsPhoneVerification $verification */
-                    $verification = new OtpService();
-                    $verified = $verification->recordExternalVerification(
-                        (string) $check['phone'],
-                        $purpose,
-                        'firebase'
-                    );
-                    Session::set('otp_verified_phone', $verified['phone']);
-                    Session::set('otp_verified_at', time());
-                    $result = [
-                        'success' => true,
-                        'message' => $verified['message'],
-                    ];
-                }
-            }
-        } catch (\Throwable $e) {
-            $result = ['success' => false, 'message' => 'OTP verification failed. Please try again.'];
-            error_log('[Findownn Firebase OTP] ' . $e->getMessage());
-        }
+        $result = [
+            'success' => false,
+            'message' => 'Mobile OTP verification is temporarily unavailable.',
+        ];
 
         if ($request->isAjax() || str_contains($request->header('Accept') ?? '', 'application/json')) {
             $this->json($result, $result['success'] ? 200 : 422);

@@ -72,6 +72,12 @@ $role     = auth()['role'] ?? '';
     <?php endforeach; ?>
   </div>
   <?php if ($role === 'venue_owner'): ?>
+  <?php if (empty($myVenues)): ?>
+  <div class="alert alert-warning py-2 small mb-0 me-2">
+    <i class="bi bi-info-circle me-1"></i>
+    Pehle <a href="<?= url('/venues/create') ?>" class="alert-link">venue add</a> karo, phir offline booking create kar sakte ho.
+  </div>
+  <?php endif; ?>
   <a href="<?= url('/bookings/offline/create') ?>" class="btn btn-sm btn-success">
     <i class="bi bi-plus-circle me-1"></i>Add Offline Booking
   </a>

@@ -23,21 +23,36 @@ class SportController extends ApiController
      */
     private static function index($query)
     {
+        // Single aggregated query — O(S) rows vs O(S×V) correlated subqueries
         $sql = "SELECT s.*,
-                (SELECT COUNT(DISTINCT v.id) FROM venues v
-                 JOIN venue_sports vs ON v.id = vs.venue_id
-                 WHERE vs.sport_id = s.id AND v.status = 'active' AND v.deleted_at IS NULL) as total_venues,
-                (SELECT COUNT(*) FROM courts c
-                 WHERE c.sport_id = s.id AND c.status = 'active' AND c.deleted_at IS NULL) as total_courts
+                COALESCE(vc.total_venues, 0) AS total_venues,
+                COALESCE(cc.total_courts, 0) AS total_courts
                 FROM sports s
+                LEFT JOIN (
+                    SELECT vs.sport_id, COUNT(DISTINCT v.id) AS total_venues
+                    FROM venue_sports vs
+                    INNER JOIN venues v ON v.id = vs.venue_id
+                        AND v.status = 'active' AND v.deleted_at IS NULL
+                    GROUP BY vs.sport_id
+                ) vc ON vc.sport_id = s.id
+                LEFT JOIN (
+                    SELECT sport_id, COUNT(*) AS total_courts
+                    FROM courts
+                    WHERE status = 'active' AND deleted_at IS NULL
+                    GROUP BY sport_id
+                ) cc ON cc.sport_id = s.id
                 WHERE s.is_active = 1";
-        
+
         if (!empty($query['featured'])) {
             $sql .= " AND s.is_featured = 1";
         }
-        
+
+        if (!empty($query['live'])) {
+            $sql .= " AND COALESCE(vc.total_venues, 0) > 0";
+        }
+
         $sql .= " ORDER BY s.sort_order ASC, s.name ASC";
-        
+
         $sports = self::$db->fetchAll($sql);
         
         return self::success([

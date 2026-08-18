@@ -46,7 +46,7 @@ DirectoryIndex index.php index.html
 
 # Enable GZIP compression
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml
 </IfModule>
 
 # Cache static files
@@ -59,12 +59,20 @@ DirectoryIndex index.php index.html
     ExpiresByType image/webp "access plus 1 year"
     ExpiresByType text/css "access plus 1 month"
     ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
 </IfModule>
 
-# Cache-Control for static assets
+# Cache-Control for static assets (never cache API JSON or dynamic pages)
 <IfModule mod_headers.c>
     <FilesMatch "\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff2?)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
     </FilesMatch>
+    # API responses must always be fresh
+    SetEnvIf Request_URI "/api/" IS_API_REQUEST
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0" env=IS_API_REQUEST
+    Header set Pragma "no-cache" env=IS_API_REQUEST
+    # User dashboard / booking pages — always revalidate
+    SetEnvIf Request_URI "(dashboard|booking-payment|booking-success)" NO_CACHE_PAGE
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0" env=NO_CACHE_PAGE
+    Header set Pragma "no-cache" env=NO_CACHE_PAGE
 </IfModule>

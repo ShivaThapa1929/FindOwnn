@@ -38,8 +38,8 @@ function site_seo_meta(string $routeName = 'index'): array
             'description' => 'View playground photos, courts, pricing, and available time slots. Book instantly on Findownn.',
         ],
         'sports' => [
-            'title'       => 'Sports & Activities — Findownn Bhuj',
-            'description' => 'Box Cricket, Pickleball, Football, Badminton and more — find playgrounds for every sport in Bhuj.',
+            'title'       => 'Live Sports — Box Cricket & Pickleball | Findownn Bhuj',
+            'description' => 'Book Box Cricket and Pickleball playgrounds in Bhuj. Live sports with verified venues and instant online booking.',
         ],
         'partner' => [
             'title'       => 'List Your Playground — Findownn Partner Program',
@@ -121,4 +121,32 @@ function site_json_ld_organization(string $assetBase): string
     ];
 
     return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
+
+function site_json_ld_website(string $assetBase): string
+{
+    $base = rtrim($assetBase, '/');
+    $origin = site_canonical_origin();
+
+    $data = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'WebSite',
+        'name'     => 'Findownn',
+        'url'      => $origin . $base . '/',
+        'potentialAction' => [
+            '@type'       => 'SearchAction',
+            'target'      => $origin . $base . '/venues?search={search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ],
+    ];
+
+    return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
+
+function site_canonical_origin(): string
+{
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    return rtrim($protocol . '://' . $host, '/');
 }

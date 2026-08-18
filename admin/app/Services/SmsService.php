@@ -17,21 +17,20 @@ class SmsService
         $this->provider = strtolower(trim((string) Config::get('SMS_PROVIDER', 'fast2sms')));
     }
 
+    /** SMS OTP temporarily disabled site-wide. */
     public function isConfigured(): bool
     {
-        return match ($this->provider) {
-            'smsalert', 'sms_alert' => trim((string) Config::get('SMSALERT_API_KEY', '')) !== ''
-                && trim((string) Config::get('SMSALERT_SENDER_ID', '')) !== '',
-            'fast2sms' => trim((string) Config::get('FAST2SMS_API_KEY', '')) !== '',
-            'twilio'   => $this->twilioCredentials()['ok'],
-            'msg91'    => trim((string) Config::get('MSG91_AUTH_KEY', '')) !== '',
-            default    => false,
-        };
+        return false;
     }
 
     /** @return array{success:bool,message:string,channel?:string} */
     public function sendOtp(string $phone, string $otp): array
     {
+        return [
+            'success' => false,
+            'message' => 'SMS OTP is temporarily unavailable.',
+        ];
+
         $digits = $this->digits10($phone);
         if (!preg_match('/^[6-9]\d{9}$/', $digits)) {
             return ['success' => false, 'message' => 'Enter a valid 10-digit Indian mobile number.'];

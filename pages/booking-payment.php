@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php
+    require_once __DIR__ . '/../includes/user-auth.php';
+    site_send_no_cache_headers();
+    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Payment - Findownn</title>
@@ -115,8 +119,8 @@
 </div>
 
 <!-- Payment JS -->
-<script src="<?= htmlspecialchars($asset_base ?? '/') ?>js/api.js"></script>
-<script src="<?= htmlspecialchars($asset_base ?? '/') ?>js/payment.js"></script>
+<script src="<?= htmlspecialchars($asset_base ?? '/') ?>js/api.js?v=1.4"></script>
+<script src="<?= htmlspecialchars($asset_base ?? '/') ?>js/payment.js?v=1.1"></script>
 
 <script>
 const bookingData = {

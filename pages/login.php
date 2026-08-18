@@ -86,12 +86,12 @@ include __DIR__ . '/../includes/header.php';
 
             <?php elseif ($selectedRole === 'venue_owner'): ?>
                 <h2 class="text-white h4 mb-1 text-center">Venue owner portal</h2>
-                <p class="text-secondary small text-center mb-4">Owners sign in on the dedicated dashboard. New owners need mobile OTP verification.</p>
+                <p class="text-secondary small text-center mb-4">Owners sign in on the dedicated dashboard to manage venues and bookings.</p>
                 <a href="<?= e($adminBase) ?>owner/login" class="btn btn-premium w-100 py-3">
                     <i class="bi bi-box-arrow-in-right me-2"></i>Continue to Owner Login
                 </a>
                 <p class="text-center text-secondary small mt-3 mb-0">
-                    New owner? <a href="<?= e($adminBase) ?>owner/register" class="text-success text-decoration-none fw-600">Register with OTP</a>
+                    New owner? <a href="<?= e($adminBase) ?>owner/register" class="text-success text-decoration-none fw-600">Create owner account</a>
                 </p>
 
             <?php else: ?>

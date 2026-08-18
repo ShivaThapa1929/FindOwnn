@@ -1,9 +1,9 @@
 # Findownn — Bug Fixes & Quality Report
 
-**Date:** August 17, 2026  
-**Project:** Findownn Website + Admin Dashboard  
-**Live URL:** https://blanchedalmond-echidna-926714.hostingersite.com  
-**GitHub:** https://github.com/ShivaThapa1929/FindOwnn  
+**Date:** August 17, 2026
+**Project:** Findownn Website + Admin Dashboard
+**Live URL:** https://blanchedalmond-echidna-926714.hostingersite.com
+**GitHub:** https://github.com/ShivaThapa1929/FindOwnn
 
 ---
 
@@ -161,9 +161,9 @@ api/v1/OpenWAController.php
 
 ## 8. Support contacts
 
-- **Email:** findownn@gmail.com  
-- **WhatsApp:** +91 95583 46768  
-- **Office:** Sanskar Nagar, Bhuj, Gujarat 370001  
+- **Email:** findownn@gmail.com
+- **WhatsApp:** +91 95583 46768
+- **Office:** New Station Road, Bhuj, Gujarat 370001
 
 ---
 

@@ -53,6 +53,7 @@ $canonical = site_canonical_url();
   <meta name="author" content="Findownn">
   <meta name="robots" content="<?= e($seo['robots']) ?>">
   <link rel="canonical" href="<?= e($canonical) ?>">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="<?= e(rtrim($asset_base, '/') . '/sitemap.xml') ?>">
   <meta property="og:type" content="<?= e($seo['og_type']) ?>">
   <meta property="og:site_name" content="Findownn">
   <meta property="og:title" content="<?= e($seo['title']) ?>">
@@ -64,6 +65,9 @@ $canonical = site_canonical_url();
   <meta name="twitter:description" content="<?= e($seo['description']) ?>">
   <meta name="theme-color" content="#080c09">
   <script type="application/ld+json"><?= site_json_ld_organization($asset_base) ?></script>
+  <?php if (($route_name ?? '') === 'index'): ?>
+  <script type="application/ld+json"><?= site_json_ld_website($asset_base) ?></script>
+  <?php endif; ?>
   <?php if (!$site_user): ?>
   <meta name="csrf-token" content="<?= e(site_csrf_token()) ?>">
   <?php endif; ?>
@@ -81,31 +85,37 @@ $canonical = site_canonical_url();
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- Preconnect -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <!-- Critical CSS (preload) -->
+  <link rel="preload" href="<?= $asset_base ?>css/style.css?v=4.6" as="style">
 
   <!-- Fonts (non-blocking) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 
   <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Bootstrap Icons (non-blocking) -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=4.5">
-  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=1.1">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=4.6">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=1.4">
   <?php if (($route_name ?? '') === 'index'): ?>
-  <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=4.3">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=4.8">
   <?php endif; ?>
 </head>
 <body class="splash-active">
 
   <!-- ============================================================
-       SPLASH SCREEN
+      SPLASH SCREEN
   ============================================================ -->
   <div id="splash-screen" aria-hidden="true">
     <div class="splash-logo">
@@ -117,14 +127,14 @@ $canonical = site_canonical_url();
   </div>
 
   <!-- ============================================================
-       NAVBAR
+      NAVBAR
   ============================================================ -->
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="main-navbar">
     <div class="container">
 
       <a class="navbar-brand" href="<?= $asset_base ?>">
         <div class="navbar-brand-logo" style="background:none;box-shadow:none;">
-          <img src="<?= $asset_base ?>assets/images/logo.png" alt="Findownn" style="width:32px;height:32px;object-fit:contain;border-radius:8px;">
+          <img src="<?= $asset_base ?>assets/images/logo.png" alt="Findownn" width="32" height="32" loading="eager" decoding="async" style="width:32px;height:32px;object-fit:contain;border-radius:8px;">
         </div>
         <span class="navbar-brand-text">FIND<span class="brand-accent">OWNN</span></span>
       </a>
