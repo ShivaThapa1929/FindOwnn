@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Core\Config;
+use App\Models\Setting;
 use PHPMailer\PHPMailer\Exception as MailException;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -11,20 +12,35 @@ use PHPMailer\PHPMailer\PHPMailer;
  */
 class MailService
 {
+    private static function getConfig(string $key, mixed $default = null): mixed
+    {
+        $val = Config::get($key);
+        if ($val !== null && $val !== '') {
+            return $val;
+        }
+        try {
+            $dbVal = Setting::getValue(strtolower($key));
+            if ($dbVal !== null && $dbVal !== '') {
+                return $dbVal;
+            }
+        } catch (\Throwable $e) {}
+        return $default;
+    }
+
     public function isSmtpConfigured(): bool
     {
-        $host = trim((string) Config::get('MAIL_HOST', ''));
-        $user = trim((string) Config::get('MAIL_USERNAME', ''))
-            ?: trim((string) Config::get('MAIL_FROM', ''));
-        $pass = trim((string) Config::get('MAIL_PASSWORD', ''));
+        $host = trim((string) self::getConfig('MAIL_HOST', ''));
+        $user = trim((string) self::getConfig('MAIL_USERNAME', ''))
+            ?: trim((string) self::getConfig('MAIL_FROM', ''));
+        $pass = trim((string) self::getConfig('MAIL_PASSWORD', ''));
 
         return $host !== '' && $user !== '' && $pass !== '';
     }
 
     private function smtpUsername(): string
     {
-        return trim((string) Config::get('MAIL_USERNAME', ''))
-            ?: trim((string) Config::get('MAIL_FROM', ''));
+        return trim((string) self::getConfig('MAIL_USERNAME', ''))
+            ?: trim((string) self::getConfig('MAIL_FROM', ''));
     }
 
     /**
@@ -55,14 +71,14 @@ class MailService
         $mail = new PHPMailer(true);
 
         $mail->isSMTP();
-        $mail->Host       = (string) Config::get('MAIL_HOST', 'smtp.gmail.com');
-        $mail->Port       = (int) Config::get('MAIL_PORT', 587);
+        $mail->Host       = (string) self::getConfig('MAIL_HOST', 'smtp.gmail.com');
+        $mail->Port       = (int) self::getConfig('MAIL_PORT', 587);
         $mail->SMTPAuth   = true;
         $mail->Username   = $this->smtpUsername();
-        $mail->Password   = (string) Config::get('MAIL_PASSWORD', '');
+        $mail->Password   = (string) self::getConfig('MAIL_PASSWORD', '');
         $mail->CharSet    = PHPMailer::CHARSET_UTF8;
 
-        $encryption = strtolower((string) Config::get('MAIL_ENCRYPTION', 'tls'));
+        $encryption = strtolower((string) self::getConfig('MAIL_ENCRYPTION', 'tls'));
         if ($encryption === 'ssl') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         } elseif ($encryption === 'tls') {
@@ -72,8 +88,8 @@ class MailService
             $mail->SMTPAutoTLS = false;
         }
 
-        $fromEmail = (string) Config::get('MAIL_FROM', Config::get('MAIL_USERNAME', ''));
-        $fromName  = (string) Config::get('MAIL_FROM_NAME', 'Findownn');
+        $fromEmail = (string) self::getConfig('MAIL_FROM', self::getConfig('MAIL_USERNAME', ''));
+        $fromName  = (string) self::getConfig('MAIL_FROM_NAME', 'Findownn');
         $mail->setFrom($fromEmail, $fromName);
         $mail->addAddress($to);
 
@@ -104,38 +120,30 @@ class MailService
         ];
     }
 
-    /** @param array{reply_to?:string,reply_name?:string} $options */
+    /** @param array{reply_to?:string,reply_name?:string,html?:string} $options */
     private function sendViaMailFunction(string $to, string $subject, string $bodyText, array $options): array
     {
-        $fromEmail = (string) Config::get('MAIL_FROM', 'findownn@gmail.com');
-        $fromName  = (string) Config::get('MAIL_FROM_NAME', 'Findownn');
+        $domain = $_SERVER['HTTP_HOST'] ?? 'findownn.com';
+        $domain = preg_replace('/:\d+$/', '', $domain);
+        $fromEmail = (string) self::getConfig('MAIL_FROM', "no-reply@{$domain}");
+        $fromName  = (string) self::getConfig('MAIL_FROM_NAME', 'Findownn');
+
+        $isHtml = !empty($options['html']);
+        $body   = $isHtml ? $options['html'] : $bodyText;
 
         $headers = [
             'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8',
+            'Content-Type: ' . ($isHtml ? 'text/html; charset=UTF-8' : 'text/plain; charset=UTF-8'),
             'From: ' . $this->encodeAddress($fromEmail, $fromName),
+            'Reply-To: support@' . $domain,
+            'X-Mailer: PHP/' . phpversion()
         ];
 
-        if (!empty($options['reply_to']) && filter_var($options['reply_to'], FILTER_VALIDATE_EMAIL)) {
-            $headers[] = 'Reply-To: ' . $this->encodeAddress(
-                $options['reply_to'],
-                $options['reply_name'] ?? ''
-            );
-        }
-
-        $ok = @mail($to, $this->encodeSubject($subject), $bodyText, implode("\r\n", $headers));
-
-        if (!$ok) {
-            return [
-                'success' => false,
-                'message' => 'Email could not be sent. Configure MAIL_HOST, MAIL_USERNAME, and MAIL_PASSWORD in admin/.env.',
-                'transport' => 'mail',
-            ];
-        }
+        $ok = @mail($to, $this->encodeSubject($subject), $body, implode("\r\n", $headers));
 
         return [
-            'success'   => true,
-            'message'   => 'Email sent via PHP mail().',
+            'success'   => (bool)$ok,
+            'message'   => $ok ? 'Email sent successfully via PHP mail().' : 'Failed to send email via PHP mail().',
             'transport' => 'mail',
         ];
     }

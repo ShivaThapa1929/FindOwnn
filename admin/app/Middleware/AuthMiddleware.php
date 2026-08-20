@@ -6,8 +6,8 @@ use App\Core\Request;
 use App\Core\Session;
 
 /**
- * AuthMiddleware — Ensures the user is logged in.
- * Redirects to login page if not authenticated.
+ * AuthMiddleware — Ensures the user is logged in and verified.
+ * Blocks unverified venue owners from accessing dashboard routes.
  */
 class AuthMiddleware
 {
@@ -17,6 +17,17 @@ class AuthMiddleware
             Session::flash('error', 'Please login to continue.');
             redirect(url('/owner/login'));
         }
+
+        $user = Session::get('user');
+
+        // Venue Owner Dashboard Protection: Block unverified venue owners
+        if (($user['role'] ?? '') === 'venue_owner') {
+            if (empty($user['email_verified_at']) || ($user['status'] ?? '') === 'pending_email_verification') {
+                Session::flash('error', 'Please verify your email address before accessing your Venue Owner Dashboard.');
+                redirect(url('/owner/verify-notice'));
+            }
+        }
+
         $next();
     }
 }

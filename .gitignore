@@ -33,3 +33,5 @@ Desktop.ini
 # Misc local
 cookies.txt
 _test_*.php
+admin/scratch/
+admin/composer.phar

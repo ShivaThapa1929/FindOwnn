@@ -162,12 +162,16 @@ class ApiController
     }
     
     /**
-     * Check if user is authenticated
+     * Check if user is authenticated and email verified
      */
     protected static function requireAuth()
     {
         if (!self::$user) {
             self::sendResponse(self::error('Authentication required', 401, 'AUTH_REQUIRED'));
+        }
+
+        if (self::$user['role'] === 'venue_owner' && (empty(self::$user['email_verified_at']) || self::$user['status'] === 'pending_email_verification')) {
+            self::sendResponse(self::error('Email verification required. Please verify your email address before accessing your dashboard.', 403, 'EMAIL_VERIFICATION_REQUIRED'));
         }
     }
 

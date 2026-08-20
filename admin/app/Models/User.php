@@ -114,11 +114,15 @@ class User extends Model
         );
     }
 
-    /** Players = registered app users + walk-in customers */
+    /** Players = registered app/website player accounts + walk-in customers (excludes admins and venue owners) */
     public function isPlayerRecord(array $user): bool
     {
-        return $user['role'] === 'player'
-            || str_contains($user['email'] ?? '', '@offline.findownn');
+        $nonPlayerRoles = ['super_admin', 'admin', 'sub_admin', 'venue_owner', 'owner', 'staff'];
+        $role = strtolower(trim((string)($user['role'] ?? '')));
+        if (str_contains($user['email'] ?? '', '@offline.findownn')) {
+            return true;
+        }
+        return !in_array($role, $nonPlayerRoles, true);
     }
 
     public function countPlayers(): int
@@ -126,13 +130,14 @@ class User extends Model
         return (int) $this->db->fetchColumn(
             "SELECT COUNT(*) FROM users
              WHERE deleted_at IS NULL
-               AND (role = 'player' OR email LIKE '%@offline.findownn')"
+               AND (role IN ('player', 'user', 'customer') OR role IS NULL OR role = '' OR email LIKE '%@offline.findownn')
+               AND (role NOT IN ('super_admin', 'admin', 'sub_admin', 'venue_owner', 'owner', 'staff') OR role IS NULL)"
         );
     }
 
     public function getPlayers(int $page = 1, int $perPage = 20, string $search = '', string $filter = 'all', ?int $ownerId = null): array
     {
-        $where  = "u.deleted_at IS NULL AND (u.role = 'player' OR u.email LIKE '%@offline.findownn')";
+        $where  = "u.deleted_at IS NULL AND (u.role IN ('player', 'user', 'customer') OR u.role IS NULL OR u.role = '' OR u.email LIKE '%@offline.findownn') AND (u.role NOT IN ('super_admin', 'admin', 'sub_admin', 'venue_owner', 'owner', 'staff') OR u.role IS NULL)";
         $params = [];
 
         if ($ownerId) {
@@ -155,7 +160,7 @@ class User extends Model
         } elseif ($filter === 'walkin') {
             $where .= " AND u.email LIKE '%@offline.findownn'";
         } elseif ($filter === 'registered') {
-            $where .= " AND u.role = 'player' AND u.email NOT LIKE '%@offline.findownn'";
+            $where .= " AND u.email NOT LIKE '%@offline.findownn'";
         }
 
         $total = (int) $this->db->fetchColumn(
@@ -180,9 +185,29 @@ class User extends Model
                     COUNT(DISTINCT b.id) AS total_bookings,
                     COALESCE(SUM(CASE WHEN b.payment_status = 'paid' THEN b.amount ELSE 0 END), 0) AS total_spent,
                     MAX(b.booking_date) AS last_booking_date,
-                    SUM(CASE WHEN b.status IN ('confirmed','pending') AND b.booking_date >= CURDATE() THEN 1 ELSE 0 END) AS upcoming_bookings
+                    SUM(CASE WHEN b.status IN ('confirmed','pending') AND b.booking_date >= CURDATE() THEN 1 ELSE 0 END) AS upcoming_bookings,
+                    lb.id AS latest_booking_id,
+                    COALESCE(lb.booking_reference, CONCAT('#BK-', lb.id)) AS latest_booking_number,
+                    lb.booking_date AS latest_booking_date_val,
+                    lb.start_time AS latest_start_time,
+                    lb.end_time AS latest_end_time,
+                    lb.amount AS latest_amount,
+                    lb.status AS latest_status,
+                    lv.name AS latest_venue_name,
+                    ls.name AS latest_sport_name
              FROM users u
              LEFT JOIN bookings b ON b.user_id = u.id{$bookingJoinExtra}
+             LEFT JOIN (
+                 SELECT b1.*
+                 FROM bookings b1
+                 INNER JOIN (
+                     SELECT user_id, MAX(id) AS max_id
+                     FROM bookings
+                     GROUP BY user_id
+                 ) b2 ON b1.id = b2.max_id
+             ) lb ON lb.user_id = u.id
+             LEFT JOIN venues lv ON lb.venue_id = lv.id
+             LEFT JOIN sports ls ON lb.sport_id = ls.id
              WHERE {$where}
              GROUP BY u.id
              ORDER BY last_booking_date DESC, u.created_at DESC

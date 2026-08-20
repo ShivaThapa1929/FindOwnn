@@ -11,7 +11,18 @@ $router->group(['middleware' => ['csrf']], function (Router $r) {
     $r->post('/otp/firebase-verify',  ['OtpController', 'firebaseVerify'])->name('otp.firebase.verify');
 });
 
+$router->get('/mail-test', ['AuthController', 'testMail']);
+
 // ── Guest routes ──────────────────────────────────────────────────
+$router->group(['middleware' => ['csrf']], function (Router $r) {
+    // Venue owner email verification routes (guest & authenticated)
+    $r->get('/owner/verify-email',        ['AuthController', 'verifyEmail'])->name('owner.verify.email');
+    $r->get('/owner/verify-notice',       ['AuthController', 'showVerifyNotice'])->name('owner.verify.notice');
+    $r->post('/owner/resend-verification', ['AuthController', 'resendVerification'])->name('owner.resend.verification');
+    $r->post('/owner/change-email',        ['AuthController', 'changeUnverifiedEmail'])->name('owner.change.email');
+    $r->post('/owner/direct-verify',       ['AuthController', 'directVerify'])->name('owner.direct.verify');
+});
+
 $router->group(['middleware' => ['guest', 'csrf']], function (Router $r) {
     // Venue owner portal
     $r->get('/owner/login',     ['AuthController', 'showOwnerLogin'])->name('owner.login');

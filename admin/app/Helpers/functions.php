@@ -145,6 +145,13 @@ if (!function_exists('csrf_field')) {
     }
 }
 
+if (!function_exists('site_csrf_field')) {
+    function site_csrf_field(): string
+    {
+        return csrf_field();
+    }
+}
+
 if (!function_exists('e')) {
     /** Escape HTML output */
     function e(mixed $value): string
