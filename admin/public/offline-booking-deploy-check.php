@@ -62,7 +62,7 @@ if ($indexView) {
     $src = (string) file_get_contents($indexView);
     $contentChecks[] = [
         'label' => 'bookings/index.php: venue warning before offline button',
-        'ok'    => str_contains($src, 'Pehle') && str_contains($src, '/bookings/offline/create'),
+        'ok'    => str_contains($src, 'add a venue') && str_contains($src, '/bookings/offline/create'),
         'fix'   => 'Re-upload admin/views/bookings/index.php',
     ];
 }

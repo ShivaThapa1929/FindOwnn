@@ -27,17 +27,17 @@ $pricePerHourJs = (float) (is_array($court) ? ($court['price_per_hour'] ?? 0) : 
 .slots-card { background: rgba(15,25,18,0.95) !important; border: 1px solid rgba(134,168,146,0.15); border-radius: 12px; margin-bottom: 1.5rem; }
 .slots-card .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(134,168,146,0.15); }
 .slots-card .card-header h3 { font-size: 1.1rem; font-weight: 600; color: #f0fdf4; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
-.slots-card .card-header h3 i { color: #22c55e; }
+.slots-card .card-header h3 i { color: #3887C6; }
 .slots-card .card-body { padding: 1.5rem; background: transparent !important; }
 .slot-filter-form .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end; }
 .form-group { margin-bottom: 0; }
 .form-group label { display: block; margin-bottom: 0.5rem; color: #d1e7d9; font-weight: 500; font-size: 0.875rem; }
 .form-control { width: 100%; padding: 0.65rem 1rem; background: #0d1510; border: 1px solid rgba(134,168,146,0.15); border-radius: 8px; color: #f0fdf4; font-size: 0.875rem; }
-.form-control:focus { outline: none; border-color: #22c55e; background: #0a0f0b; }
+.form-control:focus { outline: none; border-color: #3887C6; background: #E5EFFB; }
 .form-control option { background: #0d1510; color: #f0fdf4; }
 .btn { padding: 0.65rem 1.5rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; text-decoration: none; transition: all 0.3s; }
-.btn-primary { background: #22c55e; color: #0a0f0b; }
-.btn-primary:hover { background: #16a34a; }
+.btn-primary { background: #3887C6; color: #E5EFFB; }
+.btn-primary:hover { background: #2a6ba0; }
 .empty-state { text-align: center; padding: 4rem 2rem; }
 .empty-icon { font-size: 4rem; color: #86a892; margin-bottom: 1.5rem; }
 .empty-state h3 { color: #f0fdf4; font-size: 1.5rem; margin-bottom: 0.75rem; }
@@ -45,39 +45,39 @@ $pricePerHourJs = (float) (is_array($court) ? ($court['price_per_hour'] ?? 0) : 
 .stats-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
 .stat-card { background: rgba(15,25,18,0.95); border: 1px solid rgba(134,168,146,0.15); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
 .stat-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-.stat-icon.available-color { background: rgba(34,197,94,0.15); color: #22c55e; }
+.stat-icon.available-color { background: rgba(56,135,198,0.15); color: #3887C6; }
 .stat-icon.booked-color { background: rgba(239,68,68,0.15); color: #ef4444; }
 .stat-icon.occupancy-color { background: rgba(59,130,246,0.15); color: #3b82f6; }
 .stat-icon.revenue-color { background: rgba(245,158,11,0.15); color: #f59e0b; }
 .stat-value { font-size: 1.75rem; font-weight: 700; color: #f0fdf4; margin-bottom: 0.25rem; }
 .stat-label { font-size: 0.875rem; color: #a3c4af; font-weight: 500; }
-.venue-info-card { background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(16,185,129,0.05) 100%); border: 1px solid rgba(34,197,94,0.2); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+.venue-info-card { background: linear-gradient(135deg, rgba(56,135,198,0.1) 0%, rgba(56,135,198,0.05) 100%); border: 1px solid rgba(56,135,198,0.2); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
 .venue-info-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
 .venue-info-header h2 { color: #f0fdf4; font-size: 1.75rem; margin: 0 0 0.5rem 0; }
 .venue-location { color: #a3c4af; font-size: 1rem; margin: 0; }
-.venue-date { background: rgba(34,197,94,0.15); padding: 0.5rem 1rem; border-radius: 8px; color: #22c55e; font-weight: 600; }
-.court-info-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding-top: 1rem; border-top: 1px solid rgba(34,197,94,0.2); }
+.venue-date { background: rgba(56,135,198,0.15); padding: 0.5rem 1rem; border-radius: 8px; color: #3887C6; font-weight: 600; }
+.court-info-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding-top: 1rem; border-top: 1px solid rgba(56,135,198,0.2); }
 .court-detail { display: flex; align-items: center; gap: 0.5rem; color: #d1e7d9; font-size: 0.95rem; }
-.court-detail i { color: #22c55e; font-size: 1.1rem; }
+.court-detail i { color: #3887C6; font-size: 1.1rem; }
 .time-slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
 .time-slot { background: rgba(15,25,18,0.95); border: 2px solid; border-radius: 16px; padding: 1.5rem; transition: all 0.3s; position: relative; overflow: hidden; }
 .time-slot::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
-.time-slot.available::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.time-slot.available::before { background: linear-gradient(90deg, #3887C6, #5a9fd4); }
 .time-slot.booked::before { background: linear-gradient(90deg, #ef4444, #f87171); }
-.time-slot.available { border-color: rgba(34,197,94,0.4); cursor: pointer; }
-.time-slot.available:hover { border-color: #22c55e; background: rgba(34,197,94,0.08); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(34,197,94,0.2); }
+.time-slot.available { border-color: rgba(56,135,198,0.4); cursor: pointer; }
+.time-slot.available:hover { border-color: #3887C6; background: rgba(56,135,198,0.08); transform: translateY(-4px); box-shadow: 0 8px 16px rgba(56,135,198,0.2); }
 .time-slot.booked { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.03); cursor: not-allowed; }
 .slot-time { font-size: 1.25rem; font-weight: 700; color: #f0fdf4; margin-bottom: 1rem; letter-spacing: -0.02em; }
 .slot-status { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; }
-.available-badge { background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+.available-badge { background: rgba(56,135,198,0.2); color: #3887C6; border: 1px solid rgba(56,135,198,0.3); }
 .booked-badge { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-.slot-price { font-size: 1.75rem; font-weight: 700; color: #22c55e; margin: 1rem 0; letter-spacing: -0.02em; }
-.btn-book-slot { width: 100%; margin-top: 1rem; padding: 0.875rem 1rem; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.25)); border: 2px solid #22c55e; color: #22c55e; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.btn-book-slot:hover { background: linear-gradient(135deg, #22c55e, #16a34a); color: #0a0f0b; transform: scale(1.02); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+.slot-price { font-size: 1.75rem; font-weight: 700; color: #3887C6; margin: 1rem 0; letter-spacing: -0.02em; }
+.btn-book-slot { width: 100%; margin-top: 1rem; padding: 0.875rem 1rem; background: linear-gradient(135deg, rgba(56,135,198,0.15), rgba(56,135,198,0.25)); border: 2px solid #3887C6; color: #3887C6; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.btn-book-slot:hover { background: linear-gradient(135deg, #3887C6, #2a6ba0); color: #E5EFFB; transform: scale(1.02); box-shadow: 0 4px 12px rgba(56,135,198,0.4); }
 .btn-book-slot:active { transform: scale(0.98); }
 .booking-ref { font-size: 0.9rem; color: #3b82f6; font-weight: 600; margin-bottom: 0.5rem; font-family: 'Courier New', monospace; }
 .booking-user { font-size: 0.875rem; color: #d1e7d9; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
-.booking-amount { font-size: 1.1rem; color: #22c55e; font-weight: 700; margin-top: 0.75rem; }
+.booking-amount { font-size: 1.1rem; color: #3887C6; font-weight: 700; margin-top: 0.75rem; }
 .slot-info { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(134,168,146,0.2); }
 .slot-info small { display: block; margin-top: 0.5rem; font-size: 0.8rem; color: #86a892; font-style: italic; }
 .btn-slot-action { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.25)); border: 1px solid rgba(59,130,246,0.4); color: #3b82f6; padding: 0.625rem 1.25rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600; transition: all 0.3s; }
@@ -85,10 +85,10 @@ $pricePerHourJs = (float) (is_array($court) ? ($court['price_per_hour'] ?? 0) : 
 .time-slot.available.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.35); }
 .time-slot.merged-booked { grid-column: span 1; min-height: 160px; }
 .slot-duration-badge { display:inline-flex; align-items:center; gap:.35rem; margin-top:.5rem; padding:.35rem .65rem; border-radius:999px; background:rgba(59,130,246,.15); color:#93c5fd; font-size:.78rem; font-weight:700; }
-.selected-slot-bar { position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:1000; display:none; align-items:center; gap:12px; padding:14px 18px; background:#0f172a; border:1px solid rgba(34,197,94,.35); border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,.35); color:#f0fdf4; }
+.selected-slot-bar { position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:1000; display:none; align-items:center; gap:12px; padding:14px 18px; background:#0f172a; border:1px solid rgba(56,135,198,.35); border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,.35); color:#f0fdf4; }
 .selected-slot-bar.visible { display:flex; }
 .selected-slot-bar .summary { font-size:.92rem; font-weight:600; }
-.selected-slot-bar .btn-merge-book { background:#22c55e; color:#0a0f0b; border:none; border-radius:10px; padding:.65rem 1rem; font-weight:700; cursor:pointer; }
+.selected-slot-bar .btn-merge-book { background:#3887C6; color:#E5EFFB; border:none; border-radius:10px; padding:.65rem 1rem; font-weight:700; cursor:pointer; }
 @media (max-width: 768px) {
   .slot-filter-form .form-row { grid-template-columns: 1fr; }
   .stats-summary { grid-template-columns: 1fr; }

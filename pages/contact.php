@@ -152,7 +152,7 @@ include __DIR__ . '/../includes/header.php';
 <!-- Maps Section with Premium Dark Filter -->
 <section class="py-5 animate-on-scroll">
     <div class="container">
-        <div class="glass-card p-2 rounded-4 overflow-hidden position-relative" style="height: 400px; border-color: rgba(34, 197, 94, 0.15);">
+        <div class="glass-card p-2 rounded-4 overflow-hidden position-relative" style="height: 400px; border-color: rgba(56, 135, 198, 0.15);">
             <!-- Custom CSS Filter is applied inline to invert google map into dark theme -->
             <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58546.03606992523!2d69.62932265000002!3d23.2566782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39511e2f38d4f40f%3A0xe54d3725b74100fa!2sBhuj%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1718714000000!5m2!1sen!2sin" 

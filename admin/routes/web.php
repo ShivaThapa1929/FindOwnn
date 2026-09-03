@@ -18,6 +18,7 @@ $router->group(['middleware' => ['csrf']], function (Router $r) {
     // Venue owner email verification routes (guest & authenticated)
     $r->get('/owner/verify-email',        ['AuthController', 'verifyEmail'])->name('owner.verify.email');
     $r->get('/owner/verify-notice',       ['AuthController', 'showVerifyNotice'])->name('owner.verify.notice');
+    $r->get('/owner/verification-status', ['AuthController', 'checkVerificationStatus'])->name('owner.verification.status');
     $r->post('/owner/resend-verification', ['AuthController', 'resendVerification'])->name('owner.resend.verification');
     $r->post('/owner/change-email',        ['AuthController', 'changeUnverifiedEmail'])->name('owner.change.email');
     $r->post('/owner/direct-verify',       ['AuthController', 'directVerify'])->name('owner.direct.verify');

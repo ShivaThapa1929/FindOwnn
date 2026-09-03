@@ -42,7 +42,7 @@ $err    = fn(string $k) => isset($errors[$k])
           <label class="form-label-sm">Venue Type *</label>
           <select name="type" class="form-select <?= isset($errors['type']) ? 'is-invalid' : '' ?>" required>
             <option value="">— Select Type —</option>
-            <?php foreach (['box_cricket'=>'Box Cricket','pickleball'=>'Pickleball','football'=>'Football','badminton'=>'Badminton','tennis'=>'Tennis','other'=>'Other'] as $val=>$label): ?>
+            <?php foreach (['box_cricket'=>'Box Cricket','pickleball'=>'Pickleball'] as $val=>$label): ?>
             <option value="<?= $val ?>" <?= $old_v('type')===$val ? 'selected':'' ?>><?= $label ?></option>
             <?php endforeach; ?>
           </select>
@@ -120,6 +120,12 @@ $err    = fn(string $k) => isset($errors[$k])
           <small class="text-muted">Paste the share link from Google Maps</small>
         </div>
       </div>
+
+      <?php
+      $courts = $old['courts'] ?? [[]];
+      $mode = 'create';
+      include ROOT_PATH . '/views/venues/_courts_section.php';
+      ?>
 
       <!-- ── Submit ─────────────────────────────────────────────── -->
       <div class="d-flex gap-3 pt-2">

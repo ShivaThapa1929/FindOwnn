@@ -274,10 +274,10 @@ class AuthController extends ApiController
             width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 12px;
             font-size: 15px; background: #f8fafc;
         }
-        input:focus, textarea:focus { outline: 2px solid #bbf7d0; border-color: #22c55e; background: #fff; }
+        input:focus, textarea:focus { outline: 2px solid #E5EFFB; border-color: #3887C6; background: #fff; }
         button {
             width: 100%; margin-top: 18px; padding: 14px; border: 0; border-radius: 12px;
-            background: #22c55e; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+            background: #3887C6; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
         }
         button:hover { background: #16a34a; }
         .btn-danger { background: #ef4444; }

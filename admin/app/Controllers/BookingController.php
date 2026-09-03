@@ -27,10 +27,15 @@ class BookingController extends Controller
 
         if ($role === 'venue_owner') {
             $ownerId = $this->user()['id'];
-            $where   = 'v.owner_id = ?';
+            $where   = 'v.owner_id = ? AND v.deleted_at IS NULL';
             $params  = [$ownerId];
-            if ($filter !== 'all') { $where .= ' AND b.status = ?'; $params[] = $filter; }
-            if ($search !== '')    { $where .= ' AND (u.name LIKE ? OR b.booking_reference LIKE ? OR v.name LIKE ?)'; $params[] = "%{$search}%"; $params[] = "%{$search}%"; $params[] = "%{$search}%"; }
+            Booking::applyStatusFilter($filter, $where, $params);
+            if ($search !== '') {
+                $where .= ' AND (u.name LIKE ? OR b.booking_reference LIKE ? OR v.name LIKE ?)';
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+                $params[] = "%{$search}%";
+            }
 
             $total   = (int) $this->db->fetchColumn(
                 "SELECT COUNT(*) FROM bookings b
@@ -43,12 +48,16 @@ class BookingController extends Controller
             $pages   = (int) ceil($total / $perPage);
             $data    = $this->db->fetchAll(
                 "SELECT b.*, v.name AS venue_name,
+                        c.name AS court_name, c.court_number,
+                        s.name AS sport_name, s.slug AS sport_slug,
                         u.name AS user_name, u.email AS user_email, u.phone AS user_phone
                  FROM bookings b
                  JOIN venues v ON b.venue_id = v.id
+                 LEFT JOIN courts c ON b.court_id = c.id
+                 LEFT JOIN sports s ON b.sport_id = s.id
                  LEFT JOIN users u ON b.user_id = u.id
                  WHERE {$where}
-                 ORDER BY b.booking_date DESC, b.start_time DESC
+                 ORDER BY b.created_at DESC, b.booking_date DESC, b.start_time DESC
                  LIMIT {$perPage} OFFSET {$offset}",
                 $params
             );

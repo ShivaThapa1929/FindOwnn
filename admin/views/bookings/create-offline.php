@@ -17,7 +17,7 @@ $err    = fn(string $k) => isset($errors[$k])
 ?>
 
 <style>
-/* Dark Theme for Booking Form */
+/* Light theme form fields */
 #offlineBookingForm .form-select,
 #offlineBookingForm .form-control,
 #offlineBookingForm input[type="date"],
@@ -27,9 +27,9 @@ $err    = fn(string $k) => isset($errors[$k])
 #offlineBookingForm input[type="number"],
 #offlineBookingForm select,
 #offlineBookingForm textarea {
-    background: #0d1510 !important;
-    border: 1px solid rgba(134,168,146,0.3) !important;
-    color: #f0fdf4 !important;
+    background: #FFFFFF !important;
+    border: 1px solid rgba(56, 135, 198, 0.22) !important;
+    color: var(--text-primary) !important;
     border-radius: 8px;
 }
 
@@ -37,53 +37,52 @@ $err    = fn(string $k) => isset($errors[$k])
 #offlineBookingForm .form-control:focus,
 #offlineBookingForm input:focus,
 #offlineBookingForm select:focus {
-    background: #0a0f0b !important;
-    border-color: #22c55e !important;
-    box-shadow: 0 0 0 0.2rem rgba(34,197,94,0.15) !important;
-    color: #f0fdf4 !important;
+    background: #FFFFFF !important;
+    border-color: #3887C6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(56,135,198,0.12) !important;
+    color: var(--text-primary) !important;
 }
 
 #offlineBookingForm .form-select:disabled,
 #offlineBookingForm .form-control:disabled {
-    background: rgba(13,21,16,0.5) !important;
-    border-color: rgba(134,168,146,0.15) !important;
-    color: #6b8576 !important;
+    background: #E5EFFB !important;
+    border-color: rgba(56, 135, 198, 0.12) !important;
+    color: var(--text-muted) !important;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.75;
 }
 
 #offlineBookingForm option {
-    background: #0d1510;
-    color: #f0fdf4;
+    background: #FFFFFF;
+    color: var(--text-primary);
 }
 
 #offlineBookingForm .form-select option:disabled {
-    color: #6b8576;
+    color: var(--text-dim);
 }
 
 #offlineBookingForm .input-group-text {
-    background: #0d1510 !important;
-    border: 1px solid rgba(134,168,146,0.3) !important;
-    color: #a3c4af !important;
+    background: #E5EFFB !important;
+    border: 1px solid rgba(56, 135, 198, 0.22) !important;
+    color: var(--text-secondary) !important;
 }
 
-/* Date and Time Picker Improvements */
 #offlineBookingForm input[type="date"]::-webkit-calendar-picker-indicator,
 #offlineBookingForm input[type="time"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.8);
+    filter: none;
     cursor: pointer;
 }
 
 /* Summary Box Styling */
 .booking-summary-box {
-    background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(16,185,129,0.05));
-    border: 1px solid rgba(34,197,94,0.3);
+    background: linear-gradient(135deg, rgba(56,135,198,0.1), rgba(56,135,198,0.05));
+    border: 1px solid rgba(56,135,198,0.3);
     border-radius: 12px;
     padding: 20px;
 }
 
 .booking-summary-box .fw-700 {
-    color: #22c55e;
+    color: #3887C6;
 }
 
 .booking-summary-box .text-muted {
@@ -91,7 +90,7 @@ $err    = fn(string $k) => isset($errors[$k])
 }
 
 .booking-summary-box .text-success {
-    color: #22c55e !important;
+    color: #3887C6 !important;
 }
 
 /* Labels */
@@ -124,7 +123,7 @@ $err    = fn(string $k) => isset($errors[$k])
     <?php if ($noVenues): ?>
       <div class="alert alert-warning mb-4">
         <div class="fw-600 mb-1"><i class="bi bi-building me-1"></i>No venue found</div>
-        <p class="small mb-2">Offline booking ke liye pehle ek venue add karna hoga.</p>
+        <p class="small mb-2">You must add a venue first before creating an offline booking.</p>
         <a href="<?= url('/venues/create') ?>" class="btn btn-sm btn-success me-2">
           <i class="bi bi-plus-lg me-1"></i>Add Venue
         </a>
@@ -221,7 +220,7 @@ $err    = fn(string $k) => isset($errors[$k])
         </div>
         <div class="col-md-4">
           <label class="form-label-sm">Calculated Amount</label>
-          <div class="form-control" id="calcAmount" style="background:rgba(34,197,94,0.06);color:#4ade80;font-weight:700;">
+          <div class="form-control" id="calcAmount" style="background:rgba(56,135,198,0.06);color:#5a9fd4;font-weight:700;">
             ₹0
           </div>
         </div>

@@ -29,6 +29,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 Config::load(__DIR__ . '/../admin/.env');
 
+require_once __DIR__ . '/legal-content.php';
+
 function site_db(): Database
 {
     return Database::getInstance();
@@ -334,6 +336,9 @@ function site_auth_register(array $data): array
     }
     if ($password !== $confirm) {
         return ['ok' => false, 'error' => 'Passwords do not match.'];
+    }
+    if (!legal_terms_accepted($data)) {
+        return ['ok' => false, 'error' => 'You must agree to the Terms & Conditions and Privacy Policy.'];
     }
 
     $db = site_db();

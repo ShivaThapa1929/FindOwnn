@@ -30,7 +30,7 @@ include __DIR__ . '/../includes/header.php';
                 <a href="<?= e($asset_base) ?>venues" class="btn btn-premium btn-sm">
                     <i class="bi bi-calendar-plus me-1"></i>Book Court
                 </a>
-                <a href="<?= e($asset_base) ?>logout" class="btn btn-outline-light btn-sm">
+                <a href="<?= e($asset_base) ?>logout" class="btn btn-premium-outline btn-sm">
                     <i class="bi bi-box-arrow-right me-1"></i>Sign Out
                 </a>
             </div>
@@ -196,6 +196,20 @@ include __DIR__ . '/../includes/header.php';
                     </table>
                 </div>
             <?php endif; ?>
+        </div>
+
+        <!-- Legal -->
+        <div class="glass-card p-4 animate-on-scroll mt-4">
+            <h2 class="text-white fw-bold h6 mb-3"><i class="bi bi-shield-check text-success me-2"></i>Legal &amp; Privacy</h2>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="<?= e($asset_base) ?>privacy" class="btn btn-sm btn-premium-outline">
+                    <i class="bi bi-file-earmark-lock me-1"></i> Privacy Policy
+                </a>
+                <a href="<?= e($asset_base) ?>terms" class="btn btn-sm btn-premium-outline">
+                    <i class="bi bi-file-earmark-text me-1"></i> Terms &amp; Conditions
+                </a>
+            </div>
+            <p class="text-secondary small mb-0 mt-3">Last updated: <?= e(legal_last_updated()) ?></p>
         </div>
     </div>
 </section>

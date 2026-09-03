@@ -1,7 +1,7 @@
 /**
  * Findownn Service Worker — offline-safe static caching
  */
-const CACHE_NAME = 'findownn-v2';
+const CACHE_NAME = 'findownn-v8';
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -26,6 +26,12 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(req.url);
 
+    // Only handle same-origin assets — skip CDN/fonts (avoids preload/SW mismatch)
+    if (url.origin !== self.location.origin) return;
+
+    // Never cache API or admin routes
+    if (url.pathname.includes('/api/') || url.pathname.includes('/admin')) return;
+
     // Cache static assets (css, js, images, manifest)
     const isStatic = /\.(css|js|png|jpg|jpeg|webp|svg|ico|woff2?)$/i.test(url.pathname)
         || url.pathname.endsWith('/manifest.json');
@@ -38,7 +44,8 @@ self.addEventListener('fetch', (event) => {
             event.respondWith(
                 fetch(req).then((response) => {
                     if (response.ok) {
-                        caches.open(CACHE_NAME).then((cache) => cache.put(req, response.clone()));
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
                     }
                     return response;
                 }).catch(() => caches.match(req))
@@ -53,7 +60,9 @@ self.addEventListener('fetch', (event) => {
 
                 try {
                     const response = await fetch(req);
-                    if (response.ok) cache.put(req, response.clone());
+                    if (response.ok) {
+                        await cache.put(req, response.clone());
+                    }
                     return response;
                 } catch (_) {
                     return cached || Response.error();

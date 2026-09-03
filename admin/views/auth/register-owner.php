@@ -53,6 +53,12 @@ include __DIR__ . '/_auth-split-open.php';
           </div>
         </div>
 
+        <?php
+        $variant = 'admin';
+        $checkbox_id = 'owner-accept-terms';
+        include dirname(ROOT_PATH) . '/includes/partials/legal-agreement.php';
+        ?>
+
         <button type="submit" class="auth-btn auth-btn--owner w-100" id="registerSubmitBtn">
           <i class="bi bi-box-arrow-in-right me-2"></i>Create Owner Account
         </button>

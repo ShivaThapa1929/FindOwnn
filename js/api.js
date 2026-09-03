@@ -6,7 +6,7 @@
 const FindownnAPI = {
     /** In-memory GET cache — only for static-ish data (venues list, sports, cities) */
     _memoryCache: {},
-    _memoryCacheTtlMs: 60000,
+    _memoryCacheTtlMs: 15000,
 
     /** Endpoints that must always reflect live server state */
     _dynamicPatterns: [
@@ -15,6 +15,7 @@ const FindownnAPI = {
         /\/payments/i,
         /\/user\/stats/i,
         /\/user\/profile/i,
+        /venues/i,
     ],
 
     _isDynamicEndpoint(endpoint) {

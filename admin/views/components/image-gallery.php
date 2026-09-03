@@ -446,8 +446,8 @@ function deleteImage_<?= $type ?>(imageId) {
 }
 
 .image-card:hover {
-  border-color: rgba(34,197,94,0.4);
-  box-shadow: 0 4px 16px rgba(34,197,94,0.1);
+  border-color: rgba(56,135,198,0.4);
+  box-shadow: 0 4px 16px rgba(56,135,198,0.1);
   transform: translateY(-2px);
 }
 

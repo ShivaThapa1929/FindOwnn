@@ -1,0 +1,581 @@
+{
+  "info": {
+    "_postman_id": "findownn-api-v1-collection",
+    "name": "Findownn API v1",
+    "description": "Complete Findownn Mobile & Web API collection.\n\n**Setup:**\n1. Import this collection + environment (Local or Live)\n2. Select environment (top-right in Postman)\n3. Run **Auth → Login** — token auto-saves to `api_token`\n4. Protected requests use Bearer `{{api_token}}`\n\n**Base URL:** `{{base_url}}/api/v1`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{api_token}}", "type": "string" }]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.request.headers.upsert({ key: 'Accept', value: 'application/json' });",
+          "if (pm.request.method !== 'GET') {",
+          "  pm.request.headers.upsert({ key: 'Content-Type', value: 'application/json' });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/findownn_website" },
+    { "key": "api_token", "value": "" },
+    { "key": "venue_id", "value": "1" },
+    { "key": "court_id", "value": "1" },
+    { "key": "booking_id", "value": "1" },
+    { "key": "sport_id", "value": "1" },
+    { "key": "booking_date", "value": "2026-09-10" }
+  ],
+  "item": [
+    {
+      "name": "01 — Health & Utils",
+      "item": [
+        {
+          "name": "API Health / Index",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/v1/"
+          }
+        },
+        {
+          "name": "Ping",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/ping.php"
+          }
+        },
+        {
+          "name": "Mock API (dev)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/mock.php?resource=venues"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data && res.data.token) {",
+                  "  pm.environment.set('api_token', res.data.token);",
+                  "  pm.collectionVariables.set('api_token', res.data.token);",
+                  "  console.log('Token saved to api_token');",
+                  "}",
+                  "pm.test('Login successful', () => pm.expect(res.success).to.be.true);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/auth/login"
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Test User\",\n  \"email\": \"postman.test@findownn.com\",\n  \"phone\": \"9876543211\",\n  \"password\": \"TestPass@123\",\n  \"password_confirmation\": \"TestPass@123\",\n  \"whatsapp_opt_in\": 1\n}"
+            },
+            "url": "{{base_url}}/api/v1/auth/register"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{base_url}}/api/v1/auth/refresh"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{base_url}}/api/v1/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Sports",
+      "item": [
+        {
+          "name": "List Sports",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/sports?featured=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sports"],
+              "query": [{ "key": "featured", "value": "1" }, { "key": "live", "value": "1", "disabled": true }]
+            }
+          }
+        },
+        {
+          "name": "Get Sport by ID",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/sports/{{sport_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Venues",
+      "item": [
+        {
+          "name": "List Venues",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/venues?city=Bhuj&page=1&per_page=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "venues"],
+              "query": [
+                { "key": "city", "value": "Bhuj" },
+                { "key": "sport", "value": "box-cricket", "disabled": true },
+                { "key": "search", "value": "arena", "disabled": true },
+                { "key": "sort", "value": "rating", "disabled": true },
+                { "key": "page", "value": "1" },
+                { "key": "per_page", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Venue by ID",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/venues/{{venue_id}}"
+          }
+        },
+        {
+          "name": "Venue Images",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/venues/{{venue_id}}/images"
+          }
+        },
+        {
+          "name": "Venue Availability",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/venues/{{venue_id}}/availability?date={{booking_date}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "venues", "{{venue_id}}", "availability"],
+              "query": [{ "key": "date", "value": "{{booking_date}}" }]
+            }
+          }
+        },
+        {
+          "name": "Venue Reviews",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/venues/{{venue_id}}/reviews"
+          }
+        },
+        {
+          "name": "Venue WhatsApp Link",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/venues/{{venue_id}}/whatsapp"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Courts",
+      "item": [
+        {
+          "name": "List Courts",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/courts?venue_id={{venue_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "courts"],
+              "query": [
+                { "key": "venue_id", "value": "{{venue_id}}" },
+                { "key": "sport", "value": "box-cricket", "disabled": true },
+                { "key": "city", "value": "Bhuj", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Court by ID",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/courts/{{court_id}}"
+          }
+        },
+        {
+          "name": "Court Availability",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/courts/{{court_id}}/availability?date={{booking_date}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "courts", "{{court_id}}", "availability"],
+              "query": [{ "key": "date", "value": "{{booking_date}}" }]
+            }
+          }
+        },
+        {
+          "name": "Court Images",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/courts/{{court_id}}/images"
+          }
+        },
+        {
+          "name": "Court Reviews",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/courts/{{court_id}}/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 — Search & Location",
+      "item": [
+        {
+          "name": "Search (venues, courts, sports)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/search?q=box",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "search"],
+              "query": [{ "key": "q", "value": "box" }]
+            }
+          }
+        },
+        {
+          "name": "List Cities",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/cities"
+          }
+        },
+        {
+          "name": "List Cities (alias /location)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/location"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 — Bookings (Auth required)",
+      "item": [
+        {
+          "name": "List My Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/bookings?status=pending&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "bookings"],
+              "query": [
+                { "key": "status", "value": "pending" },
+                { "key": "from_date", "value": "2026-01-01", "disabled": true },
+                { "key": "to_date", "value": "2026-12-31", "disabled": true },
+                { "key": "page", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/bookings/{{booking_id}}"
+          }
+        },
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data && res.data.booking_id) {",
+                  "  pm.environment.set('booking_id', res.data.booking_id);",
+                  "  pm.collectionVariables.set('booking_id', res.data.booking_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"venue_id\": {{venue_id}},\n  \"court_id\": {{court_id}},\n  \"booking_date\": \"{{booking_date}}\",\n  \"start_time\": \"10:00\",\n  \"end_time\": \"11:00\",\n  \"notes\": \"Postman test booking\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/bookings"
+          }
+        },
+        {
+          "name": "Create Booking (multi-slot)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"venue_id\": {{venue_id}},\n  \"court_id\": {{court_id}},\n  \"booking_date\": \"{{booking_date}}\",\n  \"slots\": [\n    { \"start_time\": \"14:00\", \"end_time\": \"15:00\" },\n    { \"start_time\": \"15:00\", \"end_time\": \"16:00\" }\n  ],\n  \"notes\": \"Merged consecutive slots\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/bookings"
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{base_url}}/api/v1/bookings/{{booking_id}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — User Profile (Auth required)",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/user/profile"
+          }
+        },
+        {
+          "name": "Get Profile (root /user)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/user"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"9876543210\",\n  \"whatsapp_number\": \"9876543210\",\n  \"whatsapp_opt_in\": true\n}"
+            },
+            "url": "{{base_url}}/api/v1/user/profile"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"{{test_password}}\",\n  \"new_password\": \"NewTestPass@123\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/user/change-password"
+          }
+        },
+        {
+          "name": "User Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/user/stats"
+          }
+        },
+        {
+          "name": "User Bookings (alias)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/user/bookings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 — Payments (Auth required)",
+      "item": [
+        {
+          "name": "Initiate Payment (Razorpay order)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": {{booking_id}}\n}"
+            },
+            "url": "{{base_url}}/api/v1/payments/initiate"
+          }
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": {{booking_id}},\n  \"razorpay_order_id\": \"order_xxxxx\",\n  \"razorpay_payment_id\": \"pay_xxxxx\",\n  \"razorpay_signature\": \"signature_xxxxx\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/payments/verify"
+          }
+        },
+        {
+          "name": "Razorpay Webhook (no auth)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "X-Razorpay-Signature", "value": "webhook_signature_here" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment.captured\",\n  \"payload\": {\n    \"payment\": {\n      \"entity\": {\n        \"order_id\": \"order_xxxxx\"\n      }\n    }\n  }\n}"
+            },
+            "url": "{{base_url}}/api/v1/payments/webhook"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 — Reviews",
+      "item": [
+        {
+          "name": "List Reviews",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/reviews"
+          }
+        },
+        {
+          "name": "Create Review (Auth)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": {{booking_id}},\n  \"rating\": 5,\n  \"comment\": \"Great court!\"\n}"
+            },
+            "url": "{{base_url}}/api/v1/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 — Legacy / Website APIs",
+      "item": [
+        {
+          "name": "Create Razorpay Order (legacy)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": {{booking_id}},\n  \"user_id\": 12\n}"
+            },
+            "url": "{{base_url}}/api/payment/create-order.php"
+          }
+        },
+        {
+          "name": "Verify Payment (legacy)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razorpay_order_id\": \"order_xxxxx\",\n  \"razorpay_payment_id\": \"pay_xxxxx\",\n  \"razorpay_signature\": \"signature_xxxxx\",\n  \"booking_id\": {{booking_id}}\n}"
+            },
+            "url": "{{base_url}}/api/payment/verify.php"
+          }
+        },
+        {
+          "name": "Partner Request",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Owner\",\n  \"email\": \"owner.test@findownn.com\",\n  \"phone\": \"9876543210\",\n  \"venue_name\": \"Test Arena\",\n  \"city\": \"Bhuj\",\n  \"sport\": \"box_cricket\",\n  \"message\": \"Interested in listing my venue\"\n}"
+            },
+            "url": "{{base_url}}/api/partner-request.php"
+          }
+        },
+        {
+          "name": "Venue Search (legacy)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/venue-search.php?q=box&city=Bhuj",
+              "host": ["{{base_url}}"],
+              "path": ["api", "venue-search.php"],
+              "query": [{ "key": "q", "value": "box" }, { "key": "city", "value": "Bhuj" }]
+            }
+          }
+        },
+        {
+          "name": "Location Proxy (Nominatim)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/nominatim-proxy.php?q=Bhuj",
+              "host": ["{{base_url}}"],
+              "path": ["api", "nominatim-proxy.php"],
+              "query": [{ "key": "q", "value": "Bhuj" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

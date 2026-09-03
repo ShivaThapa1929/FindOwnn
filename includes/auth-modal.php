@@ -60,7 +60,7 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
               </p>
             </div>
 
-            <div id="authOwnerLoginNote" class="alert py-2 px-3 small d-none mb-3" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#bbf7d0;">
+            <div id="authOwnerLoginNote" class="alert py-2 px-3 small d-none mb-3" style="background:rgba(56,135,198,0.1);border:1px solid rgba(56,135,198,0.25);color:#E5EFFB;">
               Venue owners use a separate dashboard. Continue to owner login to manage your playgrounds.
             </div>
 
@@ -85,7 +85,8 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
               <span class="auth-btn-text"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</span>
               <span class="auth-btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Signing in…</span>
             </button>
-            <p class="text-center text-secondary small mt-3 mb-0">
+            <?php include __DIR__ . '/partials/legal-login-links.php'; ?>
+            <p class="text-center text-secondary small mt-2 mb-0">
               Venue owner?
               <a href="<?= e(rtrim($asset_base, '/')) ?>/admin/owner/login" class="text-success text-decoration-none fw-600">Owner dashboard</a>
             </p>
@@ -133,12 +134,18 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
               </div>
             </div>
 
-            <div class="form-check mb-4">
+            <div class="form-check mb-3">
               <input class="form-check-input" type="checkbox" name="whatsapp_opt_in" value="1" id="authWaOptIn">
               <label class="form-check-label text-secondary small" for="authWaOptIn">
                 Send booking reminders on WhatsApp
               </label>
             </div>
+
+            <?php
+            $variant = 'site';
+            $checkbox_id = 'auth-reg-terms';
+            include __DIR__ . '/partials/legal-agreement.php';
+            ?>
 
             <button type="submit" class="btn btn-premium w-100 py-3 auth-submit-btn">
               <span class="auth-btn-text"><i class="bi bi-person-plus me-2"></i>Create Account</span>
@@ -151,7 +158,9 @@ $prefill_auth_email = site_normalize_email($_GET['email'] ?? '');
           </form>
         </div>
 
-        <p class="auth-modal-footer-note text-center text-secondary mb-0">
+        <?php include __DIR__ . '/partials/legal-login-links.php'; ?>
+
+        <p class="auth-modal-footer-note text-center text-secondary mb-0 mt-2">
           Book a court?
           <a href="<?= e($asset_base) ?>" class="text-success text-decoration-none fw-600">Find playgrounds</a>
         </p>

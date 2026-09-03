@@ -60,9 +60,7 @@ $mockVenues = [
 
 $mockSports = [
     ['id' => 1, 'name' => 'Box Cricket', 'slug' => 'cricket'],
-    ['id' => 2, 'name' => 'Pickleball', 'slug' => 'pickleball'],
-    ['id' => 3, 'name' => 'Football', 'slug' => 'football'],
-    ['id' => 4, 'name' => 'Badminton', 'slug' => 'badminton']
+    ['id' => 2, 'name' => 'Pickleball', 'slug' => 'pickleball']
 ];
 
 // Parse request

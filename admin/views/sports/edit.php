@@ -4,7 +4,7 @@
     <a href="<?= url('/sports') ?>" class="text-muted text-decoration-none small">
         <i class="bi bi-arrow-left me-1"></i> Back to Sports
     </a>
-    <h4 class="fw-700 text-white mt-2 mb-0"><?= e($title) ?></h4>
+    <h4 class="fw-700 mt-2 mb-0"><?= e($title) ?></h4>
 </div>
 
 <?php if (!empty($error)): ?>
@@ -24,18 +24,18 @@
                     <label class="form-label text-muted small fw-500">Sport Name <span class="text-danger">*</span></label>
                     <input type="text" name="name" class="form-control form-control-lg"
                            value="<?= e($sport['name']) ?>" required autofocus
-                           style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:#fff;">
+                           style="background:#FFFFFF; border-color:rgba(56,135,198,0.2); color:#1a2332;">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-muted small fw-500">Slug <span class="text-danger">*</span></label>
                     <input type="text" name="slug" id="slug" class="form-control form-control-lg"
                            value="<?= e($sport['slug']) ?>"
-                           style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:#fff;">
+                           style="background:#FFFFFF; border-color:rgba(56,135,198,0.2); color:#1a2332;">
                 </div>
                 <div class="col-12">
                     <label class="form-label text-muted small fw-500">Description</label>
                     <textarea name="description" class="form-control" rows="3"
-                              style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:#fff; resize:none;"><?= e($sport['description'] ?? '') ?></textarea>
+                              style="background:#FFFFFF; border-color:rgba(56,135,198,0.2); color:#1a2332; resize:none;"><?= e($sport['description'] ?? '') ?></textarea>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-muted small fw-500">Bootstrap Icon Class</label>
@@ -45,21 +45,21 @@
                         </span>
                         <input type="text" name="icon" id="icon-input" class="form-control"
                                value="<?= e($sport['icon'] ?? 'bi-trophy') ?>"
-                               style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:#fff;">
+                               style="background:#FFFFFF; border-color:rgba(56,135,198,0.2); color:#1a2332;">
                     </div>
                     <small class="text-muted">See <a href="https://icons.getbootstrap.com" target="_blank" class="text-success">Bootstrap Icons</a></small>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label text-muted small fw-500">Brand Color</label>
                     <input type="color" name="color" class="form-control form-control-color w-100"
-                           value="<?= e($sport['color'] ?? '#22c55e') ?>"
+                           value="<?= e($sport['color'] ?? '#3887C6') ?>"
                            style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); height: 48px;">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label text-muted small fw-500">Sort Order</label>
                     <input type="number" name="sort_order" class="form-control"
                            value="<?= (int)($sport['sort_order'] ?? 99) ?>" min="1" max="999"
-                           style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:#fff;">
+                           style="background:#FFFFFF; border-color:rgba(56,135,198,0.2); color:#1a2332;">
                 </div>
                 <div class="col-md-6">
                     <div class="d-flex gap-4 mt-2">

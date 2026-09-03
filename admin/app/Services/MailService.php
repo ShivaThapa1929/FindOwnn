@@ -54,15 +54,21 @@ class MailService
             return ['success' => false, 'message' => 'Invalid recipient email.'];
         }
 
+        $smtpErr = null;
         if ($this->isSmtpConfigured()) {
             try {
                 return $this->sendViaSmtp($to, $subject, $bodyText, $options);
             } catch (\Throwable $e) {
+                $smtpErr = $e->getMessage();
                 error_log('[Findownn Mail SMTP] ' . $e->getMessage());
             }
         }
 
-        return $this->sendViaMailFunction($to, $subject, $bodyText, $options);
+        $res = $this->sendViaMailFunction($to, $subject, $bodyText, $options);
+        if ($smtpErr) {
+            $res['smtp_error'] = $smtpErr;
+        }
+        return $res;
     }
 
     /** @param array{reply_to?:string,reply_name?:string,html?:string} $options */
@@ -101,6 +107,7 @@ class MailService
         }
 
         $mail->Subject = $subject;
+        $mail->addCustomHeader('Auto-Submitted', 'auto-generated');
 
         if (!empty($options['html'])) {
             $mail->isHTML(true);
@@ -125,21 +132,38 @@ class MailService
     {
         $domain = $_SERVER['HTTP_HOST'] ?? 'findownn.com';
         $domain = preg_replace('/:\d+$/', '', $domain);
-        $fromEmail = (string) self::getConfig('MAIL_FROM', "no-reply@{$domain}");
+        if ($domain === 'localhost' || $domain === '127.0.0.1') {
+            $domain = 'findownn.com';
+        }
+
+        $configFrom = trim((string) self::getConfig('MAIL_FROM', ''));
+        if ($configFrom === '' || preg_match('/@(gmail|yahoo|hotmail|outlook)\.com$/i', $configFrom)) {
+            $fromEmail = "no-reply@{$domain}";
+        } else {
+            $fromEmail = $configFrom;
+        }
+
         $fromName  = (string) self::getConfig('MAIL_FROM_NAME', 'Findownn');
 
         $isHtml = !empty($options['html']);
         $body   = $isHtml ? $options['html'] : $bodyText;
+
+        $msgId = '<' . time() . '.' . bin2hex(random_bytes(8)) . '@' . $domain . '>';
 
         $headers = [
             'MIME-Version: 1.0',
             'Content-Type: ' . ($isHtml ? 'text/html; charset=UTF-8' : 'text/plain; charset=UTF-8'),
             'From: ' . $this->encodeAddress($fromEmail, $fromName),
             'Reply-To: support@' . $domain,
+            'Date: ' . date('r'),
+            'Message-ID: ' . $msgId,
+            'Auto-Submitted: auto-generated',
+            'X-Auto-Response-Suppress: All',
             'X-Mailer: PHP/' . phpversion()
         ];
 
-        $ok = @mail($to, $this->encodeSubject($subject), $body, implode("\r\n", $headers));
+        // Send via mail() with Return-Path (-f) for SPF compliance on Hostinger
+        $ok = @mail($to, $this->encodeSubject($subject), $body, implode("\r\n", $headers), "-f {$fromEmail}");
 
         return [
             'success'   => (bool)$ok,

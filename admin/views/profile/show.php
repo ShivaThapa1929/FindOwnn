@@ -26,7 +26,7 @@ $sub  = !empty($u['sub_status']) ? $u : null;
       <div class="panel-head"><h6 class="panel-title"><i class="bi bi-credit-card-fill me-2"></i>Subscription</h6></div>
       <div class="panel-body">
         <?php if (!empty($u['plan_name'])): ?>
-        <div class="d-flex align-items-center gap-2 p-2 rounded mb-3" style="background:rgba(34,197,94,0.08);">
+        <div class="d-flex align-items-center gap-2 p-2 rounded mb-3" style="background:rgba(56,135,198,0.08);">
           <i class="bi bi-patch-check-fill text-success fs-4"></i>
           <div>
             <div class="fw-700 text-success"><?= e($u['plan_name']) ?></div>
@@ -135,6 +135,23 @@ $sub  = !empty($u['sub_status']) ? $u : null;
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Legal -->
+    <div class="panel">
+      <div class="panel-head"><h6 class="panel-title"><i class="bi bi-shield-check me-2"></i>Legal &amp; Privacy</h6></div>
+      <div class="panel-body">
+        <p class="text-muted small mb-3">Review how Findownn handles your data and platform usage.</p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="<?= e(legal_privacy_url()) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-file-earmark-lock me-1"></i> Privacy Policy
+          </a>
+          <a href="<?= e(legal_terms_url()) ?>" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-file-earmark-text me-1"></i> Terms &amp; Conditions
+          </a>
+        </div>
+        <p class="text-muted small mb-0 mt-3">Last updated: <?= e(legal_last_updated()) ?></p>
       </div>
     </div>
   </div>

@@ -13,7 +13,7 @@ class ImageController extends Controller
     {
         parent::__construct();
         $this->uploadsPath = __DIR__ . '/../../public/uploads';
-        
+
         // Create upload directories if they don't exist
         if (!is_dir($this->uploadsPath)) {
             mkdir($this->uploadsPath, 0755, true);
@@ -36,13 +36,13 @@ class ImageController extends Controller
         // Enable error reporting for debugging
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        
+
         $this->log('info', 'Venue image upload started', [
             'post' => $_POST,
             'files' => array_keys($_FILES),
             'user' => $this->user()['id'] ?? 'none'
         ]);
-        
+
         try {
             $venueId = $request->input('venue_id');
             $imageType = $request->input('image_type', 'gallery'); // featured or gallery
@@ -76,7 +76,7 @@ class ImageController extends Controller
                 'size' => $file['size'],
                 'error' => $file['error']
             ]);
-            
+
             $uploadResult = $this->uploadImage($file, 'venues');
 
             if (!$uploadResult['success']) {
@@ -92,7 +92,7 @@ class ImageController extends Controller
                  VALUES (?, ?, ?, ?, NOW(), NOW())",
                 [$venueId, $uploadResult['path'], $imageType, $caption]
             );
-            
+
             $this->log('info', 'Image uploaded successfully', ['image_id' => $imageId]);
 
             $this->json([
@@ -205,13 +205,13 @@ class ImageController extends Controller
         // Enable error reporting for debugging
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        
+
         $this->log('info', 'Court image upload started', [
             'post' => $_POST,
             'files' => array_keys($_FILES),
             'user' => $this->user()['id'] ?? 'none'
         ]);
-        
+
         try {
             $courtId = $request->input('court_id');
             $imageType = $request->input('image_type', 'gallery'); // featured or gallery
@@ -227,7 +227,7 @@ class ImageController extends Controller
                 $court = $this->db->fetch(
                     "SELECT c.*, v.owner_id FROM courts c 
                      JOIN venues v ON c.venue_id = v.id 
-                     WHERE c.id = ?", 
+                     WHERE c.id = ?",
                     [$courtId]
                 );
                 if (!$court || $court['owner_id'] != $this->user()['id']) {
@@ -250,7 +250,7 @@ class ImageController extends Controller
                 'size' => $file['size'],
                 'error' => $file['error']
             ]);
-            
+
             $uploadResult = $this->uploadImage($file, 'courts');
 
             if (!$uploadResult['success']) {
@@ -266,7 +266,7 @@ class ImageController extends Controller
                  VALUES (?, ?, ?, ?, NOW(), NOW())",
                 [$courtId, $uploadResult['path'], $imageType, $caption]
             );
-            
+
             $this->log('info', 'Court image uploaded successfully', ['image_id' => $imageId]);
 
             $this->json([
@@ -302,7 +302,7 @@ class ImageController extends Controller
                 "SELECT ci.*, v.owner_id FROM court_images ci 
                  JOIN courts c ON ci.court_id = c.id
                  JOIN venues v ON c.venue_id = v.id 
-                 WHERE ci.id = ?", 
+                 WHERE ci.id = ?",
                 [$imageId]
             );
 
@@ -349,7 +349,7 @@ class ImageController extends Controller
                 "SELECT ci.*, v.owner_id FROM court_images ci 
                  JOIN courts c ON ci.court_id = c.id
                  JOIN venues v ON c.venue_id = v.id 
-                 WHERE ci.id = ?", 
+                 WHERE ci.id = ?",
                 [$imageId]
             );
 
@@ -436,9 +436,10 @@ class ImageController extends Controller
 
         try {
             $sizes = @\getimagesize($path);
-            if (!$sizes) return;
+            if (!$sizes)
+                return;
             list($width, $height) = $sizes;
-            
+
             // Skip if already small enough
             if ($width <= 1920 && $height <= 1920) {
                 return;
@@ -477,11 +478,12 @@ class ImageController extends Controller
                     return;
             }
 
-            if (!$source) return;
+            if (!$source)
+                return;
 
             // Create resized image
             $thumb = \imagecreatetruecolor($newWidth, $newHeight);
-            
+
             // Preserve transparency for PNG
             if ($mimeType === 'image/png') {
                 \imagealphablending($thumb, false);
@@ -494,13 +496,16 @@ class ImageController extends Controller
             switch ($mimeType) {
                 case 'image/jpeg':
                 case 'image/jpg':
-                    if (function_exists('imagejpeg')) \imagejpeg($thumb, $path, 85);
+                    if (function_exists('imagejpeg'))
+                        \imagejpeg($thumb, $path, 85);
                     break;
                 case 'image/png':
-                    if (function_exists('imagepng')) \imagepng($thumb, $path, 8);
+                    if (function_exists('imagepng'))
+                        \imagepng($thumb, $path, 8);
                     break;
                 case 'image/webp':
-                    if (function_exists('imagewebp')) \imagewebp($thumb, $path, 85);
+                    if (function_exists('imagewebp'))
+                        \imagewebp($thumb, $path, 85);
                     break;
             }
 
@@ -521,11 +526,11 @@ class ImageController extends Controller
         // Simple logging implementation
         $logFile = __DIR__ . '/../../storage/logs/' . date('Y-m-d') . '.log';
         $logDir = dirname($logFile);
-        
+
         if (!is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
-        
+
         $logMessage = sprintf(
             "[%s] %s: %s %s\n",
             date('Y-m-d H:i:s'),
@@ -533,7 +538,7 @@ class ImageController extends Controller
             $message,
             !empty($context) ? json_encode($context) : ''
         );
-        
+
         file_put_contents($logFile, $logMessage, FILE_APPEND);
     }
 }

@@ -58,7 +58,7 @@ $plans    = $plans ?? [];
 <!-- Starter plan confirmation for venue owners -->
 <div class="modal fade" id="freePlanModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="background:#0f1612;border:1px solid rgba(34,197,94,0.25);">
+    <div class="modal-content" style="background:#0f1612;border:1px solid rgba(56,135,198,0.25);">
       <div class="modal-header border-secondary border-opacity-25">
         <h6 class="modal-title text-success"><i class="bi bi-gift me-2"></i>Continue with Starter Plan?</h6>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -66,7 +66,7 @@ $plans    = $plans ?? [];
       <div class="modal-body">
         <p class="small text-muted mb-3">This venue owner will start on the <strong class="text-white">Starter Plan (₹0/month, 5% platform fee)</strong> automatically so they can log in right away.</p>
         <?php if ($freePlan): ?>
-        <div class="p-3 rounded" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.15);">
+        <div class="p-3 rounded" style="background:rgba(56,135,198,0.08);border:1px solid rgba(56,135,198,0.15);">
           <div class="fw-700"><?= e($freePlan['name']) ?> — ₹0/month</div>
           <?php if (!empty($freePlan['platform_fee_percent'])): ?>
           <div class="small text-success mt-1">Platform fee: <?= e(rtrim(rtrim(number_format((float) $freePlan['platform_fee_percent'], 2), '0'), '.')) ?>% per booking</div>

@@ -79,7 +79,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     gap: 2rem !important;
     margin-bottom: 1.5rem !important;
     padding-bottom: 1.2rem !important;
-    border-bottom: 4px solid #22c55e !important;
+    border-bottom: 4px solid #3887C6 !important;
     position: relative !important;
   }
   
@@ -92,17 +92,17 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     right: 0 !important;
     width: 120px !important;
     height: 4px !important;
-    background: linear-gradient(90deg, #22c55e, #10b981) !important;
+    background: linear-gradient(90deg, #3887C6, #10b981) !important;
   }
   
   .company-info h2 {
     font-size: 2.5rem !important;
     font-weight: 900 !important;
     margin: 0 !important;
-    color: #0a0f0b !important;
+    color: #E5EFFB !important;
     letter-spacing: -0.5px !important;
     line-height: 1 !important;
-    background: linear-gradient(135deg, #0a0f0b 0%, #1a1a1a 100%) !important;
+    background: linear-gradient(135deg, #E5EFFB 0%, #1a1a1a 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
@@ -111,7 +111,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   .company-tagline {
     font-size: 0.9rem !important;
     margin: 0.4rem 0 0.5rem 0 !important;
-    color: #22c55e !important;
+    color: #3887C6 !important;
     font-weight: 600 !important;
     letter-spacing: 0.3px !important;
   }
@@ -124,7 +124,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
   
   .company-contact a {
-    color: #22c55e !important;
+    color: #3887C6 !important;
     text-decoration: none !important;
   }
   
@@ -140,7 +140,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     font-size: 2rem !important;
     font-weight: 900 !important;
     margin-bottom: 0.6rem !important;
-    color: #0a0f0b !important;
+    color: #E5EFFB !important;
     letter-spacing: 3px !important;
   }
   
@@ -149,11 +149,11 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     font-weight: 700 !important;
     padding: 0.6rem 1.2rem !important;
     margin-bottom: 0.5rem !important;
-    border: 2px solid #22c55e !important;
+    border: 2px solid #3887C6 !important;
     border-radius: 8px !important;
     display: inline-block !important;
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
-    color: #16a34a !important;
+    color: #2a6ba0 !important;
     font-family: 'Courier New', monospace !important;
     letter-spacing: 0.5px !important;
   }
@@ -183,7 +183,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   
   .status-badge.success {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
-    border-color: #22c55e !important;
+    border-color: #3887C6 !important;
   }
   
   .status-badge.info {
@@ -233,8 +233,8 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     letter-spacing: 1.2px !important;
     margin: 0 0 0.7rem 0 !important;
     padding-bottom: 0.5rem !important;
-    border-bottom: 3px solid #22c55e !important;
-    color: #0a0f0b !important;
+    border-bottom: 3px solid #3887C6 !important;
+    color: #E5EFFB !important;
   }
   
   .info-block p {
@@ -251,7 +251,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
   
   .info-block p i {
-    color: #22c55e !important;
+    color: #3887C6 !important;
     margin-right: 0.4rem !important;
     font-size: 0.85rem !important;
   }
@@ -336,7 +336,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   /* TOTAL - Eye-catching */
   .pricing-total {
     background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
-    border-top: 4px solid #22c55e !important;
+    border-top: 4px solid #3887C6 !important;
     padding: 1.2rem 1.2rem !important;
     position: relative !important;
   }
@@ -357,7 +357,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     font-weight: 900 !important;
     text-transform: uppercase !important;
     letter-spacing: 1.5px !important;
-    color: #0a0f0b !important;
+    color: #E5EFFB !important;
   }
   
   .pricing-total .amount {
@@ -384,7 +384,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   
   .footer-note p strong {
     font-weight: 800 !important;
-    color: #22c55e !important;
+    color: #3887C6 !important;
   }
   
   .footer-note p:last-child {
@@ -405,10 +405,10 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   /* Main Invoice Card */
   .invoice-print {
     background: linear-gradient(135deg, rgba(13,21,16,0.98) 0%, rgba(10,15,11,0.98) 100%);
-    border: 1px solid rgba(34,197,94,0.25);
+    border: 1px solid rgba(56,135,198,0.25);
     border-radius: 16px;
     padding: 2.5rem;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(34,197,94,0.1) inset;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(56,135,198,0.1) inset;
     position: relative;
     overflow: hidden;
   }
@@ -421,7 +421,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     right: -20%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(56,135,198,0.08) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
   }
@@ -452,7 +452,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
     border-bottom: 3px solid;
-    border-image: linear-gradient(90deg, #22c55e, #16a34a, transparent) 1;
+    border-image: linear-gradient(90deg, #3887C6, #2a6ba0, transparent) 1;
   }
 
   .company-info {
@@ -471,12 +471,12 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   .company-logo-box {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #3887C6, #2a6ba0);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(34,197,94,0.4);
+    box-shadow: 0 4px 16px rgba(56,135,198,0.4);
   }
 
   .company-logo-box img {
@@ -491,7 +491,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     font-weight: 800;
     margin: 0;
     letter-spacing: 1px;
-    background: linear-gradient(135deg, #4ade80, #22c55e);
+    background: linear-gradient(135deg, #5a9fd4, #3887C6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -521,7 +521,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .company-contact a:hover {
-    color: #22c55e;
+    color: #3887C6;
   }
 
   /* Invoice Meta */
@@ -540,21 +540,21 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     margin-bottom: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 3px;
-    text-shadow: 0 2px 10px rgba(34,197,94,0.3);
+    text-shadow: 0 2px 10px rgba(56,135,198,0.3);
   }
 
   .invoice-ref {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #22c55e;
+    color: #3887C6;
     font-family: 'Courier New', monospace;
-    background: rgba(34,197,94,0.18);
+    background: rgba(56,135,198,0.18);
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
     display: inline-block;
     margin-bottom: 0.75rem;
-    border: 2px solid rgba(34,197,94,0.4);
-    box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+    border: 2px solid rgba(56,135,198,0.4);
+    box-shadow: 0 4px 12px rgba(56,135,198,0.2);
   }
 
   .invoice-date {
@@ -595,9 +595,9 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .status-badge.success { 
-    background: rgba(34,197,94,0.12); 
-    border-color: rgba(34,197,94,0.4);
-    box-shadow: 0 4px 12px rgba(34,197,94,0.15);
+    background: rgba(56,135,198,0.12); 
+    border-color: rgba(56,135,198,0.4);
+    box-shadow: 0 4px 12px rgba(56,135,198,0.15);
   }
 
   .status-badge.info { 
@@ -633,7 +633,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     letter-spacing: 0.5px;
   }
 
-  .status-confirmed { color: #4ade80; }
+  .status-confirmed { color: #5a9fd4; }
   .status-completed { color: #60a5fa; }
   .status-pending { color: #fbbf24; }
   .status-cancelled { color: #f87171; }
@@ -650,19 +650,19 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     padding: 1.5rem;
     background: rgba(15,25,18,0.6);
     border-radius: 12px;
-    border: 1px solid rgba(34,197,94,0.15);
+    border: 1px solid rgba(56,135,198,0.15);
     box-shadow: 0 4px 16px rgba(0,0,0,0.2);
   }
 
   .info-block h6 {
-    color: #22c55e;
+    color: #3887C6;
     font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0 0 1rem 0;
     padding-bottom: 0.6rem;
-    border-bottom: 2px solid rgba(34,197,94,0.3);
+    border-bottom: 2px solid rgba(56,135,198,0.3);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -672,7 +672,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     content: '';
     width: 4px;
     height: 16px;
-    background: linear-gradient(180deg, #22c55e, #16a34a);
+    background: linear-gradient(180deg, #3887C6, #2a6ba0);
     border-radius: 2px;
   }
 
@@ -693,7 +693,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .info-block p i {
-    color: #22c55e;
+    color: #3887C6;
     width: 18px;
     font-size: 0.9rem;
   }
@@ -711,14 +711,14 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
     padding: 1.25rem;
     border-radius: 10px;
     background: rgba(15,25,18,0.5);
-    border: 1px solid rgba(34,197,94,0.15);
+    border: 1px solid rgba(56,135,198,0.15);
     transition: all 0.3s ease;
   }
 
   .detail-item:hover {
     transform: translateY(-2px);
-    border-color: rgba(34,197,94,0.3);
-    box-shadow: 0 8px 20px rgba(34,197,94,0.15);
+    border-color: rgba(56,135,198,0.3);
+    box-shadow: 0 8px 20px rgba(56,135,198,0.15);
   }
 
   .detail-icon {
@@ -749,7 +749,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   /* Pricing Table */
   .pricing-table {
     margin: 2rem 0;
-    border: 1px solid rgba(34,197,94,0.25);
+    border: 1px solid rgba(56,135,198,0.25);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
@@ -785,10 +785,10 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .pricing-total {
-    background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.15)) !important;
-    border-top: 3px solid #22c55e !important;
+    background: linear-gradient(135deg, rgba(56,135,198,0.2), rgba(22,163,74,0.15)) !important;
+    border-top: 3px solid #3887C6 !important;
     padding: 1.25rem 1.5rem !important;
-    box-shadow: 0 -4px 20px rgba(34,197,94,0.15) inset;
+    box-shadow: 0 -4px 20px rgba(56,135,198,0.15) inset;
   }
 
   .pricing-total span:first-child {
@@ -800,10 +800,10 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .pricing-total .amount {
-    color: #4ade80;
+    color: #5a9fd4;
     font-size: 2rem;
     font-weight: 800;
-    text-shadow: 0 2px 10px rgba(34,197,94,0.4);
+    text-shadow: 0 2px 10px rgba(56,135,198,0.4);
   }
 
   /* Footer */
@@ -822,7 +822,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .footer-note p strong {
-    color: #22c55e;
+    color: #3887C6;
     font-weight: 700;
   }
 
@@ -834,7 +834,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
 
   .action-card {
     background: rgba(13,21,16,0.95);
-    border: 1px solid rgba(34,197,94,0.2);
+    border: 1px solid rgba(56,135,198,0.2);
     border-radius: 12px;
     margin-bottom: 1rem;
     overflow: hidden;
@@ -843,14 +843,14 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .action-card:hover {
-    border-color: rgba(34,197,94,0.4);
-    box-shadow: 0 8px 24px rgba(34,197,94,0.2);
+    border-color: rgba(56,135,198,0.4);
+    box-shadow: 0 8px 24px rgba(56,135,198,0.2);
   }
 
   .action-card-header {
-    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(22,163,74,0.1));
+    background: linear-gradient(135deg, rgba(56,135,198,0.15), rgba(22,163,74,0.1));
     padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(34,197,94,0.2);
+    border-bottom: 1px solid rgba(56,135,198,0.2);
     font-weight: 700;
     color: #f0fdf4;
     font-size: 0.9rem;
@@ -862,7 +862,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
   }
 
   .action-card-header i {
-    color: #22c55e;
+    color: #3887C6;
   }
 
   .action-card-body {
@@ -877,7 +877,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
 
   .action-card-body .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+    box-shadow: 0 4px 12px rgba(56,135,198,0.3);
   }
 
 /* Responsive */
@@ -1009,7 +1009,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
             <span>₹<?= number_format($booking['subtotal'], 2) ?></span>
           </div>
           <?php if (!empty($booking['discount_amount']) && $booking['discount_amount'] > 0): ?>
-          <div class="pricing-row" style="color: #22c55e;">
+          <div class="pricing-row" style="color: #3887C6;">
             <span>Discount <?= $booking['discount_percent'] > 0 ? '('.number_format($booking['discount_percent']).'%)' : '' ?></span>
             <span>-₹<?= number_format($booking['discount_amount'], 2) ?></span>
           </div>

@@ -58,7 +58,7 @@ function site_seo_meta(string $routeName = 'index'): array
             'description' => 'How Findownn collects, uses, and protects your personal information.',
         ],
         'terms' => [
-            'title'       => 'Terms of Service — Findownn',
+            'title'       => 'Terms & Conditions — Findownn',
             'description' => 'Terms and conditions for using Findownn as a player or venue partner.',
         ],
         'login' => [

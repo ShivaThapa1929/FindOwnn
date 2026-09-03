@@ -13,11 +13,11 @@
 }
 select.form-select.glass-input {
     background-color: #0d1711 !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2322c55e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%233887C6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
     background-position: right 0.85rem center !important;
     background-size: 14px 10px !important;
     background-repeat: no-repeat !important;
-    border: 1px solid rgba(34, 197, 94, 0.35) !important;
+    border: 1px solid rgba(56, 135, 198, 0.35) !important;
     color: #ffffff !important;
     border-radius: 10px !important;
     padding: 11px 36px 11px 16px !important;
@@ -32,8 +32,8 @@ select.form-select.glass-input {
 }
 select.form-select.glass-input:focus {
     background-color: #060b08 !important;
-    border-color: #22c55e !important;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25) !important;
+    border-color: #3887C6 !important;
+    box-shadow: 0 0 0 3px rgba(56, 135, 198, 0.25) !important;
     color: #ffffff !important;
 }
 select.form-select.glass-input option {
@@ -51,9 +51,9 @@ select.form-select.glass-input option {
     box-shadow: 0 0 0 2px rgba(239,68,68,0.2) !important;
 }
 .map-coords-badge {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    color: #4ade80;
+    background: rgba(56, 135, 198, 0.1);
+    border: 1px solid rgba(56, 135, 198, 0.3);
+    color: #5a9fd4;
     font-size: 0.8rem;
     padding: 4px 10px;
     border-radius: 20px;
@@ -70,7 +70,7 @@ select.form-select.glass-input option {
     right: 0;
     z-index: 9999;
     background: #0d1711;
-    border: 1px solid rgba(34,197,94,0.35);
+    border: 1px solid rgba(56,135,198,0.35);
     border-top: none;
     border-radius: 0 0 10px 10px;
     max-height: 220px;
@@ -85,7 +85,7 @@ select.form-select.glass-input option {
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid rgba(34,197,94,0.1);
+    border-bottom: 1px solid rgba(56,135,198,0.1);
     transition: background 0.15s;
 }
 #mapSuggestions .suggestion-item:last-child {
@@ -94,11 +94,11 @@ select.form-select.glass-input option {
 }
 #mapSuggestions .suggestion-item:hover,
 #mapSuggestions .suggestion-item.active {
-    background: rgba(34,197,94,0.15);
+    background: rgba(56,135,198,0.15);
     color: #ffffff;
 }
 #mapSuggestions .suggestion-item i {
-    color: #4ade80;
+    color: #5a9fd4;
     font-size: 0.85rem;
     flex-shrink: 0;
 }
@@ -268,7 +268,7 @@ select.form-select.glass-input option {
                 ?>
                 <div class="col-lg-3 col-md-6 animate-on-scroll">
                     <div class="glass-card p-4 h-100 position-relative d-flex flex-column" 
-                         style="<?= $isFeatured ? 'border: 1px solid #22c55e; box-shadow: 0 0 25px rgba(34,197,94,0.25); background: linear-gradient(180deg, rgba(34,197,94,0.08) 0%, rgba(13,23,17,0.85) 100%);' : '' ?>">
+                         style="<?= $isFeatured ? 'border: 1px solid #3887C6; box-shadow: 0 0 25px rgba(56,135,198,0.25); background: linear-gradient(180deg, rgba(56,135,198,0.08) 0%, rgba(255,255,255,0.85) 100%);' : '' ?>">
                         
                         <?php if ($isFeatured): ?>
                             <div class="position-absolute top-0 end-0 m-3">

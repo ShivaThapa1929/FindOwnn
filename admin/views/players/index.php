@@ -122,7 +122,14 @@ $result = $result ?? ['data' => [], 'total' => 0, 'page' => 1, 'pages' => 1];
   </div>
   <div class="panel-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
     <small class="text-muted">Showing <?= count($result['data']) ?> of <?= $result['total'] ?></small>
-    <?= paginate_links($result['page'], $result['pages'], url('/players')) ?>
+    <?php
+      $playerParams = array_filter([
+        'filter' => (isset($filter) && $filter !== 'all') ? $filter : null,
+        'search' => !empty($search) ? $search : null,
+      ]);
+      $playerPaginationUrl = url('/players') . ($playerParams ? '?' . http_build_query($playerParams) : '');
+    ?>
+    <?= paginate_links($result['page'], $result['pages'], $playerPaginationUrl) ?>
   </div>
 </div>
 

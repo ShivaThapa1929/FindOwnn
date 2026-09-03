@@ -24,6 +24,15 @@ $role     = auth()['role'] ?? '';
     </div>
   </div>
   <div class="col-6 col-md-3">
+    <div class="stat-card stat-card--yellow">
+      <div class="stat-card__icon"><i class="bi bi-hourglass-split"></i></div>
+      <div class="stat-card__body">
+        <div class="stat-card__value"><?= number_format($stats['pending'] ?? 0) ?></div>
+        <div class="stat-card__label">Pending</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
     <div class="stat-card stat-card--green">
       <div class="stat-card__icon"><i class="bi bi-check-circle-fill"></i></div>
       <div class="stat-card__body">
@@ -38,15 +47,6 @@ $role     = auth()['role'] ?? '';
       <div class="stat-card__body">
         <div class="stat-card__value">₹<?= number_format($stats['total_revenue'] ?? 0) ?></div>
         <div class="stat-card__label">Revenue</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="stat-card stat-card--red">
-      <div class="stat-card__icon"><i class="bi bi-x-circle-fill"></i></div>
-      <div class="stat-card__body">
-        <div class="stat-card__value"><?= number_format($stats['cancelled'] ?? 0) ?></div>
-        <div class="stat-card__label">Cancelled</div>
       </div>
     </div>
   </div>
@@ -75,7 +75,7 @@ $role     = auth()['role'] ?? '';
   <?php if (empty($myVenues)): ?>
   <div class="alert alert-warning py-2 small mb-0 me-2">
     <i class="bi bi-info-circle me-1"></i>
-    Pehle <a href="<?= url('/venues/create') ?>" class="alert-link">venue add</a> karo, phir offline booking create kar sakte ho.
+    Please <a href="<?= url('/venues/create') ?>" class="alert-link">add a venue</a> first before creating an offline booking.
   </div>
   <?php endif; ?>
   <a href="<?= url('/bookings/offline/create') ?>" class="btn btn-sm btn-success">
@@ -155,7 +155,14 @@ $role     = auth()['role'] ?? '';
           <tr>
             <td colspan="9" class="text-center py-5 text-muted">
               <i class="bi bi-calendar-x d-block mb-2" style="font-size:2rem;"></i>
-              No bookings found
+              <?php if ($role === 'venue_owner' && empty($myVenues)): ?>
+                No bookings yet — <a href="<?= url('/venues/create') ?>">add a venue and courts</a> first.
+                Player bookings for your venues will appear here (including pending payments).
+              <?php elseif ($filter === 'pending'): ?>
+                No pending bookings. Pending includes unpaid online bookings and walk-ins marked payment pending.
+              <?php else: ?>
+                No bookings found
+              <?php endif; ?>
             </td>
           </tr>
           <?php endif; ?>

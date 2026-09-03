@@ -20,11 +20,21 @@ class AuthMiddleware
 
         $user = Session::get('user');
 
-        // Venue Owner Dashboard Protection: Block unverified venue owners
+        // Venue Owner Dashboard Protection: Block unverified or suspended venue owners
         if (($user['role'] ?? '') === 'venue_owner') {
-            if (empty($user['email_verified_at']) || ($user['status'] ?? '') === 'pending_email_verification') {
-                Session::flash('error', 'Please verify your email address before accessing your Venue Owner Dashboard.');
-                redirect(url('/owner/verify-notice'));
+            $userId = (int)($user['id'] ?? 0);
+            $dbUser = (new \App\Models\User())->find($userId);
+
+            if (!$dbUser || $dbUser['status'] === 'suspended') {
+                Session::destroy();
+                Session::flash('error', 'Account suspended or invalid. Please contact support.');
+                redirect(url('/owner/login'));
+            }
+
+            if (empty($dbUser['email_verified_at']) || $dbUser['status'] === 'pending_email_verification') {
+                $_SESSION['unverified_email'] = $dbUser['email'];
+                Session::flash('error', 'Please verify your email before logging in.');
+                redirect(url('/owner/verify-notice?email=' . urlencode($dbUser['email'])));
             }
         }
 

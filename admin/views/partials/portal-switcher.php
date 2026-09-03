@@ -76,13 +76,13 @@ $portals = [
   transition: border-color .2s, background .2s;
 }
 .portal-switcher-card:hover {
-  border-color: rgba(34,197,94,.4);
-  background: rgba(34,197,94,.06);
+  border-color: rgba(56,135,198,.4);
+  background: rgba(56,135,198,.06);
   color: inherit;
 }
 .portal-switcher-card--active {
-  border-color: rgba(34,197,94,.55);
-  background: rgba(34,197,94,.1);
+  border-color: rgba(56,135,198,.55);
+  background: rgba(56,135,198,.1);
 }
 .portal-switcher-icon {
   width: 36px;
@@ -91,8 +91,8 @@ $portals = [
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(34,197,94,.12);
-  color: #4ade80;
+  background: rgba(56,135,198,.12);
+  color: #5a9fd4;
   flex-shrink: 0;
 }
 .portal-switcher-body { flex: 1; min-width: 0; }
@@ -135,5 +135,5 @@ $portals = [
   transition: background .15s, color .15s;
 }
 .sidebar-portal-link:hover { background: rgba(255,255,255,.05); color: #fff; }
-.sidebar-portal-link i { color: #4ade80; }
+.sidebar-portal-link i { color: #5a9fd4; }
 </style>

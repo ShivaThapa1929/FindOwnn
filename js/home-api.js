@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const response = await FindownnAPI.getVenues({
                 per_page: 6,
-                sort: 'rating',
+                sort: 'recent',
             });
 
             const venues = response?.data?.venues ?? [];
@@ -185,57 +185,72 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function createFeaturedVenueCard(venue, index) {
         const rating = parseFloat(venue.rating || 0);
+        const ratingHtml = rating > 0
+            ? `<span class="text-warning fw-bold" style="font-size:.9rem;"><i class="bi bi-star-fill me-1"></i>${rating.toFixed(1)}</span>`
+            : `<span class="text-muted" style="font-size:.8rem;">No reviews</span>`;
+
         const price = parseInt(venue.price_per_hour || 0).toLocaleString('en-IN');
         const sports = Array.isArray(venue.sports) ? venue.sports : [];
-        const sportTag = sports[0] || 'Sports';
+        const sportTag = sports.length > 0 ? sports[0] : 'Sports';
         const address = venue.address || venue.city || 'Bhuj';
+        const verified = venue.is_verified
+            ? `<span class="badge ms-2" style="background:rgba(56,135,198,.15);color:#3887C6;font-size:.6rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>`
+            : '';
         const delay = index % 3 === 0 ? '' : ` delay-${Math.min(index * 100, 300)}`;
 
-        let image = resolveImage(venue.featured_image, null);
-        if (!image) {
-            const slug = sports[0]?.toLowerCase().replace(/\s+/g, '-') || '';
-            image = SPORT_IMAGES[slug] || VENUE_FALLBACKS[(venue.id - 1) % VENUE_FALLBACKS.length];
+        const fallbackImage = resolveImage('assets/images/venue1.jpg', null);
+        let image = resolveImage(venue.featured_image, null) || fallbackImage;
+
+        // Amenities
+        const amenityIconMap = {
+            'Floodlights': 'bi-lightbulb-fill',
+            'Parking':     'bi-p-circle-fill',
+            'Water':       'bi-droplet-fill',
+            'Cafeteria':   'bi-cup-hot-fill',
+            'Indoor':      'bi-wind',
+            'Washroom':    'bi-door-open-fill',
+            'Coaching':    'bi-person-video2',
+        };
+        const amenities = Array.isArray(venue.amenities) ? venue.amenities.slice(0, 3) : [];
+        let amenityHtml = '';
+        if (amenities.length > 0) {
+            amenityHtml = amenities.map(a => {
+                const key  = Object.keys(amenityIconMap).find(k => a.toLowerCase().includes(k.toLowerCase()));
+                const icon = key ? amenityIconMap[key] : 'bi-check-circle-fill';
+                return `<span class="venue-amenity" style="font-size:0.75rem; background:rgba(255,255,255,0.05); color:var(--text-secondary); padding:4px 8px; border-radius:4px; margin-right:4px; display:inline-flex; align-items:center; gap:4px;"><i class="${icon}"></i> ${a}</span>`;
+            }).join('');
+        } else if (venue.has_floodlights || venue.has_parking || venue.has_water) {
+            const list = [];
+            if (venue.has_floodlights) list.push('<span class="venue-amenity" style="font-size:0.75rem; background:rgba(255,255,255,0.05); color:var(--text-secondary); padding:4px 8px; border-radius:4px; margin-right:4px; display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-lightbulb-fill"></i> Floodlights</span>');
+            if (venue.has_parking)     list.push('<span class="venue-amenity" style="font-size:0.75rem; background:rgba(255,255,255,0.05); color:var(--text-secondary); padding:4px 8px; border-radius:4px; margin-right:4px; display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-p-circle-fill"></i> Parking</span>');
+            if (venue.has_water)       list.push('<span class="venue-amenity" style="font-size:0.75rem; background:rgba(255,255,255,0.05); color:var(--text-secondary); padding:4px 8px; border-radius:4px; margin-right:4px; display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-droplet-fill"></i> Water</span>');
+            amenityHtml = list.slice(0, 3).join('');
         }
-
-        const badge = venue.is_verified
-            ? '<span class="sport-badge-live mb-2"><i class="bi bi-patch-check-fill"></i> Verified</span>'
-            : '<span class="sport-badge-live mb-2"><i class="bi bi-star-fill"></i> Top Rated</span>';
-
-        const ratingStat = rating > 0
-            ? `<span><i class="bi bi-star-fill"></i> ${rating.toFixed(1)} rating</span>`
-            : `<span><i class="bi bi-stars"></i> New</span>`;
-
-        const statsParts = [ratingStat];
-        if (venue.total_courts) {
-            statsParts.push(`<span><i class="bi bi-grid-3x3"></i> ${venue.total_courts} court${venue.total_courts !== 1 ? 's' : ''}</span>`);
-        }
-        statsParts.push(`<span><i class="bi bi-currency-rupee"></i> ${price}/hr</span>`);
-        if (venue.available_courts != null) {
-            statsParts.push(`<span><i class="bi bi-check-circle"></i> ${venue.available_courts} free today</span>`);
-        }
-
-        const stats = `<div class="sport-card-stats">${statsParts.join('')}</div>`;
-        const subtitle = address.length > 55 ? address.slice(0, 52) + '…' : address;
 
         return `
-            <div class="home-featured-item animate-on-scroll${delay}">
-                <div class="glass-card sport-card sport-card-live"
-                     role="button" tabindex="0"
-                     data-venue-id="${venue.id}"
-                     aria-label="View ${escapeHtml(venue.name)}">
-                    <img src="${image}" alt="${escapeHtml(venue.name)}" loading="lazy">
-                    <div class="sport-card-overlay"></div>
-                    <div class="sport-card-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                    <div class="sport-card-content">
-                        ${badge}
-                        <h3 class="sport-title">${escapeHtml(venue.name)}</h3>
-                        <p class="sport-subtitle">${escapeHtml(subtitle)} · ${escapeHtml(sportTag)}</p>
-                        ${stats}
-                        <span class="sport-card-cta">Book now <i class="bi bi-arrow-right"></i></span>
+        <div class="home-featured-item animate-on-scroll${delay}" style="cursor:pointer;" onclick="window.location.href='venue-details?id=${venue.id}'">
+            <div class="glass-card h-100 venue-card-premium" style="border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="position-relative overflow-hidden" style="height: 200px;">
+                    <img src="${image}" alt="${escapeHtml(venue.name)}" loading="lazy" style="width:100%; height:100%; object-fit:cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);" class="venue-card-img">
+                    <span class="position-absolute" style="top: 16px; left: 16px; background: rgba(8, 12, 9, 0.75); color: var(--primary); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(56, 135, 198, 0.25); z-index: 2;">${escapeHtml(sportTag)}</span>
+                    <span class="position-absolute" style="bottom: 16px; right: 16px; background: var(--primary); color: #1a2332; font-size: 0.85rem; font-weight: 700; padding: 6px 12px; border-radius: 6px; z-index: 2; box-shadow: 0 4px 12px rgba(56, 135, 198, 0.3);">₹${price}/hr</span>
+                    <div class="position-absolute inset-0" style="background: linear-gradient(180deg, transparent 50%, rgba(8,12,9,0.8) 100%); pointer-events: none;"></div>
+                </div>
+                <div class="p-4 bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="text-white mb-0" style="font-size:1.15rem; font-weight:700; letter-spacing:-0.01em;">${escapeHtml(venue.name)}${verified}</h4>
+                        ${ratingHtml}
                     </div>
+                    <p class="text-secondary mb-3" style="font-size:.85rem; display: flex; align-items: center; gap: 4px;">
+                        <i class="bi bi-geo-alt-fill text-success"></i>${escapeHtml(address)}
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mb-4" style="min-height: 28px;">${amenityHtml}</div>
+                    <button class="btn btn-premium w-100" style="border-radius: 10px; padding: 12px; font-size: 0.9rem; font-weight: 700;">
+                        <i class="bi bi-calendar-check me-2"></i>Book Now
+                    </button>
                 </div>
             </div>
-        `;
+        </div>`;
     }
 
     function bindFeaturedCards(container) {

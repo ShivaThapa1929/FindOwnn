@@ -61,4 +61,10 @@
       </div>
     <?php endif; ?>
   </div>
+  <?php if (!empty($pages) && $pages > 1): ?>
+  <div class="panel-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <small class="text-muted">Showing <?= count($rows ?? []) ?> of <?= $total ?? 0 ?></small>
+    <?= paginate_links($page ?? 1, $pages ?? 1, url('/contact-messages')) ?>
+  </div>
+  <?php endif; ?>
 </div>

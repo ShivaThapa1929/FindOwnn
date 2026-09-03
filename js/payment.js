@@ -130,7 +130,7 @@ const FindownnPayment = {
                 user_id: bookingData.user_id
             },
 
-            theme: { color: '#22c55e' },
+            theme: { color: '#3887C6' },
 
             method: {
                 netbanking: true,

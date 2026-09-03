@@ -3,6 +3,11 @@
 use App\Core\Config;
 use App\Core\Session;
 
+$legalContentPath = dirname(__DIR__, 3) . '/includes/legal-content.php';
+if (is_file($legalContentPath)) {
+    require_once $legalContentPath;
+}
+
 if (!function_exists('url')) {
     function url(string $path = ''): string
     {
@@ -215,11 +220,29 @@ if (!function_exists('paginate_links')) {
     function paginate_links(int $currentPage, int $totalPages, string $baseUrl): string
     {
         if ($totalPages <= 1) return '';
+
+        $parts = parse_url($baseUrl);
+        $query = [];
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+        }
+
+        $scheme   = isset($parts['scheme']) ? $parts['scheme'] . '://' : '';
+        $host     = $parts['host'] ?? '';
+        $port     = isset($parts['port']) ? ':' . $parts['port'] : '';
+        $user     = $parts['user'] ?? '';
+        $pass     = isset($parts['pass']) ? ':' . $parts['pass'] : '';
+        $auth     = ($user || $pass) ? "{$user}{$pass}@" : '';
+        $path     = $parts['path'] ?? '';
+        $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+
         $html = '<nav><ul class="pagination pagination-sm mb-0">';
         for ($i = 1; $i <= $totalPages; $i++) {
             $active = $i === $currentPage ? 'active' : '';
-            $url    = $baseUrl . '?page=' . $i;
-            $html  .= "<li class=\"page-item {$active}\"><a class=\"page-link\" href=\"{$url}\">{$i}</a></li>";
+            $query['page'] = $i;
+            $queryString = http_build_query($query);
+            $url = "{$scheme}{$auth}{$host}{$port}{$path}?{$queryString}{$fragment}";
+            $html .= "<li class=\"page-item {$active}\"><a class=\"page-link\" href=\"{$url}\">{$i}</a></li>";
         }
         $html .= '</ul></nav>';
         return $html;

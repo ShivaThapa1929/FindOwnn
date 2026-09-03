@@ -10,10 +10,10 @@
   <style>
     body { background:#080c09; color:#f0fdf4; font-family:'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
     .error-box { text-align:center; padding:40px 20px; }
-    .error-code { font-size:7rem; font-weight:800; background:linear-gradient(135deg,#dcfce7,#22c55e); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+    .error-code { font-size:7rem; font-weight:800; background:linear-gradient(135deg,#dcfce7,#3887C6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
     .error-title { font-size:1.5rem; font-weight:700; margin:16px 0 8px; }
     .error-sub { color:#86a892; margin-bottom:32px; }
-    .btn-go { background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; border:none; padding:12px 32px; border-radius:50px; font-weight:700; text-decoration:none; }
+    .btn-go { background:linear-gradient(135deg,#3887C6,#2a6ba0); color:#fff; border:none; padding:12px 32px; border-radius:50px; font-weight:700; text-decoration:none; }
     .btn-go:hover { color:#fff; opacity:.9; }
   </style>
 </head>

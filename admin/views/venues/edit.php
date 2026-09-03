@@ -22,9 +22,29 @@ $errors = $errors ?? [];
       <?= csrf_field() ?>
 
       <div class="row g-3">
-        <div class="col-md-12">
+        <div class="col-md-8">
           <label class="form-label-sm">Venue Name *</label>
           <input type="text" name="name" class="form-control" value="<?= e($venue['name']) ?>" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label-sm">Venue Type *</label>
+          <?php
+          // Get current sport for this venue
+          $db = \App\Core\Database::getInstance();
+          $currentSport = $db->fetch("
+              SELECT s.slug FROM sports s
+              JOIN venue_sports vs ON s.id = vs.sport_id
+              WHERE vs.venue_id = ? LIMIT 1
+          ", [$venue['id']]);
+          $selectedSlug = $currentSport ? $currentSport['slug'] : '';
+          $selectedType = str_replace('-', '_', $selectedSlug);
+          ?>
+          <select name="type" class="form-select" required>
+            <option value="">— Select Type —</option>
+            <?php foreach (['box_cricket'=>'Box Cricket','pickleball'=>'Pickleball'] as $val=>$label): ?>
+            <option value="<?= $val ?>" <?= $selectedType===$val ? 'selected':'' ?>><?= $label ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div class="col-12">
           <label class="form-label-sm">Description</label>
@@ -63,6 +83,15 @@ $errors = $errors ?? [];
           <small class="text-muted">Type amenity and press Enter or comma to add</small>
         </div>
       </div>
+
+      <?php
+      $courts = !empty($old['courts']) ? $old['courts'] : ($existingCourts ?? [[]]);
+      if ($courts === []) {
+          $courts = [[]];
+      }
+      $mode = 'edit';
+      include ROOT_PATH . '/views/venues/_courts_section.php';
+      ?>
 
       <div class="d-flex gap-2 mt-4">
         <button type="submit" class="btn btn-primary px-4">

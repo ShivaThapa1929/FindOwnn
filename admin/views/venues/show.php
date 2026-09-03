@@ -55,39 +55,39 @@ if ($bannerImage) {
     <svg class="venue-banner-dummy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 400" width="1600" height="400" preserveAspectRatio="xMidYMid slice" style="display:none;">
       <defs>
         <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#0a0f0b;stop-opacity:1" />
+          <stop offset="0%" style="stop-color:#E5EFFB;stop-opacity:1" />
           <stop offset="50%" style="stop-color:#0d1510;stop-opacity:1" />
           <stop offset="100%" style="stop-color:#111a13;stop-opacity:1" />
         </linearGradient>
         <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#22c55e" stroke-width="0.5" opacity="0.15"/>
+          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#3887C6" stroke-width="0.5" opacity="0.15"/>
         </pattern>
       </defs>
       <rect width="1600" height="400" fill="url(#bgGrad)"/>
       <rect width="1600" height="400" fill="url(#grid)"/>
-      <circle cx="400" cy="200" r="150" fill="#22c55e" opacity="0.08"/>
-      <circle cx="1200" cy="200" r="180" fill="#22c55e" opacity="0.08"/>
-      <path d="M 700 150 L 750 180 L 750 220 L 700 250 L 650 220 L 650 180 Z" fill="#22c55e" opacity="0.15"/>
-      <path d="M 900 150 L 950 180 L 950 220 L 900 250 L 850 220 L 850 180 Z" fill="#22c55e" opacity="0.15"/>
+      <circle cx="400" cy="200" r="150" fill="#3887C6" opacity="0.08"/>
+      <circle cx="1200" cy="200" r="180" fill="#3887C6" opacity="0.08"/>
+      <path d="M 700 150 L 750 180 L 750 220 L 700 250 L 650 220 L 650 180 Z" fill="#3887C6" opacity="0.15"/>
+      <path d="M 900 150 L 950 180 L 950 220 L 900 250 L 850 220 L 850 180 Z" fill="#3887C6" opacity="0.15"/>
     </svg>
   <?php else: ?>
     <svg class="venue-banner-dummy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 400" width="1600" height="400" preserveAspectRatio="xMidYMid slice">
       <defs>
         <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#0a0f0b;stop-opacity:1" />
+          <stop offset="0%" style="stop-color:#E5EFFB;stop-opacity:1" />
           <stop offset="50%" style="stop-color:#0d1510;stop-opacity:1" />
           <stop offset="100%" style="stop-color:#111a13;stop-opacity:1" />
         </linearGradient>
         <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#22c55e" stroke-width="0.5" opacity="0.15"/>
+          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#3887C6" stroke-width="0.5" opacity="0.15"/>
         </pattern>
       </defs>
       <rect width="1600" height="400" fill="url(#bgGrad)"/>
       <rect width="1600" height="400" fill="url(#grid)"/>
-      <circle cx="400" cy="200" r="150" fill="#22c55e" opacity="0.08"/>
-      <circle cx="1200" cy="200" r="180" fill="#22c55e" opacity="0.08"/>
-      <path d="M 700 150 L 750 180 L 750 220 L 700 250 L 650 220 L 650 180 Z" fill="#22c55e" opacity="0.15"/>
-      <path d="M 900 150 L 950 180 L 950 220 L 900 250 L 850 220 L 850 180 Z" fill="#22c55e" opacity="0.15"/>
+      <circle cx="400" cy="200" r="150" fill="#3887C6" opacity="0.08"/>
+      <circle cx="1200" cy="200" r="180" fill="#3887C6" opacity="0.08"/>
+      <path d="M 700 150 L 750 180 L 750 220 L 700 250 L 650 220 L 650 180 Z" fill="#3887C6" opacity="0.15"/>
+      <path d="M 900 150 L 950 180 L 950 220 L 900 250 L 850 220 L 850 180 Z" fill="#3887C6" opacity="0.15"/>
     </svg>
   <?php endif; ?>
   <div class="venue-banner-overlay"></div>
@@ -290,8 +290,8 @@ if ($bannerImage) {
               <div class="court-card-image court-card-dummy-image">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
                   <rect width="400" height="225" fill="#0d1510"/>
-                  <circle cx="200" cy="112.5" r="40" fill="#22c55e" opacity="0.2"/>
-                  <path d="M160 112.5 L180 92.5 L220 92.5 L240 112.5 L220 132.5 L180 132.5 Z" fill="#22c55e" opacity="0.3"/>
+                  <circle cx="200" cy="112.5" r="40" fill="#3887C6" opacity="0.2"/>
+                  <path d="M160 112.5 L180 92.5 L220 92.5 L240 112.5 L220 132.5 L180 132.5 Z" fill="#3887C6" opacity="0.3"/>
                   <text x="200" y="170" font-family="Arial, sans-serif" font-size="14" fill="#86a892" text-anchor="middle">No Image</text>
                 </svg>
                 <div class="court-card-status">
@@ -475,7 +475,7 @@ if ($bannerImage) {
           </button>
         </form>
         <?php else: ?>
-        <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded" style="background:rgba(34,197,94,0.08);">
+        <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded" style="background:rgba(56,135,198,0.08);">
           <i class="bi bi-patch-check-fill text-success fs-4"></i>
           <div>
             <div class="fw-600 small text-success">Badge Active</div>
@@ -592,7 +592,7 @@ function toggleAllCourts() {
   overflow: hidden;
   border-radius: 16px;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #0a0f0b, #0d1510, #111a13);
+  background: linear-gradient(135deg, #E5EFFB, #0d1510, #111a13);
 }
 
 .venue-banner-image {
@@ -705,8 +705,8 @@ function toggleAllCourts() {
 }
 
 .court-card:hover {
-  border-color: rgba(34,197,94,0.4);
-  box-shadow: 0 4px 16px rgba(34,197,94,0.1);
+  border-color: rgba(56,135,198,0.4);
+  box-shadow: 0 4px 16px rgba(56,135,198,0.1);
   transform: translateY(-2px);
 }
 
@@ -786,7 +786,7 @@ function toggleAllCourts() {
 .court-card-price {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #22c55e;
+  color: #3887C6;
 }
 
 .court-card-description {

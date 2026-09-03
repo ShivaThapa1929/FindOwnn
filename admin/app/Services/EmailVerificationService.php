@@ -42,7 +42,7 @@ class EmailVerificationService
     {
         $rawToken = $this->generateRawToken();
         $tokenHash = $this->hashToken($rawToken);
-        $expiresAt = date('Y-m-d H:i:s', time() + 86400); // 24 hours in PHP time
+        $expiresAt = date('Y-m-d H:i:s', time() + 3600); // 60 minutes in PHP time
 
         $this->db->execute(
             "UPDATE users 
@@ -62,10 +62,10 @@ class EmailVerificationService
      */
     public function sendVerificationEmail(array $user, string $rawToken): bool
     {
-        $verificationUrl = url('/owner/verify-email?token=' . urlencode($rawToken));
+        $verificationUrl = url('/owner/verify-email?token=' . urlencode($rawToken) . '&email=' . urlencode($user['email']));
 
         $to = $user['email'];
-        $subject = 'Verify Your Venue Owner Email — FindOwnn';
+        $subject = 'Verify Your FindOwnn Venue Owner Account';
 
         $htmlContent = $this->buildEmailHtml($user['name'], $verificationUrl);
 
@@ -90,16 +90,24 @@ class EmailVerificationService
         // Direct host mail fallback
         $host = $_SERVER['HTTP_HOST'] ?? 'findownn.com';
         $host = preg_replace('/:\d+$/', '', $host);
+        if ($host === 'localhost' || $host === '127.0.0.1') {
+            $host = 'findownn.com';
+        }
+
+        $fromAddr = 'no-reply@' . $host;
+        $msgId = '<' . time() . '.' . bin2hex(random_bytes(8)) . '@' . $host . '>';
 
         $headers = [
             'MIME-Version: 1.0',
             'Content-type: text/html; charset=utf-8',
-            'From: FindOwnn <no-reply@' . $host . '>',
+            'From: FindOwnn <' . $fromAddr . '>',
             'Reply-To: support@' . $host,
+            'Date: ' . date('r'),
+            'Message-ID: ' . $msgId,
             'X-Mailer: PHP/' . phpversion()
         ];
 
-        return (bool) @mail($to, $subject, $htmlContent, implode("\r\n", $headers));
+        return (bool) @mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $htmlContent, implode("\r\n", $headers), "-f {$fromAddr}");
     }
 
     /**
@@ -131,14 +139,14 @@ class EmailVerificationService
             $sessionEmail = $_SESSION['unverified_email'] ?? '';
             if ($sessionEmail !== '') {
                 $checkUser = $this->db->fetch(
-                    "SELECT * FROM users WHERE email = ? AND deleted_at IS NULL",
-                    [$sessionEmail]
+                    "SELECT * FROM users WHERE LOWER(TRIM(email)) = ? AND deleted_at IS NULL",
+                    [strtolower(trim($sessionEmail))]
                 );
                 if ($checkUser && (!empty($checkUser['email_verified_at']) || $checkUser['status'] === 'active')) {
                     return [
                         'success' => true,
                         'code'    => 'SUCCESS',
-                        'message' => 'Your Venue Owner account is already verified! You can sign in to your dashboard.',
+                        'message' => 'Your Venue Owner account is already verified! Welcome to your dashboard.',
                         'user'    => $checkUser
                     ];
                 }
@@ -147,11 +155,31 @@ class EmailVerificationService
             return [
                 'success' => false,
                 'code'    => 'INVALID_TOKEN',
-                'message' => 'Invalid or already used verification link. If your account is already active, please try signing in.'
+                'message' => 'Invalid or expired verification link. If your account is already active, please try signing in.'
             ];
         }
 
-        // Check if token has expired (24h PHP timestamp)
+        // If user is ALREADY verified and active (e.g. pre-fetched by Gmail link scanner or double-tapped on mobile)
+        if (!empty($user['email_verified_at']) && $user['status'] === 'active') {
+            $this->db->execute(
+                "UPDATE users 
+                 SET email_verification_token_hash = NULL,
+                     email_verification_expires_at = NULL,
+                     email_verification_attempts = 0,
+                     updated_at = NOW()
+                 WHERE id = ?",
+                [$user['id']]
+            );
+
+            return [
+                'success' => true,
+                'code'    => 'SUCCESS',
+                'message' => 'Your Venue Owner account is already verified! Welcome to your dashboard.',
+                'user'    => $user
+            ];
+        }
+
+        // Check if token has expired (60m PHP timestamp)
         $expiresAt = !empty($user['email_verification_expires_at']) ? strtotime($user['email_verification_expires_at']) : 0;
         if ($expiresAt > 0 && $expiresAt < time()) {
             return [
@@ -162,7 +190,7 @@ class EmailVerificationService
             ];
         }
 
-        // Single-use token: Mark email as verified, set status active, clear token
+        // Single-use token: Mark email as verified and set status active
         $this->db->execute(
             "UPDATE users 
              SET email_verified_at = NOW(),
@@ -198,11 +226,8 @@ class EmailVerificationService
      */
     public function resendVerification(string $email): array
     {
-        $email = User::normalizeEmail($email);
-        $user = $this->db->fetch(
-            "SELECT * FROM users WHERE email = ? AND deleted_at IS NULL",
-            [$email]
-        );
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
 
         if (!$user) {
             return ['success' => false, 'message' => 'No account found for this email address.'];
@@ -210,6 +235,16 @@ class EmailVerificationService
 
         if (!empty($user['email_verified_at']) && $user['status'] === 'active') {
             return ['success' => false, 'message' => 'This account is already verified. Please sign in to your dashboard.'];
+        }
+
+        // 60-second rate limiting cooldown check
+        $lastUpdated = !empty($user['updated_at']) ? strtotime($user['updated_at']) : 0;
+        if ($lastUpdated > 0 && (time() - $lastUpdated) < 60) {
+            $remaining = 60 - (time() - $lastUpdated);
+            return [
+                'success' => false,
+                'message' => "Please wait {$remaining} seconds before requesting another verification email."
+            ];
         }
 
         // Create new token and send email immediately
@@ -240,14 +275,14 @@ class EmailVerificationService
             return ['success' => false, 'message' => 'Please use a valid permanent email address that you can access.'];
         }
 
-        // Check if email already registered by another account
+        // Check if email already registered by another account (global case-insensitive check because UNIQUE constraint is on email)
         $existing = $this->db->fetch(
-            "SELECT id FROM users WHERE email = ? AND id != ? AND deleted_at IS NULL",
-            [$newEmail, $userId]
+            "SELECT id FROM users WHERE LOWER(TRIM(email)) = ? AND id != ? LIMIT 1",
+            [strtolower(trim($newEmail)), $userId]
         );
 
         if ($existing) {
-            return ['success' => false, 'message' => 'This email address is already registered by another user.'];
+            return ['success' => false, 'message' => 'This email address is already registered.'];
         }
 
         $user = $this->db->fetch("SELECT * FROM users WHERE id = ?", [$userId]);
@@ -261,15 +296,22 @@ class EmailVerificationService
         }
 
         // Update email and generate new token
-        $this->db->execute(
-            "UPDATE users 
-             SET email = ?,
-                 email_verified_at = NULL,
-                 status = 'pending_email_verification',
-                 updated_at = NOW()
-             WHERE id = ?",
-            [$newEmail, $userId]
-        );
+        try {
+            $this->db->execute(
+                "UPDATE users 
+                 SET email = ?,
+                     email_verified_at = NULL,
+                     status = 'pending_email_verification',
+                     updated_at = NOW()
+                 WHERE id = ?",
+                [$newEmail, $userId]
+            );
+        } catch (\Throwable $e) {
+            if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
+                return ['success' => false, 'message' => 'This email address is already registered.'];
+            }
+            throw $e;
+        }
 
         $user['email'] = $newEmail;
         $rawToken = $this->createVerificationToken($userId);

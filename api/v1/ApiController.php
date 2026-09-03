@@ -337,28 +337,32 @@ class ApiController
     {
         $perPage = min($perPage, 50); // Max 50 items per page
         $offset = ($page - 1) * $perPage;
-        
-        // Get total count
-        $countQuery = preg_replace('/SELECT .* FROM/i', 'SELECT COUNT(*) as total FROM', $query);
+
+        // Safely count total rows by wrapping the full query as a subquery.
+        // The old preg_replace approach broke on multi-line queries with
+        // GROUP_CONCAT, subqueries, or multiple FROM clauses.
+        $countQuery = "SELECT COUNT(*) FROM ({$query}) AS _count_sub";
         $total = (int) self::$db->fetchColumn($countQuery, $params);
-        
+
         // Get paginated results
         $query .= " LIMIT ? OFFSET ?";
         $params[] = $perPage;
         $params[] = $offset;
-        
+
         $items = self::$db->fetchAll($query, $params);
-        
+
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+
         return [
             'items' => $items,
             'meta' => [
                 'current_page' => $page,
-                'per_page' => $perPage,
-                'total' => $total,
-                'total_pages' => ceil($total / $perPage),
-                'has_more' => $page < ceil($total / $perPage),
-                'next_page' => $page < ceil($total / $perPage) ? $page + 1 : null,
-                'prev_page' => $page > 1 ? $page - 1 : null
+                'per_page'     => $perPage,
+                'total'        => $total,
+                'total_pages'  => $totalPages,
+                'has_more'     => $page < $totalPages,
+                'next_page'    => $page < $totalPages ? $page + 1 : null,
+                'prev_page'    => $page > 1 ? $page - 1 : null,
             ]
         ];
     }

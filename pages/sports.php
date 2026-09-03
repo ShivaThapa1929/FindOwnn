@@ -19,7 +19,7 @@
         <!-- Box Cricket Details -->
         <div class="row align-items-center g-5 mb-5 pb-5">
             <div class="col-lg-6 animate-on-scroll">
-                <div class="venue-img-wrapper" style="height: 380px; border-radius: 20px; box-shadow: 0 15px 40px rgba(34, 197, 94, 0.1);">
+                <div class="venue-img-wrapper" style="height: 380px; border-radius: 20px; box-shadow: 0 15px 40px rgba(56, 135, 198, 0.1);">
                     <img src="assets/images/venue-cricket.jpg" alt="Box Cricket Specifications" style="object-position: center;">
                 </div>
             </div>
@@ -56,7 +56,7 @@
         <!-- Pickleball Details -->
         <div class="row align-items-center g-5 pt-5">
             <div class="col-lg-6 order-lg-2 animate-on-scroll">
-                <div class="venue-img-wrapper" style="height: 380px; border-radius: 20px; box-shadow: 0 15px 40px rgba(34, 197, 94, 0.1);">
+                <div class="venue-img-wrapper" style="height: 380px; border-radius: 20px; box-shadow: 0 15px 40px rgba(56, 135, 198, 0.1);">
                     <img src="assets/images/venue-pickleball.jpg" alt="Pickleball Specifications" style="object-position: center;">
                 </div>
             </div>

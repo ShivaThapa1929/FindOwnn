@@ -13,15 +13,33 @@ class Booking extends Model
         'booking_reference', 'notes', 'created_at', 'updated_at',
     ];
 
+    /** SQL fragment: unpaid / awaiting confirmation bookings */
+    public static function pendingCondition(string $alias = 'b'): string
+    {
+        $a = $alias;
+        return "({$a}.status = 'pending' OR ({$a}.payment_status = 'pending' AND {$a}.status NOT IN ('cancelled','completed')))";
+    }
+
+    /** Append status filter to WHERE clause and params */
+    public static function applyStatusFilter(string $filter, string &$where, array &$params, string $alias = 'b'): void
+    {
+        if ($filter === 'all') {
+            return;
+        }
+        if ($filter === 'pending') {
+            $where .= ' AND ' . self::pendingCondition($alias);
+            return;
+        }
+        $where .= " AND {$alias}.status = ?";
+        $params[] = $filter;
+    }
+
     public function getAllWithDetails(int $page = 1, int $perPage = 20, string $filter = 'all', string $search = ''): array
     {
         $where  = '1=1';
         $params = [];
 
-        if ($filter !== 'all') {
-            $where  .= ' AND b.status = ?';
-            $params[] = $filter;
-        }
+        self::applyStatusFilter($filter, $where, $params);
 
         if ($search !== '') {
             $like    = "%{$search}%";
@@ -69,11 +87,12 @@ class Booking extends Model
         return $this->db->fetch(
             "SELECT
                 COUNT(*) AS total,
-                SUM(status = 'confirmed') AS confirmed,
-                SUM(status = 'cancelled') AS cancelled,
-                SUM(payment_status = 'paid') AS paid_count,
-                SUM(CASE WHEN payment_status = 'paid' THEN amount ELSE 0 END) AS total_revenue
-             FROM bookings"
+                SUM(" . self::pendingCondition('b') . ") AS pending,
+                SUM(b.status = 'confirmed') AS confirmed,
+                SUM(b.status = 'cancelled') AS cancelled,
+                SUM(b.payment_status = 'paid') AS paid_count,
+                SUM(CASE WHEN b.payment_status = 'paid' THEN b.amount ELSE 0 END) AS total_revenue
+             FROM bookings b"
         ) ?: [];
     }
 
@@ -83,6 +102,7 @@ class Booking extends Model
         return $this->db->fetch(
             "SELECT
                 COUNT(*) AS total,
+                SUM(" . self::pendingCondition('b') . ") AS pending,
                 SUM(b.status = 'confirmed') AS confirmed,
                 SUM(b.status = 'cancelled') AS cancelled,
                 SUM(b.payment_status = 'paid') AS paid_count,
@@ -92,7 +112,7 @@ class Booking extends Model
              WHERE v.owner_id = ? AND v.deleted_at IS NULL",
             [$ownerId]
         ) ?: [
-            'total' => 0, 'confirmed' => 0, 'cancelled' => 0,
+            'total' => 0, 'pending' => 0, 'confirmed' => 0, 'cancelled' => 0,
             'paid_count' => 0, 'total_revenue' => 0,
         ];
     }

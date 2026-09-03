@@ -9,6 +9,7 @@ use App\Models\Venue;
 use App\Models\Booking;
 use App\Models\Subscription;
 use App\Models\ActivityLog;
+use App\Services\OwnerRecommendationService;
 
 class DashboardController extends Controller
 {
@@ -97,6 +98,23 @@ class DashboardController extends Controller
         $subStats      = $subModel->getStats();
         $recentUsers   = $userModel->getRecentUsers(6);
         $recentActivity = $actModel->getRecent(8);
+
+        // Role-Based User Statistics
+        $roleStats = [
+            'super_admin' => (int) $this->db->fetchColumn("SELECT COUNT(*) FROM users WHERE role = 'super_admin' AND deleted_at IS NULL"),
+            'admin'       => (int) $this->db->fetchColumn("SELECT COUNT(*) FROM users WHERE role = 'admin' AND deleted_at IS NULL"),
+            'venue_owner' => (int) $this->db->fetchColumn("SELECT COUNT(*) FROM users WHERE role = 'venue_owner' AND deleted_at IS NULL"),
+            'player'      => (int) $this->db->fetchColumn("SELECT COUNT(*) FROM users WHERE (role = 'player' OR role = 'customer' OR role = 'user') AND deleted_at IS NULL"),
+            'pending_owner_verification' => (int) $this->db->fetchColumn("SELECT COUNT(*) FROM users WHERE role = 'venue_owner' AND status = 'pending_email_verification' AND deleted_at IS NULL"),
+        ];
+
+        // Recent Role Logins & Accounts
+        $recentRoleLogins = $this->db->fetchAll(
+            "SELECT u.id, u.name, u.email, u.phone, u.role, u.status, u.email_verified_at, u.created_at, u.updated_at
+             FROM users u
+             WHERE u.deleted_at IS NULL
+             ORDER BY u.id DESC LIMIT 8"
+        );
 
         // Pending venues that need action
         $pendingVenues = $this->db->fetchAll(
@@ -230,6 +248,8 @@ class DashboardController extends Controller
         $this->render('dashboard.index', [
             'title'            => 'Dashboard',
             'stats'            => $stats,
+            'roleStats'        => $roleStats,
+            'recentRoleLogins' => $recentRoleLogins,
             'bookStats'        => $bookStats,
             'subStats'         => $subStats,
             'monthlyRev'       => $monthlyRev,
@@ -268,14 +288,16 @@ class DashboardController extends Controller
         $bookStats = $this->db->fetch(
             "SELECT
                 COUNT(*)  AS total,
-                SUM(status = 'confirmed') AS confirmed,
-                SUM(status = 'cancelled') AS cancelled,
-                SUM(CASE WHEN payment_status = 'paid' THEN amount ELSE 0 END) AS total_revenue,
-                SUM(CASE WHEN payment_status = 'paid'
-                    AND booking_date >= DATE_FORMAT(NOW(),'%Y-%m-01')
-                    THEN amount ELSE 0 END) AS monthly_revenue
-             FROM bookings
-             WHERE venue_id IN (SELECT id FROM venues WHERE owner_id = ?)",
+                SUM(" . \App\Models\Booking::pendingCondition('b') . ") AS pending,
+                SUM(b.status = 'confirmed') AS confirmed,
+                SUM(b.status = 'cancelled') AS cancelled,
+                SUM(CASE WHEN b.payment_status = 'paid' THEN b.amount ELSE 0 END) AS total_revenue,
+                SUM(CASE WHEN b.payment_status = 'paid'
+                    AND b.booking_date >= DATE_FORMAT(NOW(),'%Y-%m-01')
+                    THEN b.amount ELSE 0 END) AS monthly_revenue
+             FROM bookings b
+             JOIN venues v ON b.venue_id = v.id
+             WHERE v.owner_id = ? AND v.deleted_at IS NULL",
             [$ownerId]
         ) ?: [];
 
@@ -386,17 +408,23 @@ class DashboardController extends Controller
         );
 
         $this->render('dashboard.owner', [
-            'title'          => 'My Dashboard',
-            'myVenues'       => $myVenues,
-            'venueStats'     => $venueStats,
-            'bookStats'      => $bookStats,
-            'mySub'          => $mySub,
-            'recentBookings' => $recentBookings,
-            'ownerMonthlyRev'=> $ownerMonthlyRev,
-            'activity'       => $activity,
-            'bestPerforming' => $bestPerforming,
-            'mostLoved'      => $mostLoved,
-            'allPlans'       => $allPlans,
+            'title'           => 'My Dashboard',
+            'myVenues'        => $myVenues,
+            'venueStats'      => $venueStats,
+            'bookStats'       => $bookStats,
+            'mySub'           => $mySub,
+            'recentBookings'  => $recentBookings,
+            'ownerMonthlyRev' => $ownerMonthlyRev,
+            'activity'        => $activity,
+            'bestPerforming'  => $bestPerforming,
+            'mostLoved'       => $mostLoved,
+            'allPlans'        => $allPlans,
+            'recommendations' => (new OwnerRecommendationService())->forOwner($ownerId, [
+                'myVenues'   => $myVenues,
+                'mySub'      => $mySub,
+                'bookStats'  => $bookStats,
+                'venueStats' => $venueStats,
+            ]),
         ]);
     }
 }

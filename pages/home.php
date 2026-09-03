@@ -27,17 +27,31 @@
                         <span class="hero-subtitle">Booked in seconds.</span>
                     </h1>
 
-                    <p class="hero-text mb-5">
+                    <p class="hero-text mb-4">
                         Tired of WhatsApp chains and missed calls just to book a slot? Findownn lets you see real availability, pick your time, and confirm instantly — no back-and-forth needed.
                     </p>
 
-                    <div class="hero-buttons mb-5">
-                        <a href="#download-cta" class="btn btn-premium btn-shimmer">
-                            <i class="bi bi-download"></i>
-                            <span>Download Free</span>
+                    <!-- Modern Search Bar -->
+                    <form action="venues" method="GET" class="hero-search-box glass-card p-2 d-flex align-items-center mb-4" style="border-radius: 99px; border: 1px solid rgba(56, 135, 198, 0.18); box-shadow: 0 16px 40px rgba(56, 135, 198, 0.12);">
+                        <div class="d-flex align-items-center px-3 border-end border-secondary border-opacity-25" style="min-width: 100px;">
+                            <i class="bi bi-geo-alt-fill text-success me-2" style="font-size: 1.1rem;"></i>
+                            <span class="fw-semibold" style="font-size: 0.95rem; color: var(--text-primary);">Bhuj</span>
+                        </div>
+                        <div class="flex-grow-1 position-relative d-flex align-items-center">
+                            <i class="bi bi-search text-success position-absolute" style="font-size: 1.05rem; left: 16px;"></i>
+                            <input type="text" name="search" class="form-control bg-transparent border-0 ps-5" placeholder="Search box cricket, pickleball..." style="font-size: 0.95rem; box-shadow: none; color: var(--text-primary);">
+                        </div>
+                        <button type="submit" class="btn btn-premium px-4 py-3" style="border-radius: 99px; min-height: 48px;">
+                            Search
+                        </button>
+                    </form>
+
+                    <div class="d-flex gap-3 justify-content-center justify-content-lg-start mb-5 flex-wrap hero-buttons">
+                        <a href="#download-cta" class="btn btn-premium-outline px-4 py-2" style="font-size: 0.88rem; border-radius: var(--r-full);">
+                            <i class="bi bi-download me-1"></i> Get Mobile App
                         </a>
-                        <a href="venues" class="btn btn-premium-outline">
-                            <i class="bi bi-search"></i> Explore Playgrounds
+                        <a href="venues" class="btn btn-premium-outline px-4 py-2" style="font-size: 0.88rem; border-radius: var(--r-full); background: rgba(56, 135, 198, 0.05) !important; border-color: rgba(56, 135, 198, 0.2) !important; color: #3887C6 !important;">
+                            Explore All Playgrounds <i class="bi bi-arrow-right ms-1"></i>
                         </a>
                     </div>
 
@@ -81,7 +95,7 @@
 </section>
 
 <!-- STATS -->
-<section class="stats-section">
+<section class="stats-section home-section home-section--stats">
     <div class="container">
         <div class="stats-container animate-on-scroll">
             <div class="row g-0 text-center">
@@ -181,7 +195,7 @@
 </section>
 
 <!-- SPORTS -->
-<section class="section-padding home-sports-section" id="sports">
+<section class="section-padding home-sports-section home-section home-section--sports" id="sports">
     <div class="container">
 
         <div class="section-header section-header-split section-header-title-center animate-on-scroll">
@@ -235,6 +249,53 @@
             </div>
         </div>
 
+    </div>
+</section>
+
+<!-- PROMOTIONAL BANNERS -->
+<section class="py-5 position-relative bg-subtle home-section home-section--promos">
+    <div class="container">
+        <div class="section-header section-header-split animate-on-scroll mb-4 mb-md-5">
+            <h2 class="section-title mb-2">Play more, pay less</h2>
+            <div class="section-header-split-row">
+                <div>
+                    <span class="badge-premium mb-3"><i class="bi bi-gift-fill"></i> Special Offers</span>
+                    <p class="section-subtitle mb-0">Exclusive deals on Bhuj's top sports — book today and save</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 align-items-stretch animate-on-scroll">
+            <!-- Box Cricket Promo -->
+            <div class="col-md-6 d-flex">
+                <div class="glass-card promo-banner-card promo-banner-card--cricket position-relative overflow-hidden p-5 d-flex flex-column justify-content-end w-100">
+                    <div class="promo-banner-bg promo-banner-bg--cricket" aria-hidden="true"></div>
+                    <div class="position-relative z-1">
+                        <span class="promo-banner-badge">Box Cricket</span>
+                        <h3 class="promo-banner-title">Under the Floodlights</h3>
+                        <p class="promo-banner-text">Book premium Box Cricket turfs with full lighting and nets in Bhuj. Play with your squad today.</p>
+                        <a href="venues?sport=box-cricket" class="btn btn-premium btn-sm px-4 py-2 promo-banner-btn">
+                            Book Turf Now <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pickleball Promo -->
+            <div class="col-md-6 d-flex">
+                <div class="glass-card promo-banner-card promo-banner-card--pickleball position-relative overflow-hidden p-5 d-flex flex-column justify-content-end w-100">
+                    <div class="promo-banner-bg promo-banner-bg--pickleball" aria-hidden="true"></div>
+                    <div class="position-relative z-1">
+                        <span class="promo-banner-badge">Pickleball</span>
+                        <h3 class="promo-banner-title">Pickleball Mania</h3>
+                        <p class="promo-banner-text">Join the fastest growing sport in Bhuj. Premium indoor and outdoor courts with paddle rentals.</p>
+                        <a href="venues?sport=pickleball" class="btn btn-premium btn-sm px-4 py-2 promo-banner-btn">
+                            Find Courts <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

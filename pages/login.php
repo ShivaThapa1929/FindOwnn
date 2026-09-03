@@ -102,6 +102,8 @@ include __DIR__ . '/../includes/header.php';
                 </a>
             <?php endif; ?>
         </div>
+
+        <?php include __DIR__ . '/../includes/partials/legal-login-links.php'; ?>
     </div>
 </section>
 
@@ -109,8 +111,8 @@ include __DIR__ . '/../includes/header.php';
 .role-portal-card .glass-card { transition: border-color .2s, box-shadow .2s; border: 1px solid transparent; }
 .role-portal-card--active .glass-card,
 .role-portal-card:hover .glass-card {
-    border-color: rgba(34, 197, 94, 0.45);
-    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+    border-color: rgba(56, 135, 198, 0.45);
+    box-shadow: 0 0 0 1px rgba(56, 135, 198, 0.2);
 }
 .page-header--compact { padding: 4rem 0 2rem; }
 </style>

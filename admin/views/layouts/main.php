@@ -13,7 +13,7 @@ $showSplashOnLoad = (bool) flash('show_splash');
   <link rel="icon" type="image/png" sizes="16x16" href="<?= e(url('/public/assets/images/favicon-16x16.png') . '?v=6') ?>">
   <link rel="shortcut icon" href="<?= e(url('/public/assets/images/favicon-32x32.png') . '?v=6') ?>">
   <link rel="apple-touch-icon" href="<?= e(url('/public/assets/images/apple-touch-icon.png') . '?v=6') ?>">
-  <meta name="theme-color" content="#080c09">
+  <meta name="theme-color" content="#3887C6">
   <meta name="csrf-token" content="<?= csrf_token() ?>">
 
   <!-- Bootstrap 5 -->
@@ -41,11 +41,11 @@ $showSplashOnLoad = (bool) flash('show_splash');
 
 <style>
 :root {
-  --gradient-primary: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  --gradient-text:    linear-gradient(135deg, #dcfce7 0%, #4ade80 50%, #22c55e 100%);
-  --border-glass:     rgba(255, 255, 255, 0.07);
-  --text-primary:     #ffffff;
-  --text-muted:       #94a3b8;
+  --gradient-primary: linear-gradient(135deg, #3887C6 0%, #2a6ba0 100%);
+  --gradient-text:    linear-gradient(135deg, #1a2332 0%, #3887C6 55%, #2a6ba0 100%);
+  --border-glass:     rgba(56, 135, 198, 0.14);
+  --text-primary:     #1a2332;
+  --text-muted:       #64748b;
   --font-heading:     'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --ease-out:         cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -55,7 +55,7 @@ $showSplashOnLoad = (bool) flash('show_splash');
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #080c09;
+  background: #E5EFFB;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,7 +77,7 @@ $showSplashOnLoad = (bool) flash('show_splash');
   align-items: center;
   justify-content: center;
   animation: splashLogoIn 0.6s var(--ease-spring) 0.2s both;
-  box-shadow: 0 0 40px rgba(34,197,94,0.15), 0 8px 24px rgba(0,0,0,0.4);
+  box-shadow: 0 0 40px rgba(56,135,198,0.18), 0 8px 24px rgba(56,135,198,0.12);
   overflow: hidden;
 }
 
@@ -241,21 +241,6 @@ body.splash-active { overflow: hidden; }
     <a href="<?= url('/settings') ?>" class="sidebar-link <?= str_contains($_SERVER['REQUEST_URI'], '/settings') ? 'active' : '' ?>">
       <i class="bi bi-gear-fill"></i><span>Settings</span>
     </a>
-    <?php endif; ?>
-
-    <?php if (in_array($role, ['super_admin', 'admin'], true)): ?>
-    <div class="sidebar-portals mt-2">
-      <div class="sidebar-portals-label">Switch Portal</div>
-      <a href="<?= e(site_login_url('player')) ?>" class="sidebar-portal-link" target="_blank" rel="noopener">
-        <i class="bi bi-person-fill"></i> Player login
-      </a>
-      <a href="<?= e(site_login_url('venue_owner')) ?>" class="sidebar-portal-link" target="_blank" rel="noopener">
-        <i class="bi bi-building"></i> Owner login
-      </a>
-      <a href="<?= e(site_login_url('admin')) ?>" class="sidebar-portal-link" target="_blank" rel="noopener">
-        <i class="bi bi-shield-lock"></i> Admin login
-      </a>
-    </div>
     <?php endif; ?>
 
     <!-- Profile -->

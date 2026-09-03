@@ -93,28 +93,62 @@ class AuthController extends Controller
             $this->redirect(url('/owner/register'));
         }
 
+        if (!legal_terms_accepted($request->all())) {
+            Session::flash('error', 'You must agree to the Terms & Conditions and Privacy Policy.');
+            $this->redirect(url('/owner/register'));
+        }
+
         $cleanPhone = preg_replace('/\D/', '', $phone);
         if (strlen($cleanPhone) === 10) {
             $phone = '+91 ' . substr($cleanPhone, 0, 5) . ' ' . substr($cleanPhone, 5);
         }
 
-        $userModel = new User();
-        if ($userModel->findByEmail($email)) {
-            Session::flash('error', 'This email is already registered. Please sign in instead.');
-            $this->redirect(url('/owner/login'));
+        $db = \App\Core\Database::getInstance();
+        $existing = $db->fetch("SELECT * FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1", [$email]);
+
+        if ($existing) {
+            if ($existing['status'] === 'pending_email_verification' || empty($existing['email_verified_at'])) {
+                $verifyService = new EmailVerificationService();
+                $rawToken = $verifyService->createVerificationToken((int)$existing['id']);
+                $verifyService->sendVerificationEmail([
+                    'id'    => $existing['id'],
+                    'name'  => $existing['name'],
+                    'email' => $existing['email']
+                ], $rawToken);
+
+                $_SESSION['unverified_email'] = $email;
+                Session::flash('success', 'This email is already registered and pending verification. We have resent your verification email!');
+                $this->redirect(url('/owner/verify-notice?email=' . urlencode($email)));
+                return;
+            }
+
+            Session::flash('error', 'This email address is already registered. Please sign in to your dashboard.');
+            $this->redirect(url('/owner/login?email=' . urlencode($email)));
+            return;
         }
 
         // Create pending user account
-        $userId = $userModel->create([
-            'name'              => $name,
-            'email'             => $email,
-            'password'          => $userModel->hashPassword($password),
-            'phone'             => $phone,
-            'phone_verified_at' => now(),
-            'role'              => 'venue_owner',
-            'status'            => 'pending_email_verification',
-            'email_verified_at' => null,
-        ]);
+        $userModel = new User();
+        try {
+            $userId = $userModel->create([
+                'name'              => $name,
+                'email'             => $email,
+                'password'          => $userModel->hashPassword($password),
+                'phone'             => $phone,
+                'phone_verified_at' => now(),
+                'role'              => 'venue_owner',
+                'status'            => 'pending_email_verification',
+                'email_verified_at' => null,
+            ]);
+        } catch (\Throwable $e) {
+            if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), '1062')) {
+                $_SESSION['unverified_email'] = $email;
+                Session::flash('error', 'This email address is already registered. Please sign in or check your email verification.');
+                $this->redirect(url('/owner/login?email=' . urlencode($email)));
+                return;
+            }
+            throw $e;
+        }
 
         $subModel = new Subscription();
         if (!$subModel->assignPlanToUser($userId, 'starter', 12)) {
@@ -135,7 +169,7 @@ class AuthController extends Controller
         ], $rawToken);
 
         $_SESSION['unverified_email'] = $email;
-        Session::flash('success', 'Registration submitted! Please check your email and click the verification link to activate your Venue Owner account.');
+        Session::flash('success', 'Verification email has been sent to your email address. Please verify your email before logging in.');
         $this->redirect(url('/owner/verify-notice?email=' . urlencode($email)));
     }
 
@@ -148,6 +182,29 @@ class AuthController extends Controller
             $user = $userModel->findByEmail($email);
         }
 
+        // If user is already verified, directly redirect to dashboard
+        if ($user && !empty($user['email_verified_at']) && $user['status'] === 'active') {
+            $currentUser = Session::get('user');
+            if (empty($currentUser) || (int)$currentUser['id'] !== (int)$user['id']) {
+                Session::regenerate();
+                Session::set('user', [
+                    'id'                => (int)$user['id'],
+                    'name'              => $user['name'],
+                    'email'             => $user['email'],
+                    'role'              => $user['role'] ?? 'venue_owner',
+                    'email_verified_at' => $user['email_verified_at'],
+                    'status'            => 'active',
+                    'avatar'            => $user['avatar'] ?? '',
+                ]);
+                $userModel = new User();
+                $userModel->updateLastLogin((int)$user['id']);
+            }
+            unset($_SESSION['unverified_email']);
+            Session::flash('success', 'Email already verified.');
+            $this->redirect(url('/dashboard'));
+            return;
+        }
+
         $this->render('auth.verify-notice', [
             'title'          => 'Verify Email — FindOwnn',
             'email'          => $email,
@@ -158,8 +215,11 @@ class AuthController extends Controller
     public function verifyEmail(Request $request): void
     {
         $token = trim($request->query('token', ''));
+        $email = trim($request->query('email', ''));
+
         $verifyService = new EmailVerificationService();
         $res = $verifyService->verifyEmailToken($token);
+        $userModel = new User();
 
         if (!empty($res['success']) && !empty($res['user'])) {
             $user = $res['user'];
@@ -175,7 +235,6 @@ class AuthController extends Controller
                 'avatar'            => $user['avatar'] ?? '',
             ]);
 
-            $userModel = new User();
             $userModel->updateLastLogin((int)$user['id']);
 
             try {
@@ -190,6 +249,35 @@ class AuthController extends Controller
             return;
         }
 
+        // If the token check failed, check if the user is already verified via email parameter
+        if ($email !== '') {
+            $user = $userModel->findByEmail($email);
+            if ($user && !empty($user['email_verified_at']) && $user['status'] === 'active') {
+                Session::regenerate();
+                Session::set('user', [
+                    'id'                => (int)$user['id'],
+                    'name'              => $user['name'],
+                    'email'             => $user['email'],
+                    'role'              => $user['role'] ?? 'venue_owner',
+                    'email_verified_at' => $user['email_verified_at'],
+                    'status'            => 'active',
+                    'avatar'            => $user['avatar'] ?? '',
+                ]);
+
+                $userModel->updateLastLogin((int)$user['id']);
+
+                try {
+                    ActivityLog::record("Logged in automatically - email already verified", 'auth', 'User', (int)$user['id']);
+                    AuditLog::log('EMAIL_ALREADY_VERIFIED_LOGIN', 'User', (int)$user['id']);
+                } catch (\Throwable $e) {}
+
+                unset($_SESSION['unverified_email']);
+                Session::flash('success', 'Email Already Verified');
+                $this->redirect(url('/dashboard'));
+                return;
+            }
+        }
+
         $this->render('auth.verify-result', [
             'title'   => 'Email Verification — FindOwnn',
             'status'  => strtolower($res['code'] ?? '') === 'expired_token' ? 'expired' : 'invalid',
@@ -198,16 +286,100 @@ class AuthController extends Controller
         ], 'auth');
     }
 
+    /**
+     * Check verification status via AJAX API for real-time cross-device sync.
+     */
+    public function checkVerificationStatus(Request $request): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        
+        $email = User::normalizeEmail($request->query('email', '')) 
+              ?: User::normalizeEmail($request->input('email', '')) 
+              ?: ($_SESSION['unverified_email'] ?? '');
+
+        if ($email === '') {
+            echo json_encode([
+                'verified' => false,
+                'status'   => 'no_email_provided',
+                'message'  => 'Email address not provided.'
+            ]);
+            exit;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
+
+        if (!$user) {
+            echo json_encode([
+                'verified' => false,
+                'status'   => 'user_not_found',
+                'message'  => 'No account found for this email.'
+            ]);
+            exit;
+        }
+
+        if ($user['status'] === 'active' && !empty($user['email_verified_at'])) {
+            // Auto-login the desktop session if not already logged in
+            $currentUser = Session::get('user');
+            if (empty($currentUser) || (int)$currentUser['id'] !== (int)$user['id']) {
+                Session::regenerate();
+                Session::set('user', [
+                    'id'                => (int)$user['id'],
+                    'name'              => $user['name'],
+                    'email'             => $user['email'],
+                    'role'              => $user['role'] ?? 'venue_owner',
+                    'email_verified_at' => $user['email_verified_at'],
+                    'status'            => 'active',
+                    'avatar'            => $user['avatar'] ?? '',
+                ]);
+                $userModel = new User();
+                $userModel->updateLastLogin((int)$user['id']);
+            }
+
+            unset($_SESSION['unverified_email']);
+            Session::flash('show_splash', '1');
+            Session::flash('success', 'Email verified successfully! Welcome to your Venue Owner Dashboard.');
+
+            echo json_encode([
+                'verified'     => true,
+                'status'       => 'active',
+                'message'      => 'Your email is verified successfully! 🎉',
+                'subtext'      => 'Your venue owner account has been verified. Redirecting you to your dashboard...',
+                'redirect_url' => url('/dashboard')
+            ]);
+            exit;
+        }
+
+        echo json_encode([
+            'verified' => false,
+            'status'   => $user['status'] ?? 'pending_email_verification',
+            'message'  => 'Verification link sent. Waiting for verification...'
+        ]);
+        exit;
+    }
+
     public function resendVerification(Request $request): void
     {
         $email = trim($request->input('email', '')) ?: ($_SESSION['unverified_email'] ?? '');
         if ($email === '') {
+            if ($request->header('X-Requested-With') === 'XMLHttpRequest' || $request->query('json') === '1') {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['success' => false, 'message' => 'Please enter your email address to resend verification.']);
+                exit;
+            }
             Session::flash('error', 'Please enter your email address to resend verification.');
             $this->redirect(url('/owner/verify-notice'));
         }
 
         $verifyService = new EmailVerificationService();
         $res = $verifyService->resendVerification($email);
+
+        if ($request->header('X-Requested-With') === 'XMLHttpRequest' || $request->query('json') === '1') {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($res);
+            exit;
+        }
 
         if ($res['success']) {
             Session::flash('success', $res['message']);
@@ -254,21 +426,39 @@ class AuthController extends Controller
     public function directVerify(Request $request): void
     {
         $userId = (int)$request->input('user_id', 0);
-        if (!$userId && !empty($_SESSION['unverified_email'])) {
-            $userModel = new User();
-            $u = $userModel->findByEmail($_SESSION['unverified_email']);
-            if ($u) $userId = (int)$u['id'];
-        }
+        $email  = User::normalizeEmail($request->raw('email', ''));
 
-        if (!$userId) {
-            Session::flash('error', 'User account not found. Please register again.');
-            $this->redirect(url('/owner/register'));
-            return;
+        if ($email === '') {
+            $email = User::normalizeEmail($request->query('email', ''));
+        }
+        if ($email === '' && !empty($_SESSION['unverified_email'])) {
+            $email = User::normalizeEmail($_SESSION['unverified_email']);
         }
 
         $userModel = new User();
+
+        if (!$userId && $email !== '') {
+            $u = $userModel->findByEmail($email);
+            if ($u) {
+                $userId = (int)$u['id'];
+            }
+        }
+
+        if (!$userId && !empty($_SESSION['unverified_email'])) {
+            $u = $userModel->findByEmail($_SESSION['unverified_email']);
+            if ($u) {
+                $userId = (int)$u['id'];
+            }
+        }
+
+        if (!$userId) {
+            Session::flash('error', 'User account not found. Please try signing in or registering again.');
+            $this->redirect(url('/owner/login'));
+            return;
+        }
+
         $db = \App\Core\Database::getInstance();
-        $user = $db->fetch("SELECT * FROM users WHERE id = ?", [$userId]);
+        $user = $db->fetch("SELECT * FROM users WHERE id = ? AND deleted_at IS NULL", [$userId]);
 
         if (!$user) {
             Session::flash('error', 'User account not found.');
@@ -277,7 +467,11 @@ class AuthController extends Controller
         }
 
         // Activate user directly
-        $db->execute("UPDATE users SET email_verified_at = NOW(), status = 'active', email_verification_token_hash = NULL, email_verification_expires_at = NULL, updated_at = NOW() WHERE id = ?", [$userId]);
+        $now = date('Y-m-d H:i:s');
+        $db->execute(
+            "UPDATE users SET email_verified_at = NOW(), status = 'active', email_verification_token_hash = NULL, email_verification_expires_at = NULL, updated_at = NOW() WHERE id = ?",
+            [$userId]
+        );
 
         Session::regenerate();
         Session::set('user', [
@@ -285,13 +479,19 @@ class AuthController extends Controller
             'name'              => $user['name'],
             'email'             => $user['email'],
             'role'              => $user['role'] ?? 'venue_owner',
-            'email_verified_at' => date('Y-m-d H:i:s'),
+            'email_verified_at' => $now,
             'status'            => 'active',
             'avatar'            => $user['avatar'] ?? '',
         ]);
 
         $userModel->updateLastLogin((int)$user['id']);
         unset($_SESSION['unverified_email']);
+
+        try {
+            ActivityLog::record("Logged in automatically after direct email verification", 'auth', 'User', (int)$user['id']);
+            AuditLog::log('DIRECT_EMAIL_VERIFIED_LOGIN', 'User', (int)$user['id']);
+        } catch (\Throwable $e) {}
+
         Session::flash('show_splash', '1');
         Session::flash('success', 'Account verified & activated successfully! Welcome to your Venue Owner Dashboard.');
         $this->redirect(url('/dashboard'));

@@ -25,7 +25,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="glass-card p-4 p-md-5 text-center animate-on-scroll">
             <div class="mb-4">
                 <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
-                     style="width:72px;height:72px;background:rgba(34,197,94,0.15);border:2px solid rgba(34,197,94,0.4);">
+                     style="width:72px;height:72px;background:rgba(56,135,198,0.15);border:2px solid rgba(56,135,198,0.4);">
                     <i class="bi bi-check-lg text-success" style="font-size:2rem;"></i>
                 </div>
             </div>

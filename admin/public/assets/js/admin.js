@@ -172,7 +172,7 @@
       document.body.appendChild(container);
     }
 
-    const colors = { success:'#22c55e', danger:'#ef4444', warning:'#f59e0b', info:'#3b82f6' };
+    const colors = { success:'#3887C6', danger:'#ef4444', warning:'#f59e0b', info:'#3b82f6' };
     const icons  = { success:'check-circle-fill', danger:'exclamation-triangle-fill', warning:'exclamation-circle-fill', info:'info-circle-fill' };
     const c = colors[type] ?? colors.info;
     const i = icons[type]  ?? icons.info;

@@ -28,7 +28,7 @@
                 <!-- Sport Filter Buttons (static - All Sports, Box Cricket, Pickleball) -->
                 <div class="col-lg-7 d-flex gap-2 justify-content-lg-end flex-wrap" id="sport-filter-buttons">
                     <button class="filter-btn" data-slug="all">All Sports</button>
-                    <button class="filter-btn" data-slug="box-cricket"><i class="bi bi-circle-fill me-1" style="color:#22c55e;font-size:0.5rem;"></i>Box Cricket</button>
+                    <button class="filter-btn" data-slug="box-cricket"><i class="bi bi-circle-fill me-1" style="color:#3887C6;font-size:0.5rem;"></i>Box Cricket</button>
                     <button class="filter-btn" data-slug="pickleball"><i class="bi bi-circle-fill me-1" style="color:#3b82f6;font-size:0.5rem;"></i>Pickleball</button>
                 </div>
             </div>

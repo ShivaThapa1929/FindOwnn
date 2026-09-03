@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         per_page: 50,
         sport: null,
         search: null,
-        sort: 'rating'
+        sort: 'recent'
     };
 
     let isLoading = false;
@@ -157,31 +157,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sportTag = sports.length > 0 ? sports[0] : 'Sports';
         const address  = venue.address || venue.city || 'Bhuj';
         const verified = venue.is_verified
-            ? `<span class="badge ms-2" style="background:rgba(34,197,94,.15);color:#22c55e;font-size:.6rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>`
+            ? `<span class="badge ms-2" style="background:rgba(56,135,198,.15);color:#3887C6;font-size:.6rem;"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>`
             : '';
 
-        // Sport → image map
-        const sportImageMap = {
-            'box-cricket': 'assets/images/venue1.jpg',
-            'cricket':     'assets/images/venue1.jpg',
-            'pickleball':  'assets/images/venue2.jpg',
-            'football':    'assets/images/venue3.jpg',
-            'badminton':   'assets/images/venue2.jpg',
-        };
-        const fallbacks = [
-            'assets/images/venue1.jpg',
-            'assets/images/venue2.jpg',
-            'assets/images/venue3.jpg',
-        ];
-
-        let image = FindownnAPI.resolveImageUrl(venue.featured_image);
-        if (!image) {
-            const slugs = sports.map(s => s.toLowerCase().replace(/\s+/g, '-'));
-            for (const sl of slugs) {
-                if (sportImageMap[sl]) { image = FindownnAPI.resolveImageUrl(sportImageMap[sl]); break; }
-            }
-        }
-        if (!image) image = FindownnAPI.resolveImageUrl(fallbacks[(venue.id - 1) % fallbacks.length]);
+        const fallbackImage = FindownnAPI.resolveImageUrl('assets/images/venue1.jpg');
+        let image = FindownnAPI.resolveImageUrl(venue.featured_image) || fallbackImage;
 
         // Amenities
         const amenityIconMap = {
@@ -296,6 +276,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // ==================== LOAD SPORTS FILTER ====================
+    async function loadSportsFilter() {
+        if (!filterButtons) return;
+        try {
+            const response = await FindownnAPI.getSports();
+            if (response.success && response.data.sports) {
+                let html = `<button class="filter-btn" data-slug="all">All Sports</button>`;
+                
+                const sportColorMap = {
+                    'box-cricket': '#3887C6',
+                    'pickleball': '#3b82f6',
+                    'football': '#ef4444',
+                    'badminton': '#f59e0b',
+                    'tennis': '#10b981',
+                    'basketball': '#ec4899'
+                };
+
+                const seenSlugs = new Set();
+                response.data.sports.forEach(sport => {
+                    if (seenSlugs.has(sport.slug)) return;
+                    seenSlugs.add(sport.slug);
+
+                    // Only show sports that have live venues
+                    if (sport.total_venues > 0) {
+                        const color = sportColorMap[sport.slug] || '#64748b';
+                        html += `
+                            <button class="filter-btn" data-slug="${escapeHtml(sport.slug)}">
+                                <i class="bi bi-circle-fill me-1" style="color:${color};font-size:0.5rem;"></i>${escapeHtml(sport.name)}
+                            </button>
+                        `;
+                    }
+                });
+
+                filterButtons.innerHTML = html;
+
+                // Re-bind click events to newly created filter buttons
+                filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const slug = btn.getAttribute('data-slug');
+                        currentFilters.sport = (slug === 'all') ? null : slug;
+                        currentFilters.page = 1;
+                        activateFilterButtons();
+                        loadVenues();
+                    });
+                });
+
+                activateFilterButtons();
+            }
+        } catch (error) {
+            console.error('Error loading sports filter:', error);
+        }
+    }
+
     // ==================== INITIALIZE ====================
+    await loadSportsFilter();
     await loadVenues();
 });

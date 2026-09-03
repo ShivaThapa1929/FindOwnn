@@ -11,7 +11,7 @@ class VenueController extends ApiController
             // GET /venues/{id}
             return $method === 'GET' ? self::show($id) : self::error('Method not allowed', 405);
         }
-        
+
         if ($id && $action) {
             // GET /venues/{id}/{action}
             switch ($action) {
@@ -27,11 +27,11 @@ class VenueController extends ApiController
                     return self::error('Invalid action', 404);
             }
         }
-        
+
         // GET /venues or /venues/search
         return $method === 'GET' ? self::index($query) : self::error('Method not allowed', 405);
     }
-    
+
     /**
      * Get all venues with filters
      */
@@ -39,10 +39,15 @@ class VenueController extends ApiController
     {
         $page = (int) ($query['page'] ?? 1);
         $perPage = min((int) ($query['per_page'] ?? 20), 50);
-        
+
         $featuredSql = self::venueFeaturedImageSql('v');
 
-        $sql = "SELECT v.*, 
+        $sql = "SELECT v.id, v.owner_id, v.contact_person, v.contact_email, v.contact_phone, v.whatsapp_number,
+                       v.name, v.slug, v.description, v.address, v.city, v.state, v.pincode, v.google_map_link,
+                       v.latitude, v.longitude, v.amenities, v.opening_time, v.closing_time, v.booking_advance_days,
+                       v.cancellation_hours, v.price_per_hour, v.rating, v.total_reviews, v.status,
+                       v.verification_status, v.is_verified, v.verified_by, v.verified_at, v.badge_expires_at,
+                       v.verification_notes, v.created_at, v.updated_at, v.deleted_at,
                 GROUP_CONCAT(DISTINCT s.name) as sports,
                 {$featuredSql} as featured_image,
                 (SELECT COUNT(*) FROM courts WHERE venue_id = v.id AND status = 'active') as total_courts,
@@ -53,15 +58,15 @@ class VenueController extends ApiController
                 LEFT JOIN venue_sports vs ON v.id = vs.venue_id
                 LEFT JOIN sports s ON vs.sport_id = s.id
                 WHERE v.deleted_at IS NULL AND v.status = 'active'";
-        
+
         $params = [];
-        
+
         // Apply filters
         if (!empty($query['city'])) {
             $sql .= " AND LOWER(TRIM(v.city)) = LOWER(TRIM(?))";
             $params[] = $query['city'];
         }
-        
+
         if (!empty($query['sport'])) {
             $sql .= " AND s.slug = ?";
             $params[] = $query['sport'];
@@ -71,7 +76,7 @@ class VenueController extends ApiController
             $sql .= " AND s.name LIKE ?";
             $params[] = '%' . $query['sport_name'] . '%';
         }
-        
+
         if (!empty($query['search'])) {
             $sql .= " AND (v.name LIKE ? OR v.description LIKE ? OR v.city LIKE ?)";
             $search = '%' . $query['search'] . '%';
@@ -79,19 +84,19 @@ class VenueController extends ApiController
             $params[] = $search;
             $params[] = $search;
         }
-        
+
         if (!empty($query['min_price'])) {
             $sql .= " AND v.price_per_hour >= ?";
             $params[] = $query['min_price'];
         }
-        
+
         if (!empty($query['max_price'])) {
             $sql .= " AND v.price_per_hour <= ?";
             $params[] = $query['max_price'];
         }
-        
+
         $sql .= " GROUP BY v.id";
-        
+
         // Apply sorting
         $sort = $query['sort'] ?? 'recent';
         switch ($sort) {
@@ -115,11 +120,11 @@ class VenueController extends ApiController
             default:
                 $sql .= " ORDER BY v.created_at DESC";
         }
-        
+
         $result = self::paginate($sql, $params, $page, $perPage);
-        
+
         // Format venues
-        $venues = array_map(function($venue) use ($query) {
+        $venues = array_map(function ($venue) use ($query) {
             $amenitiesRaw = json_decode($venue['amenities'] ?? '[]', true);
             $amenitiesArray = is_array($amenitiesRaw) ? $amenitiesRaw : [];
             $amenitiesLower = array_map('strtolower', array_map('trim', $amenitiesArray));
@@ -155,13 +160,13 @@ class VenueController extends ApiController
                 'status' => $venue['status']
             ];
         }, $result['items']);
-        
+
         return self::success([
             'venues' => $venues,
             'meta' => $result['meta']
         ]);
     }
-    
+
     /**
      * Get single venue details
      */
@@ -177,11 +182,11 @@ class VenueController extends ApiController
              WHERE v.id = ? AND v.deleted_at IS NULL",
             [$id]
         );
-        
+
         if (!$venue) {
             return self::error('Playground not found', 404, 'VENUE_001');
         }
-        
+
         // Get sports
         $sports = self::$db->fetchAll(
             "SELECT s.* FROM sports s
@@ -189,7 +194,7 @@ class VenueController extends ApiController
              WHERE vs.venue_id = ? AND s.is_active = 1",
             [$id]
         );
-        
+
         // Get images
         $images = self::$db->fetchAll(
             "SELECT id, image_path, caption, image_type
@@ -198,7 +203,7 @@ class VenueController extends ApiController
              ORDER BY sort_order ASC",
             [$id]
         );
-        
+
         // Get courts with court_image
         $courts = self::$db->fetchAll(
             "SELECT c.*, s.name as sport,
@@ -208,7 +213,7 @@ class VenueController extends ApiController
              WHERE c.venue_id = ? AND c.deleted_at IS NULL",
             [$id]
         );
-        
+
         $amenitiesRaw = json_decode($venue['amenities'] ?? '[]', true);
         $amenitiesArray = is_array($amenitiesRaw) ? $amenitiesRaw : [];
         $amenitiesLower = array_map('strtolower', array_map('trim', $amenitiesArray));
@@ -237,7 +242,7 @@ class VenueController extends ApiController
             'has_restroom' => $contains('Restroom', 'Washroom', 'Toilet', 'Bathroom'),
             'has_changing_room' => $contains('Changing Room', 'Changing Rooms', 'Locker Room'),
             'has_first_aid' => $contains('First Aid', 'First-Aid', 'Medical'),
-            'images' => array_map(function($img) {
+            'images' => array_map(function ($img) {
                 $url = self::formatImageUrl($img['image_path']);
                 return [
                     'id' => (int) $img['id'],
@@ -247,7 +252,7 @@ class VenueController extends ApiController
                     'type' => $img['image_type']
                 ];
             }, $images),
-            'courts' => array_map(function($court) {
+            'courts' => array_map(function ($court) {
                 return [
                     'id' => (int) $court['id'],
                     'name' => $court['name'],
@@ -280,7 +285,7 @@ class VenueController extends ApiController
             'status' => $venue['status']
         ]);
     }
-    
+
     /**
      * Get venue images
      */
@@ -290,8 +295,8 @@ class VenueController extends ApiController
             "SELECT * FROM venue_images WHERE venue_id = ? ORDER BY sort_order ASC",
             [$id]
         );
-        
-        $imageList = array_map(function($img) {
+
+        $imageList = array_map(function ($img) {
             $url = self::formatImageUrl($img['image_path']);
             return [
                 'id' => (int) $img['id'],
@@ -303,12 +308,12 @@ class VenueController extends ApiController
                 'sort_order' => (int) ($img['sort_order'] ?? 0)
             ];
         }, $images);
-        
+
         return self::success([
             'images' => $imageList
         ]);
     }
-    
+
     /**
      * Get WhatsApp contact link
      */
@@ -318,19 +323,19 @@ class VenueController extends ApiController
             "SELECT name, whatsapp_number FROM venues WHERE id = ?",
             [$id]
         );
-        
+
         $whatsappNum = $venue['whatsapp_number'] ?? '+919558346768';
         $phone = preg_replace('/\D/', '', $whatsappNum);
         $venueName = $venue['name'] ?? 'Playground';
         $message = urlencode("Hi, I want to book a slot at " . $venueName);
-        
+
         return self::success([
             'whatsapp_link' => "https://wa.me/{$phone}?text={$message}",
             'phone' => $whatsappNum,
             'contact_name' => $venueName
         ]);
     }
-    
+
     /**
      * Get venue reviews dynamically from DB
      */
@@ -349,9 +354,9 @@ class VenueController extends ApiController
         $sum = array_reduce($reviews, fn($carry, $item) => $carry + ($item['rating'] ?? 5), 0);
         $venueRating = (float) self::$db->fetchColumn("SELECT rating FROM venues WHERE id = ?", [$id]);
         $avg = $total > 0 ? round($sum / $total, 1) : ($venueRating ?: 5.0);
-        
+
         return self::success([
-            'reviews' => array_map(function($r) {
+            'reviews' => array_map(function ($r) {
                 return [
                     'id' => (int) $r['id'],
                     'user_name' => $r['user_name'] ?? 'Player',
@@ -366,14 +371,14 @@ class VenueController extends ApiController
             ]
         ]);
     }
-    
+
     /**
      * Get availability with real slot generation & occupancy calculation
      */
     private static function getAvailability($id, $query)
     {
         $date = $query['date'] ?? date('Y-m-d');
-        
+
         $venue = self::$db->fetch(
             "SELECT opening_time, closing_time, price_per_hour FROM venues WHERE id = ?",
             [$id]
@@ -385,7 +390,8 @@ class VenueController extends ApiController
 
         $startHour = (int) explode(':', $openTime)[0];
         $endHour = (int) explode(':', $closeTime)[0];
-        if ($endHour <= $startHour) $endHour = 23;
+        if ($endHour <= $startHour)
+            $endHour = 23;
 
         // Fetch existing bookings for this date and venue
         $existingBookings = self::$db->fetchAll(

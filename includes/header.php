@@ -9,12 +9,16 @@ require_once __DIR__ . '/seo.php';
 $site_user = site_user();
 $seo = site_seo_meta($route_name ?? 'index');
 $canonical = site_canonical_url();
+$skip_splash = in_array($route_name ?? '', [
+    'login', 'register', 'dashboard', 'account', 'privacy', 'terms',
+    'booking-success', 'booking-payment',
+], true);
 ?>
 <!DOCTYPE html>
 <html lang="en" data-site-base="<?= htmlspecialchars($asset_base, ENT_QUOTES, 'UTF-8') ?>">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <!-- Reload on any page → always land on home -->
   <script>
@@ -63,7 +67,7 @@ $canonical = site_canonical_url();
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="<?= e($seo['title']) ?>">
   <meta name="twitter:description" content="<?= e($seo['description']) ?>">
-  <meta name="theme-color" content="#080c09">
+  <meta name="theme-color" content="#3887C6">
   <script type="application/ld+json"><?= site_json_ld_organization($asset_base) ?></script>
   <?php if (($route_name ?? '') === 'index'): ?>
   <script type="application/ld+json"><?= site_json_ld_website($asset_base) ?></script>
@@ -92,7 +96,7 @@ $canonical = site_canonical_url();
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
   <!-- Critical CSS (preload) -->
-  <link rel="preload" href="<?= $asset_base ?>css/style.css?v=4.6" as="style">
+  <link rel="preload" href="<?= $asset_base ?>css/style.css?v=5.9" as="style">
 
   <!-- Fonts (non-blocking) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -106,35 +110,37 @@ $canonical = site_canonical_url();
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=4.6">
-  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=1.4">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=5.9">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=4.1">
   <?php if (($route_name ?? '') === 'index'): ?>
-  <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=4.8">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=9.0">
   <?php endif; ?>
 </head>
-<body class="splash-active">
+<body class="<?= $skip_splash ? 'page-ready' : 'splash-active' ?>"<?= $skip_splash ? ' data-skip-splash="1"' : '' ?>>
 
+  <?php if (!$skip_splash): ?>
   <!-- ============================================================
       SPLASH SCREEN
   ============================================================ -->
   <div id="splash-screen" aria-hidden="true">
     <div class="splash-logo">
-      <img src="<?= $asset_base ?>assets/images/logo.png" alt="Findownn" style="width:48px;height:48px;object-fit:contain;border-radius:10px;">
+      <img src="<?= $asset_base ?>assets/images/logo.png" alt="Findownn">
     </div>
     <div class="splash-wordmark">FIND<span class="brand-accent">OWNN</span></div>
     <div class="splash-tagline">Book playgrounds. Play more.</div>
     <div class="splash-bar"><div class="splash-bar-fill"></div></div>
   </div>
+  <?php endif; ?>
 
   <!-- ============================================================
       NAVBAR
   ============================================================ -->
-  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="main-navbar">
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="main-navbar">
     <div class="container">
 
       <a class="navbar-brand" href="<?= $asset_base ?>">
-        <div class="navbar-brand-logo" style="background:none;box-shadow:none;">
-          <img src="<?= $asset_base ?>assets/images/logo.png" alt="Findownn" width="32" height="32" loading="eager" decoding="async" style="width:32px;height:32px;object-fit:contain;border-radius:8px;">
+        <div class="navbar-brand-logo">
+          <img src="<?= $asset_base ?>assets/images/logo.png" alt="Findownn" width="32" height="32" loading="eager" decoding="async">
         </div>
         <span class="navbar-brand-text">FIND<span class="brand-accent">OWNN</span></span>
       </a>
@@ -170,6 +176,11 @@ $canonical = site_canonical_url();
           <li class="nav-item">
             <a class="nav-link <?php echo ($current_page === 'dashboard' || $current_page === 'account') ? 'active' : ''; ?>" href="dashboard">
               <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+            <a href="logout" class="btn btn-premium-outline btn-sm w-100">
+              <i class="bi bi-box-arrow-right me-1"></i> Sign Out
             </a>
           </li>
           <?php else: ?>

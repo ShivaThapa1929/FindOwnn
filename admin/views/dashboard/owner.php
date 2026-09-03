@@ -13,8 +13,8 @@ $ownerMonthlyRev = $ownerMonthlyRev ?? [];
 $activity        = $activity ?? [];
 $bestPerforming  = $bestPerforming ?? [];
 $mostLoved       = $mostLoved ?? [];
+$recommendations = $recommendations ?? [];
 $allPlans = $allPlans ?? [];
-$mySub    = $mySub ?? null;
 $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && count($ownerMonthlyRev) > 0;
 ?>
 
@@ -34,6 +34,20 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
     <i class="bi bi-plus-lg me-1"></i>Add New Venue
   </a>
 </div>
+
+<?php if ($successMsg = flash('success')): ?>
+<div class="alert alert-success d-flex align-items-center gap-2 mb-3 py-2 px-3 small border-0" style="background:rgba(56,135,198,0.15);color:#3887C6;border-left:3px solid #3887C6!important;">
+  <i class="bi bi-check-circle-fill fs-5"></i>
+  <div class="fw-600"><?= e($successMsg) ?></div>
+</div>
+<?php endif; ?>
+
+<?php if ($errorMsg = flash('error')): ?>
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-3 py-2 px-3 small border-0" style="background:rgba(239,68,68,0.15);color:#ef4444;border-left:3px solid #ef4444!important;">
+  <i class="bi bi-exclamation-circle-fill fs-5"></i>
+  <div class="fw-600"><?= e($errorMsg) ?></div>
+</div>
+<?php endif; ?>
 
 <!-- ── Subscription Alert ─────────────────────────────────────── -->
 <?php if (!$mySub): ?>
@@ -62,7 +76,7 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
   </div>
 </div>
 <?php else: ?>
-<div class="alert d-flex align-items-center gap-3 mb-4 border-0" style="background:rgba(34,197,94,0.08);border-left:3px solid #22c55e!important;">
+<div class="alert d-flex align-items-center gap-3 mb-4 border-0" style="background:rgba(56,135,198,0.08);border-left:3px solid #3887C6!important;">
   <i class="bi bi-patch-check-fill text-success fs-5 flex-shrink-0"></i>
   <div class="small flex-grow-1">
     <strong class="text-success"><?= e($mySub['plan_name'] ?? 'Subscription') ?> Plan</strong> active
@@ -135,6 +149,9 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
   </div>
 </div>
 
+<!-- ── Smart Recommendations ─────────────────────────────────────── -->
+<?php include __DIR__ . '/_recommendations.php'; ?>
+
 <!-- ── Charts + Venues ───────────────────────────────────────────── -->
 <div class="row g-3 mb-3">
   <!-- Revenue Chart -->
@@ -152,7 +169,7 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
           <svg width="140" height="100" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1.5rem; opacity: 0.5;">
             <defs>
               <linearGradient id="emptyChartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.4" />
+                <stop offset="0%" style="stop-color:#3887C6;stop-opacity:0.4" />
                 <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.2" />
               </linearGradient>
             </defs>
@@ -164,13 +181,13 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
                   stroke-linecap="round"
                   stroke-linejoin="round"/>
             <!-- Data Points -->
-            <circle cx="10" cy="80" r="4" fill="#22c55e" opacity="0.5"/>
-            <circle cx="30" cy="60" r="4" fill="#22c55e" opacity="0.5"/>
-            <circle cx="50" cy="70" r="4" fill="#22c55e" opacity="0.5"/>
-            <circle cx="70" cy="45" r="5" fill="#22c55e" opacity="0.6"/>
-            <circle cx="90" cy="55" r="4" fill="#22c55e" opacity="0.5"/>
-            <circle cx="110" cy="30" r="5" fill="#22c55e" opacity="0.6"/>
-            <circle cx="130" cy="40" r="4" fill="#22c55e" opacity="0.5"/>
+            <circle cx="10" cy="80" r="4" fill="#3887C6" opacity="0.5"/>
+            <circle cx="30" cy="60" r="4" fill="#3887C6" opacity="0.5"/>
+            <circle cx="50" cy="70" r="4" fill="#3887C6" opacity="0.5"/>
+            <circle cx="70" cy="45" r="5" fill="#3887C6" opacity="0.6"/>
+            <circle cx="90" cy="55" r="4" fill="#3887C6" opacity="0.5"/>
+            <circle cx="110" cy="30" r="5" fill="#3887C6" opacity="0.6"/>
+            <circle cx="130" cy="40" r="4" fill="#3887C6" opacity="0.5"/>
             <!-- Axis Lines -->
             <line x1="10" y1="85" x2="130" y2="85" stroke="#86a892" stroke-width="1" opacity="0.2"/>
           </svg>
@@ -214,7 +231,7 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
         <?php else: ?>
           <?php foreach ($myVenues as $v): ?>
           <div class="d-flex align-items-center gap-2 px-3 py-2 border-bottom border-opacity-10">
-            <div class="flex-shrink-0" style="width:8px;height:8px;border-radius:50%;background:<?= $v['status']==='active' ? '#22c55e' : ($v['verification_status']==='pending' ? '#f59e0b' : '#ef4444') ?>;"></div>
+            <div class="flex-shrink-0" style="width:8px;height:8px;border-radius:50%;background:<?= $v['status']==='active' ? '#3887C6' : ($v['verification_status']==='pending' ? '#f59e0b' : '#ef4444') ?>;"></div>
             <div class="flex-grow-1 min-w-0">
               <div class="fw-500 small text-truncate"><?= e($v['name']) ?></div>
               <div class="text-muted d-flex align-items-center gap-2" style="font-size:.72rem;">
@@ -265,8 +282,8 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
             <?php else: ?>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150">
                 <rect width="200" height="150" fill="#0d1510"/>
-                <circle cx="100" cy="75" r="30" fill="#22c55e" opacity="0.2"/>
-                <path d="M70 75 L85 60 L115 60 L130 75 L115 90 L85 90 Z" fill="#22c55e" opacity="0.3"/>
+                <circle cx="100" cy="75" r="30" fill="#3887C6" opacity="0.2"/>
+                <path d="M70 75 L85 60 L115 60 L130 75 L115 90 L85 90 Z" fill="#3887C6" opacity="0.3"/>
                 <text x="100" y="120" font-family="Arial" font-size="11" fill="#86a892" text-anchor="middle">No Image</text>
               </svg>
             <?php endif; ?>
@@ -533,16 +550,16 @@ document.addEventListener('DOMContentLoaded', function() {
           {
             label: 'Revenue (₹)',
             data: revenue,
-            borderColor: '#22c55e',
-            backgroundColor: 'rgba(34,197,94,0.15)',
+            borderColor: '#3887C6',
+            backgroundColor: 'rgba(56,135,198,0.15)',
             borderWidth: 3,
             tension: 0.4,
             pointRadius: 6,
             pointHoverRadius: 8,
-            pointBackgroundColor: '#22c55e',
-            pointBorderColor: '#0a0f0b',
+            pointBackgroundColor: '#3887C6',
+            pointBorderColor: '#E5EFFB',
             pointBorderWidth: 2,
-            pointHoverBackgroundColor: '#22c55e',
+            pointHoverBackgroundColor: '#3887C6',
             pointHoverBorderColor: '#fff',
             pointHoverBorderWidth: 3,
             fill: true,
@@ -558,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pointRadius: 5,
             pointHoverRadius: 7,
             pointBackgroundColor: '#f59e0b',
-            pointBorderColor: '#0a0f0b',
+            pointBorderColor: '#E5EFFB',
             pointBorderWidth: 2,
             pointHoverBackgroundColor: '#f59e0b',
             pointHoverBorderColor: '#fff',
@@ -596,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
           tooltip: {
             enabled: true,
             backgroundColor: 'rgba(10,15,11,0.95)',
-            borderColor: 'rgba(34,197,94,0.3)',
+            borderColor: 'rgba(56,135,198,0.3)',
             borderWidth: 1,
             titleColor: '#f0fdf4',
             titleFont: { size: 13, weight: 'bold' },
@@ -727,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .activity-item:hover {
-  background: rgba(34,197,94,0.02);
+  background: rgba(56,135,198,0.02);
 }
 
 .activity-icon {
@@ -747,8 +764,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .activity-icon--green {
-  background: rgba(34,197,94,0.15);
-  color: #22c55e;
+  background: rgba(56,135,198,0.15);
+  color: #3887C6;
 }
 
 .activity-icon--yellow {
@@ -797,12 +814,12 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .featured-venue-card:hover {
-  background: rgba(34,197,94,0.03);
+  background: rgba(56,135,198,0.03);
 }
 
 .featured-venue-card--top {
-  background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(16,185,129,0.03));
-  border-left: 3px solid #22c55e;
+  background: linear-gradient(135deg, rgba(56,135,198,0.05), rgba(56,135,198,0.03));
+  border-left: 3px solid #3887C6;
 }
 
 .featured-venue-rank {
@@ -812,14 +829,14 @@ document.addEventListener('DOMContentLoaded', function() {
   width: 32px;
   height: 32px;
   background: rgba(10,15,11,0.9);
-  border: 2px solid #22c55e;
+  border: 2px solid #3887C6;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 0.85rem;
-  color: #22c55e;
+  color: #3887C6;
   z-index: 2;
 }
 
@@ -915,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function() {
 .featured-venue-stat-value {
   font-size: 1rem;
   font-weight: 700;
-  color: #22c55e;
+  color: #3887C6;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -931,6 +948,106 @@ document.addEventListener('DOMContentLoaded', function() {
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-top: 0.15rem;
+}
+
+.bg-success-soft {
+  background-color: rgba(56,135,198,0.15);
+  color: #3887C6;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+}
+
+/* ========== Owner Recommendations ========== */
+.owner-recommendations-panel {
+  border: 1px solid rgba(245,158,11,0.2);
+  background: linear-gradient(135deg, rgba(245,158,11,0.04), rgba(13,21,16,0.2));
+}
+
+.owner-rec-card {
+  display: flex;
+  gap: 0.85rem;
+  height: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(134,168,146,0.14);
+  background: rgba(10,15,11,0.55);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.owner-rec-card:hover {
+  border-color: rgba(56,135,198,0.35);
+  transform: translateY(-2px);
+}
+
+.owner-rec-card--high {
+  border-left: 3px solid #ef4444;
+}
+
+.owner-rec-card--medium {
+  border-left: 3px solid #f59e0b;
+}
+
+.owner-rec-card--low {
+  border-left: 3px solid #3887C6;
+}
+
+.owner-rec-card__icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  background: rgba(56,135,198,0.12);
+  color: #5a9fd4;
+}
+
+.owner-rec-card--high .owner-rec-card__icon {
+  background: rgba(239,68,68,0.12);
+  color: #f87171;
+}
+
+.owner-rec-card--medium .owner-rec-card__icon {
+  background: rgba(245,158,11,0.12);
+  color: #fbbf24;
+}
+
+.owner-rec-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.owner-rec-card__badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #86a892;
+  margin-bottom: 0.35rem;
+}
+
+.owner-rec-card__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f0fdf4;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.3;
+}
+
+.owner-rec-card__text {
+  font-size: 0.78rem;
+  color: #86a892;
+  line-height: 1.55;
+  margin: 0 0 0.75rem 0;
+}
+
+.owner-rec-card__btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.65rem;
 }
 
 /* Badge Styles */

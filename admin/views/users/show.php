@@ -146,7 +146,7 @@ $venueCount = (int) $db->fetchColumn(
       </div>
       <div class="panel-body">
         <?php if ($activeSub): ?>
-        <div class="d-flex align-items-center gap-3 p-3 rounded mb-3" style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.15);">
+        <div class="d-flex align-items-center gap-3 p-3 rounded mb-3" style="background:rgba(56,135,198,0.07);border:1px solid rgba(56,135,198,0.15);">
           <i class="bi bi-patch-check-fill text-success" style="font-size:2rem;"></i>
           <div>
             <div class="fw-700"><?= e($activeSub['plan_name']) ?> Plan</div>

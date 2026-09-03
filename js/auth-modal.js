@@ -183,6 +183,12 @@
   if (registerForm) {
     registerForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      var terms = registerForm.querySelector('[name="accept_terms"]');
+      if (terms && !terms.checked) {
+        showAlert('Please agree to the Terms & Conditions and Privacy Policy to create an account.', 'error');
+        terms.focus();
+        return;
+      }
       submitAuth(registerForm, 'auth/register');
     });
   }

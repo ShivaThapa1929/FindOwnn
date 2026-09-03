@@ -7,6 +7,30 @@
   SPLASH — runs immediately, before DOM ready
    ============================================================ */
 (function () {
+  function revealPage() {
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.remove();
+    }
+    document.documentElement.classList.remove('splash-active');
+    document.body.classList.remove('splash-active');
+    document.body.classList.add('page-ready');
+
+    document.querySelectorAll('.animate-on-scroll').forEach(function (el) {
+      el.classList.add('appear');
+    });
+
+    if (typeof window.refreshScrollAnimations === 'function') {
+      window.refreshScrollAnimations();
+    }
+  }
+
+  // Auth / utility pages skip splash — show content immediately
+  if (document.body.dataset.skipSplash === '1' || !document.getElementById('splash-screen')) {
+    revealPage();
+    return;
+  }
+
   // Detect if the page is being reloaded
   const isReload = (
     performance.getEntriesByType &&
@@ -27,28 +51,17 @@
     
     window.addEventListener('load', function () {
       setTimeout(function () {
-        const splash = document.getElementById('splash-screen');
-        if (splash) {
-          splash.remove();
-        }
-        document.documentElement.classList.remove('splash-active');
-        document.body.classList.remove('splash-active');
-        
-        // Mark splash as shown for this session
+        revealPage();
         sessionStorage.setItem('splashShown', 'true');
       }, 900);
     });
   } else {
     // Splash already shown, remove it immediately if it exists
-    window.addEventListener('DOMContentLoaded', function() {
-      const splash = document.getElementById('splash-screen');
-      if (splash) {
-        splash.style.display = 'none';
-        splash.remove();
-      }
-      document.documentElement.classList.remove('splash-active');
-      document.body.classList.remove('splash-active');
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', revealPage);
+    } else {
+      revealPage();
+    }
   }
 })();
 
@@ -433,8 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (initialized) return;
 
     const viewport = testimonialSlider.querySelector('.testimonial-viewport');
-    const pages = Array.from(testimonialTrack.querySelectorAll('.testimonial-page'));
-    if (!viewport || pages.length === 0) return;
+    if (!viewport) return;
 
     initialized = true;
 
@@ -442,13 +454,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = testimonialSlider.querySelector('.testimonial-arrow-next');
     let currentIndex = 0;
     let autoplayTimer = null;
-    const AUTOPLAY_MS = 5000;
+    const AUTOPLAY_MS = 4000;
 
-    const getPageWidth = () => viewport.getBoundingClientRect().width;
+    const getSlides = () => Array.from(testimonialTrack.querySelectorAll('.testimonial-page'));
+    const getViewportWidth = () => viewport.getBoundingClientRect().width;
+
+    const rebuildDots = (slides) => {
+      testimonialDots.innerHTML = '';
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'testimonial-dot' + (i === currentIndex ? ' active' : '');
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Show review page ${i + 1}`);
+        dot.setAttribute('aria-selected', i === currentIndex ? 'true' : 'false');
+        dot.addEventListener('click', () => {
+          currentIndex = i;
+          updateSlider();
+          restartAutoplay();
+        });
+        testimonialDots.appendChild(dot);
+      });
+    };
 
     const updateSlider = () => {
-      const w = getPageWidth();
-      currentIndex = Math.max(0, Math.min(currentIndex, pages.length - 1));
+      const slides = getSlides();
+      if (!testimonialDots.childElementCount || testimonialDots.childElementCount !== slides.length) {
+        rebuildDots(slides);
+      }
+
+      const w = getViewportWidth();
+      currentIndex = Math.max(0, Math.min(currentIndex, slides.length - 1));
       testimonialTrack.style.transform = w > 0
         ? `translate3d(-${currentIndex * w}px, 0, 0)`
         : 'translate3d(0, 0, 0)';
@@ -459,24 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
-    if (!testimonialDots.childElementCount) {
-      pages.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('role', 'tab');
-        dot.setAttribute('aria-label', `Show reviews page ${i + 1}`);
-        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-        dot.addEventListener('click', () => {
-          currentIndex = i;
-          updateSlider();
-          restartAutoplay();
-        });
-        testimonialDots.appendChild(dot);
-      });
-    }
-
-    const maxIndex = () => pages.length - 1;
+    const maxIndex = () => getSlides().length - 1;
 
     const goNext = () => {
       currentIndex = currentIndex >= maxIndex() ? 0 : currentIndex + 1;
@@ -497,7 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startAutoplay = () => {
       stopAutoplay();
-      if (pages.length <= 1) return;
+      const slides = getSlides();
+      if (slides.length <= 1) return;
       autoplayTimer = setInterval(goNext, AUTOPLAY_MS);
     };
 
@@ -526,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
     viewport.addEventListener('touchend', (e) => {
       const diff = touchStartX - e.changedTouches[0].screenX;
-      if (Math.abs(diff) > 48) {
+      if (Math.abs(diff) > 40) {
         if (diff > 0) goNext();
         else goPrev();
         restartAutoplay();

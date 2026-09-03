@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
 
-  const green = 'rgba(34,197,94,0.8)', greenL = 'rgba(34,197,94,0.15)';
+  const green = 'rgba(56,135,198,0.8)', greenL = 'rgba(56,135,198,0.15)';
   const blue  = 'rgba(59,130,246,0.8)', blueL  = 'rgba(59,130,246,0.15)';
 
   // Data preparation
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 tension:.4, 
                 pointRadius:4, 
                 pointBackgroundColor: blue,
-                pointBorderColor: '#0a0f0b',
+                pointBorderColor: '#E5EFFB',
                 pointBorderWidth: 2,
                 yAxisID:'y1',
                 order: 1
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 backgroundColor: 'rgba(10,15,11,0.95)',
                 titleColor: '#f0fdf4',
                 bodyColor: '#d1e7d9',
-                borderColor: 'rgba(34,197,94,0.3)',
+                borderColor: 'rgba(56,135,198,0.3)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (typeLabels.length === 0 || typeRev.every(v => v === 0)) {
         typeCtx.parentElement.innerHTML = '<div style="text-align:center;padding:3rem;color:#86a892;"><i class="bi bi-pie-chart" style="font-size:3rem;opacity:0.3;display:block;margin-bottom:1rem;"></i><p>No sport type data</p></div>';
       } else {
-        const colors = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#ec4899','#14b8a6'];
+        const colors = ['#3887C6','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#ec4899','#14b8a6'];
         new Chart(typeCtx, {
           type:'doughnut',
           data:{ 
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets:[{ 
               data: typeRev, 
               backgroundColor: colors.slice(0, typeLabels.length), 
-              borderColor: '#0a0f0b',
+              borderColor: '#E5EFFB',
               borderWidth: 2, 
               hoverOffset: 8,
               hoverBorderColor: '#fff',
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 backgroundColor: 'rgba(10,15,11,0.95)',
                 titleColor: '#f0fdf4',
                 bodyColor: '#d1e7d9',
-                borderColor: 'rgba(34,197,94,0.3)',
+                borderColor: 'rgba(56,135,198,0.3)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
@@ -311,13 +311,13 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets:[{ 
               label:'New Users', 
               data: ugTotals, 
-              borderColor:'#22c55e', 
-              backgroundColor:'rgba(34,197,94,0.15)', 
+              borderColor:'#3887C6', 
+              backgroundColor:'rgba(56,135,198,0.15)', 
               fill:true, 
               tension:.4, 
               pointRadius:5,
-              pointBackgroundColor: '#22c55e',
-              pointBorderColor: '#0a0f0b',
+              pointBackgroundColor: '#3887C6',
+              pointBorderColor: '#E5EFFB',
               pointBorderWidth: 2,
               pointHoverRadius: 7,
               borderWidth: 3
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 backgroundColor: 'rgba(10,15,11,0.95)',
                 titleColor: '#f0fdf4',
                 bodyColor: '#d1e7d9',
-                borderColor: 'rgba(34,197,94,0.3)',
+                borderColor: 'rgba(56,135,198,0.3)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8
@@ -381,8 +381,8 @@ document.addEventListener('DOMContentLoaded', function() {
             labels:['Confirmed','Pending','Cancelled'],
             datasets:[{ 
               data:[confirmed, pending, cancelled], 
-              backgroundColor:['#22c55e','#f59e0b','#ef4444'], 
-              borderColor: '#0a0f0b',
+              backgroundColor:['#3887C6','#f59e0b','#ef4444'], 
+              borderColor: '#E5EFFB',
               borderWidth: 2,
               hoverOffset: 8,
               hoverBorderColor: '#fff',
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 backgroundColor: 'rgba(10,15,11,0.95)',
                 titleColor: '#f0fdf4',
                 bodyColor: '#d1e7d9',
-                borderColor: 'rgba(34,197,94,0.3)',
+                borderColor: 'rgba(56,135,198,0.3)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,

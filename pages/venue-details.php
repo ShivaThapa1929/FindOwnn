@@ -6,10 +6,12 @@
 .court-card small,
 .court-card .text-secondary,
 #courtDetailModal small,
-#courtDetailModal .text-secondary,
+#courtDetailModal .text-secondary {
+    color: var(--text-muted) !important;
+    font-weight: 500 !important;
+}
 .text-muted {
-    color: #4ade80 !important;
-    font-weight: 600 !important;
+    color: var(--text-muted) !important;
 }
 .gallery-grid {
     display: grid;
@@ -54,7 +56,7 @@
 /* ── Occupancy Banner ──────────────────────── */
 .occupancy-card {
     background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(34, 197, 94, 0.35);
+    border: 1px solid rgba(56, 135, 198, 0.35);
     border-radius: 16px;
     padding: 20px;
     backdrop-filter: blur(12px);
@@ -68,7 +70,7 @@
 }
 .occupancy-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #22c55e, #16a34a);
+    background: linear-gradient(90deg, #3887C6, #2a6ba0);
     border-radius: 99px;
     transition: width 0.8s ease;
 }
@@ -83,9 +85,9 @@
     transition: all 0.3s ease;
 }
 .court-card:hover {
-    border-color: rgba(34,197,94,0.5);
+    border-color: rgba(56,135,198,0.5);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(34,197,94,0.15);
+    box-shadow: 0 8px 24px rgba(56,135,198,0.15);
 }
 
 /* ── Amenities Grid ───────────────────────── */
@@ -106,7 +108,7 @@
     font-size: 0.88rem;
     font-weight: 500;
 }
-.amenity-item i { color: #22c55e; font-size: 1.2rem; flex-shrink: 0; }
+.amenity-item i { color: #3887C6; font-size: 1.2rem; flex-shrink: 0; }
 
 /* ── Reviews ─────────────────────────────── */
 .review-card {
@@ -125,7 +127,7 @@
 .review-avatar {
     width: 40px; height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #22c55e, #059669);
+    background: linear-gradient(135deg, #3887C6, #2a6ba0);
     color: #fff;
     display: flex;
     align-items: center;
@@ -150,22 +152,22 @@
     font-size: 0.82rem;
     font-weight: 600;
     text-align: center;
-    background: rgba(34, 197, 94, 0.08);
-    border: 1px solid rgba(34, 197, 94, 0.4);
-    color: #4ade80;
+    background: rgba(56, 135, 198, 0.08);
+    border: 1px solid rgba(56, 135, 198, 0.4);
+    color: #5a9fd4;
     cursor: pointer;
     transition: all 0.2s ease;
     line-height: 1.3;
 }
 .time-slot:hover:not(:disabled) {
-    background: rgba(34, 197, 94, 0.25);
-    border-color: #22c55e;
+    background: rgba(56, 135, 198, 0.25);
+    border-color: #3887C6;
     transform: translateY(-1px);
 }
 .time-slot.selected {
-    background: #22c55e !important;
+    background: #3887C6 !important;
     color: #052e16 !important;
-    border-color: #22c55e !important;
+    border-color: #3887C6 !important;
     font-weight: 700;
 }
 .time-slot:disabled, .time-slot.disabled {
@@ -392,7 +394,7 @@
             </div>
             <div class="modal-body text-center py-3">
                 <!-- Slot Summary Box -->
-                <div class="glass-card p-3 mb-3 text-start border-success" style="background: rgba(34,197,94,0.08);">
+                <div class="glass-card p-3 mb-3 text-start border-success" style="background: rgba(56,135,198,0.08);">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <strong id="modal-venue-title" class="text-white fs-6">Playground Name</strong>
                         <span id="modal-slot-price" class="badge bg-success fs-6">₹1,000</span>

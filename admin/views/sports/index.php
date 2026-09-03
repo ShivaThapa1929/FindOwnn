@@ -53,8 +53,8 @@
                         <td class="px-4 py-3">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="d-flex align-items-center justify-content-center rounded-3" 
-                                     style="width:40px; height:40px; background: <?= e($sport['color'] ?? '#22c55e') ?>22; border: 1px solid <?= e($sport['color'] ?? '#22c55e') ?>44;">
-                                    <i class="<?= e($sport['icon'] ?? 'bi-trophy') ?>" style="color: <?= e($sport['color'] ?? '#22c55e') ?>; font-size: 1.1rem;"></i>
+                                     style="width:40px; height:40px; background: <?= e($sport['color'] ?? '#3887C6') ?>22; border: 1px solid <?= e($sport['color'] ?? '#3887C6') ?>44;">
+                                    <i class="<?= e($sport['icon'] ?? 'bi-trophy') ?>" style="color: <?= e($sport['color'] ?? '#3887C6') ?>; font-size: 1.1rem;"></i>
                                 </div>
                                 <div>
                                     <div class="fw-600 text-white"><?= e($sport['name']) ?></div>
@@ -79,7 +79,7 @@
                         <td class="px-4 py-3 text-muted"><?= (int)$sport['sort_order'] ?></td>
                         <td class="px-4 py-3">
                             <?php if ($sport['is_active']): ?>
-                                <span class="badge" style="background:rgba(34,197,94,0.15);color:#22c55e;font-size:0.75rem;">Active</span>
+                                <span class="badge" style="background:rgba(56,135,198,0.15);color:#3887C6;font-size:0.75rem;">Active</span>
                             <?php else: ?>
                                 <span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;font-size:0.75rem;">Inactive</span>
                             <?php endif; ?>

@@ -32,6 +32,11 @@ include __DIR__ . '/_auth-split-open.php';
         </button>
       </form>
 
+      <?php
+      $variant = 'admin';
+      include dirname(ROOT_PATH) . '/includes/partials/legal-login-links.php';
+      ?>
+
       <p class="auth-split-foot text-center text-muted small">
         <a href="<?= e(site_login_url()) ?>" class="text-success fw-600 text-decoration-none">Choose portal</a>
         · <a href="<?= e(site_home_url()) ?>" class="text-secondary text-decoration-none">Website</a>

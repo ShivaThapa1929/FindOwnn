@@ -32,7 +32,7 @@
         }
 
         banner.textContent = message;
-        banner.style.background = type === 'offline' ? '#dc2626' : '#16a34a';
+        banner.style.background = type === 'offline' ? '#dc2626' : '#2a6ba0';
         banner.style.color = '#fff';
         requestAnimationFrame(function () {
             banner.style.transform = 'translateY(0)';

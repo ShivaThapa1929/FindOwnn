@@ -39,7 +39,7 @@
             </div>
 
             <div class="col-lg-6 animate-on-scroll delay-200">
-                <div class="glass-card p-5" style="border-color: rgba(34, 197, 94, 0.15);">
+                <div class="glass-card p-5" style="border-color: rgba(56, 135, 198, 0.15);">
                     <h3 class="text-white mb-4 fw-bold">Our Philosophy</h3>
                     
                     <div class="mb-4">

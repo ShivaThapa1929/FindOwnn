@@ -106,14 +106,6 @@ if (!function_exists('actColor')) {
   </div>
 </div>
 
-<?php if ($isSuper): ?>
-<div class="panel mb-3">
-  <div class="panel-body">
-    <?php $currentPortal = 'admin'; include __DIR__ . '/../partials/portal-switcher.php'; ?>
-  </div>
-</div>
-<?php endif; ?>
-
 <!-- ── KPI Cards ──────────────────────────────────────────── -->
 <div class="dashboard-kpi-grid mb-3">
 <div class="row g-4 mb-0">
@@ -224,6 +216,170 @@ if (!function_exists('actColor')) {
     </a>
   </div>
 </div>
+</div>
+
+<!-- ── Role-Based Login & Accounts Showcase ────────────────────── -->
+<?php
+  $roleStats = $roleStats ?? ['super_admin' => 0, 'admin' => 0, 'venue_owner' => 0, 'player' => 0, 'pending_owner_verification' => 0];
+  $recentRoleLogins = $recentRoleLogins ?? [];
+?>
+<div class="panel mb-4">
+  <div class="panel-head d-flex align-items-center justify-content-between flex-wrap gap-2 py-3 px-4 border-bottom" style="border-color: var(--border) !important;">
+    <div class="d-flex align-items-center gap-2">
+      <div class="icon-shape rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(56,135,198,0.15); color: #3887C6;">
+        <i class="bi bi-shield-lock-fill fs-5"></i>
+      </div>
+      <div>
+        <h6 class="panel-title mb-0 fw-bold text-white" style="font-family: var(--font-h);">Role-Based Logins & User Accounts</h6>
+        <div class="text-muted small" style="font-size: 0.78rem;">Live distribution of platform user roles and recent authentication status</div>
+      </div>
+    </div>
+    <a href="<?= url('/users') ?>" class="btn btn-xs btn-outline-success rounded-pill px-3">
+      <i class="bi bi-people me-1"></i>Manage All Users
+    </a>
+  </div>
+  
+  <div class="panel-body p-4">
+    <!-- Role Breakdown Badges Row -->
+    <div class="row g-3 mb-4">
+      <!-- Super Admin -->
+      <div class="col-6 col-md-3">
+        <a href="<?= url('/users?role=super_admin') ?>" class="card h-100 text-decoration-none p-3 rounded-3 transition-all" style="background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.25);">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge rounded-pill px-2.5 py-1 text-white" style="background: linear-gradient(135deg, #ef4444, #dc2626); font-size: 0.72rem;">👑 Super Admin</span>
+            <i class="bi bi-shield-fill-check text-danger opacity-75 fs-5"></i>
+          </div>
+          <div class="fw-800 fs-4 text-white"><?= number_format($roleStats['super_admin'] ?? 0) ?></div>
+          <div class="text-muted small" style="font-size: 0.75rem;">Full System Access</div>
+        </a>
+      </div>
+
+      <!-- Admin -->
+      <div class="col-6 col-md-3">
+        <a href="<?= url('/users?role=admin') ?>" class="card h-100 text-decoration-none p-3 rounded-3 transition-all" style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge rounded-pill px-2.5 py-1 text-white" style="background: linear-gradient(135deg, #3b82f6, #2563eb); font-size: 0.72rem;">🛡️ Admin</span>
+            <i class="bi bi-person-badge-fill text-primary opacity-75 fs-5"></i>
+          </div>
+          <div class="fw-800 fs-4 text-white"><?= number_format($roleStats['admin'] ?? 0) ?></div>
+          <div class="text-muted small" style="font-size: 0.75rem;">Management Access</div>
+        </a>
+      </div>
+
+      <!-- Venue Owner -->
+      <div class="col-6 col-md-3">
+        <a href="<?= url('/users?role=venue_owner') ?>" class="card h-100 text-decoration-none p-3 rounded-3 transition-all" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge rounded-pill px-2.5 py-1 text-white" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 0.72rem;">🏟️ Venue Owner</span>
+            <i class="bi bi-building-fill text-success opacity-75 fs-5"></i>
+          </div>
+          <div class="fw-800 fs-4 text-white"><?= number_format($roleStats['venue_owner'] ?? 0) ?></div>
+          <div class="text-muted small d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+            <span>Owner Dashboard</span>
+            <?php if (($roleStats['pending_owner_verification'] ?? 0) > 0): ?>
+              <span class="badge bg-warning text-dark rounded-pill ms-auto" style="font-size:0.65rem;"><?= $roleStats['pending_owner_verification'] ?> unverified</span>
+            <?php endif; ?>
+          </div>
+        </a>
+      </div>
+
+      <!-- Player / Customer -->
+      <div class="col-6 col-md-3">
+        <a href="<?= url('/players') ?>" class="card h-100 text-decoration-none p-3 rounded-3 transition-all" style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2);">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge rounded-pill px-2.5 py-1 text-white" style="background: linear-gradient(135deg, #a855f7, #7e22ce); font-size: 0.72rem;">⚽ Customer / Player</span>
+            <i class="bi bi-person-circle text-purple opacity-75 fs-5"></i>
+          </div>
+          <div class="fw-800 fs-4 text-white"><?= number_format($roleStats['player'] ?? 0) ?></div>
+          <div class="text-muted small" style="font-size: 0.75rem;">App / Mobile Bookings</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Role Accounts & Login Activity Table -->
+    <div class="table-responsive rounded-3 border border-secondary border-opacity-10">
+      <table class="table table-hover align-middle mb-0" style="font-size: 0.86rem;">
+        <thead class="table-dark text-secondary" style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em;">
+          <tr>
+            <th class="ps-3 py-2.5">User</th>
+            <th class="py-2.5">Assigned Role</th>
+            <th class="py-2.5">Account Status</th>
+            <th class="py-2.5">Email Verification</th>
+            <th class="pe-3 py-2.5 text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!empty($recentRoleLogins)): ?>
+            <?php foreach ($recentRoleLogins as $ru): ?>
+              <?php
+                $role = $ru['role'] ?? 'user';
+                $roleBadgeStyle = match($role) {
+                    'super_admin' => 'background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;',
+                    'admin'       => 'background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;',
+                    'venue_owner' => 'background: linear-gradient(135deg, #10b981, #059669); color: #fff;',
+                    default       => 'background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);'
+                };
+                $roleName = match($role) {
+                    'super_admin' => '👑 Super Admin',
+                    'admin'       => '🛡️ Admin',
+                    'venue_owner' => '🏟️ Venue Owner',
+                    default       => '⚽ Player / User'
+                };
+                $isVerified = !empty($ru['email_verified_at']);
+              ?>
+              <tr>
+                <td class="ps-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); font-size: 0.8rem;">
+                      <?= strtoupper(substr($ru['name'] ?? 'U', 0, 1)) ?>
+                    </div>
+                    <div>
+                      <div class="fw-semibold text-white"><?= e($ru['name'] ?? '—') ?></div>
+                      <div class="text-muted small" style="font-size: 0.75rem;"><?= e($ru['email'] ?? '') ?></div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge rounded-pill px-2.5 py-1" style="<?= $roleBadgeStyle ?>">
+                    <?= $roleName ?>
+                  </span>
+                </td>
+                <td>
+                  <?php if (($ru['status'] ?? '') === 'active'): ?>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span>
+                  <?php elseif (($ru['status'] ?? '') === 'pending_email_verification'): ?>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">Pending Email</span>
+                  <?php else: ?>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill"><?= e(ucfirst($ru['status'] ?? 'inactive')) ?></span>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <?php if ($isVerified): ?>
+                    <span class="text-success small d-flex align-items-center gap-1">
+                      <i class="bi bi-patch-check-fill"></i> Verified
+                    </span>
+                  <?php else: ?>
+                    <span class="text-warning small d-flex align-items-center gap-1">
+                      <i class="bi bi-clock-history"></i> Unverified
+                    </span>
+                  <?php endif; ?>
+                </td>
+                <td class="pe-3 text-end">
+                  <a href="<?= url(($role === 'player' || $role === 'customer') ? '/players' : '/users/' . (int)$ru['id']) ?>" class="btn btn-xs btn-outline-secondary rounded-pill">
+                    <i class="bi bi-eye me-1"></i>View
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="5" class="text-center py-3 text-muted">No recent users found.</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- ── Charts Row ───────────────────────────────────────────────── -->
@@ -581,7 +737,7 @@ if (!function_exists('actColor')) {
         datasets: [
           {
             type: 'bar', label: 'Revenue (₹)', data: revenue,
-            backgroundColor: 'rgba(34,197,94,0.75)', borderColor: '#22c55e',
+            backgroundColor: 'rgba(56,135,198,0.75)', borderColor: '#3887C6',
             borderWidth: 1, borderRadius: 5, yAxisID: 'yRev',
           },
           {
@@ -599,7 +755,7 @@ if (!function_exists('actColor')) {
           legend: { labels: { color: tickColor, boxWidth: 11, padding: 16, font: { size: 11 } } },
           tooltip: {
             backgroundColor: 'rgba(10,17,12,0.95)',
-            borderColor: 'rgba(34,197,94,0.2)', borderWidth: 1,
+            borderColor: 'rgba(56,135,198,0.2)', borderWidth: 1,
             titleColor: '#f0fdf4', bodyColor: '#86a892',
             callbacks: {
               label: ctx => ctx.dataset.label === 'Revenue (₹)'
@@ -626,7 +782,7 @@ if (!function_exists('actColor')) {
         labels: ['Approved','Pending','Rejected'],
         datasets: [{
           data: [<?= $venueStats['approved'] ?>, <?= $venueStats['pending'] ?>, <?= $venueStats['rejected'] ?>],
-          backgroundColor: ['#22c55e','#f59e0b','#ef4444'],
+          backgroundColor: ['#3887C6','#f59e0b','#ef4444'],
           borderWidth: 0, hoverOffset: 8,
         }]
       },
@@ -678,7 +834,7 @@ if (!function_exists('actColor')) {
   width: 380px;
   max-width: calc(100vw - 40px);
   background: rgba(13,22,15,0.98);
-  border: 1px solid rgba(34,197,94,0.2);
+  border: 1px solid rgba(56,135,198,0.2);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   z-index: 1050;
@@ -718,7 +874,7 @@ if (!function_exists('actColor')) {
 }
 
 .notification-item:hover {
-  background: rgba(34,197,94,0.05);
+  background: rgba(56,135,198,0.05);
 }
 
 .notification-item:last-child {
@@ -737,8 +893,8 @@ if (!function_exists('actColor')) {
 }
 
 .notification-success .notification-icon {
-  background: rgba(34,197,94,0.15);
-  color: #22c55e;
+  background: rgba(56,135,198,0.15);
+  color: #3887C6;
 }
 
 .notification-warning .notification-icon {
@@ -797,7 +953,7 @@ if (!function_exists('actColor')) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(34,197,94,0.1);
+  background: rgba(56,135,198,0.1);
   border-radius: 8px;
 }
 
@@ -829,8 +985,8 @@ if (!function_exists('actColor')) {
 }
 
 .rank-4, .rank-5 {
-  background: rgba(34,197,94,0.15);
-  color: #22c55e;
+  background: rgba(56,135,198,0.15);
+  color: #3887C6;
 }
 
 </style>

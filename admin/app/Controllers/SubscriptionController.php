@@ -201,41 +201,41 @@ class SubscriptionController extends Controller
 
         if (!$plan || !(int) ($plan['is_active'] ?? 0)) {
             Session::flash('error', 'Invalid plan selected.');
-            $this->redirect(url('/subscriptions/my-plans'));
+            $this->redirect(url('/dashboard'));
         }
 
         $current = (new Subscription())->getActiveByUser($userId);
         if ($current && (int) $current['plan_id'] === $planId) {
             Session::flash('error', 'You are already on the ' . $plan['name'] . ' plan.');
-            $this->redirect(url('/subscriptions/my-plans'));
-        }
-
-        $price = (float) ($plan['price'] ?? 0);
-        $months = ($plan['billing_cycle'] ?? '') === 'yearly' ? 12 : 1;
-        $slug   = (string) ($plan['slug'] ?? '');
-        $instantFreeSlugs = ['starter', 'free'];
-
-        if ($price <= 0 && in_array($slug, $instantFreeSlugs, true)) {
-            $subId = (new Subscription())->replaceActiveSubscription($userId, $planId, $months, 0, 'active');
-            if (!$subId) {
-                Session::flash('error', 'Could not switch plan. Please try again.');
-                $this->redirect(url('/subscriptions/my-plans'));
-            }
-            ActivityLog::record("Venue owner switched to {$plan['name']} plan", 'subscription', 'User', $userId);
-            Session::flash('success', "You are now on the {$plan['name']} plan.");
             $this->redirect(url('/dashboard'));
         }
 
-        ActivityLog::record(
-            "Upgrade request: {$plan['name']} (₹" . number_format($price) . "/{$plan['billing_cycle']}) from user #{$userId}",
-            'subscription', 'User', $userId
-        );
-        Session::flash(
-            'success',
-            "Upgrade request submitted for {$plan['name']}. Our team will contact you at "
-            . site_contact_email() . ' to complete payment and activation.'
-        );
-        $this->redirect(url('/subscriptions/my-plans'));
+        $price  = (float) ($plan['price'] ?? 0);
+        $months = ($plan['billing_cycle'] ?? '') === 'yearly' ? 12 : 1;
+        $slug   = (string) ($plan['slug'] ?? '');
+
+        if ($slug === 'enterprise') {
+            ActivityLog::record("Enterprise plan enquiry from user #{$userId}", 'subscription', 'User', $userId);
+            Session::flash('success', 'Thank you for your interest in the Enterprise Plan! Our team will contact you shortly.');
+            $this->redirect(url('/dashboard'));
+            return;
+        }
+
+        // Instantly switch and activate the selected plan for the Venue Owner
+        $subModel = new Subscription();
+        $subId    = $subModel->replaceActiveSubscription($userId, $planId, $months, $price, 'active');
+
+        if (!$subId) {
+            Session::flash('error', 'Could not switch plan. Please try again.');
+            $this->redirect(url('/dashboard'));
+            return;
+        }
+
+        AuditLog::log('SUBSCRIPTION_SWITCHED', 'Subscription', (int) $subId, [], ['plan' => $plan['name'], 'price' => $price]);
+        ActivityLog::record("Venue owner switched plan to {$plan['name']} (₹" . number_format($price) . ")", 'subscription', 'User', $userId);
+
+        Session::flash('success', "Plan switched successfully! You are now on the {$plan['name']} plan.");
+        $this->redirect(url('/dashboard'));
     }
 
     /** Admin: cancel a subscription */
