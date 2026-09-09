@@ -27,7 +27,7 @@ include __DIR__ . '/_auth-split-open.php';
           </div>
         </div>
 
-        <button type="submit" class="auth-btn auth-btn--owner w-100">
+        <button type="submit" class="auth-btn auth-btn--admin w-100">
           <i class="bi bi-shield-lock me-2"></i>Sign In to Admin Panel
         </button>
       </form>

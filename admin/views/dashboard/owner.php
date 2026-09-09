@@ -36,7 +36,7 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
 </div>
 
 <?php if ($successMsg = flash('success')): ?>
-<div class="alert alert-success d-flex align-items-center gap-2 mb-3 py-2 px-3 small border-0" style="background:rgba(56,135,198,0.15);color:#3887C6;border-left:3px solid #3887C6!important;">
+<div class="alert alert-success d-flex align-items-center gap-2 mb-3 py-2 px-3 small border-0" style="background:rgba(34,197,94,0.12);color:#22c55e;border-left:3px solid #22c55e!important;">
   <i class="bi bi-check-circle-fill fs-5"></i>
   <div class="fw-600"><?= e($successMsg) ?></div>
 </div>
@@ -76,7 +76,7 @@ $hasRevenueData  = !empty($ownerMonthlyRev) && is_array($ownerMonthlyRev) && cou
   </div>
 </div>
 <?php else: ?>
-<div class="alert d-flex align-items-center gap-3 mb-4 border-0" style="background:rgba(56,135,198,0.08);border-left:3px solid #3887C6!important;">
+<div class="alert d-flex align-items-center gap-3 mb-4 border-0" style="background:rgba(34,197,94,0.08);border-left:3px solid #22c55e!important;">
   <i class="bi bi-patch-check-fill text-success fs-5 flex-shrink-0"></i>
   <div class="small flex-grow-1">
     <strong class="text-success"><?= e($mySub['plan_name'] ?? 'Subscription') ?> Plan</strong> active
@@ -550,16 +550,16 @@ document.addEventListener('DOMContentLoaded', function() {
           {
             label: 'Revenue (₹)',
             data: revenue,
-            borderColor: '#3887C6',
-            backgroundColor: 'rgba(56,135,198,0.15)',
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34,197,94,0.15)',
             borderWidth: 3,
             tension: 0.4,
             pointRadius: 6,
             pointHoverRadius: 8,
-            pointBackgroundColor: '#3887C6',
+            pointBackgroundColor: '#22c55e',
             pointBorderColor: '#E5EFFB',
             pointBorderWidth: 2,
-            pointHoverBackgroundColor: '#3887C6',
+            pointHoverBackgroundColor: '#22c55e',
             pointHoverBorderColor: '#fff',
             pointHoverBorderWidth: 3,
             fill: true,
@@ -744,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .activity-item:hover {
-  background: rgba(56,135,198,0.02);
+  background: rgba(34,197,94,0.04);
 }
 
 .activity-icon {
@@ -764,8 +764,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .activity-icon--green {
-  background: rgba(56,135,198,0.15);
-  color: #3887C6;
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
 }
 
 .activity-icon--yellow {
@@ -814,12 +814,12 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .featured-venue-card:hover {
-  background: rgba(56,135,198,0.03);
+  background: rgba(34,197,94,0.04);
 }
 
 .featured-venue-card--top {
-  background: linear-gradient(135deg, rgba(56,135,198,0.05), rgba(56,135,198,0.03));
-  border-left: 3px solid #3887C6;
+  background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(34,197,94,0.03));
+  border-left: 3px solid #22c55e;
 }
 
 .featured-venue-rank {
@@ -829,14 +829,14 @@ document.addEventListener('DOMContentLoaded', function() {
   width: 32px;
   height: 32px;
   background: rgba(10,15,11,0.9);
-  border: 2px solid #3887C6;
+  border: 2px solid #22c55e;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 0.85rem;
-  color: #3887C6;
+  color: #22c55e;
   z-index: 2;
 }
 
@@ -932,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function() {
 .featured-venue-stat-value {
   font-size: 1rem;
   font-weight: 700;
-  color: #3887C6;
+  color: #22c55e;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -951,8 +951,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .bg-success-soft {
-  background-color: rgba(56,135,198,0.15);
-  color: #3887C6;
+  background-color: rgba(34,197,94,0.15);
+  color: #22c55e;
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.25rem 0.6rem;
@@ -976,7 +976,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .owner-rec-card:hover {
-  border-color: rgba(56,135,198,0.35);
+  border-color: rgba(34,197,94,0.35);
   transform: translateY(-2px);
 }
 
@@ -989,7 +989,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .owner-rec-card--low {
-  border-left: 3px solid #3887C6;
+  border-left: 3px solid #22c55e;
 }
 
 .owner-rec-card__icon {
@@ -1001,8 +1001,8 @@ document.addEventListener('DOMContentLoaded', function() {
   align-items: center;
   justify-content: center;
   font-size: 1.15rem;
-  background: rgba(56,135,198,0.12);
-  color: #5a9fd4;
+  background: rgba(34,197,94,0.12);
+  color: #4ade80;
 }
 
 .owner-rec-card--high .owner-rec-card__icon {

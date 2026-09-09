@@ -31,7 +31,7 @@ $showSplashOnLoad = (bool) flash('show_splash');
 <?php if ($showSplashOnLoad): ?>
 <div id="splash-screen" aria-hidden="true">
   <div class="splash-logo">
-    <img src="<?= url('/public/assets/images/logo.png') ?>" alt="Findownn" style="width:48px;height:48px;object-fit:contain;border-radius:10px;">
+    <img src="<?= e(site_logo_url()) ?>" alt="Findownn" width="48" height="48">
   </div>
   <div class="splash-wordmark">Findownn <span class="brand-accent">Dashboard</span></div>
   <div class="splash-tagline">Book playgrounds. Play more.</div>
@@ -41,11 +41,11 @@ $showSplashOnLoad = (bool) flash('show_splash');
 
 <style>
 :root {
-  --gradient-primary: linear-gradient(135deg, #3887C6 0%, #2a6ba0 100%);
-  --gradient-text:    linear-gradient(135deg, #1a2332 0%, #3887C6 55%, #2a6ba0 100%);
-  --border-glass:     rgba(56, 135, 198, 0.14);
-  --text-primary:     #1a2332;
-  --text-muted:       #64748b;
+  --gradient-primary: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  --gradient-text:    linear-gradient(135deg, #ffffff 0%, #4ade80 55%, #22c55e 100%);
+  --border-glass:     rgba(34, 197, 94, 0.18);
+  --text-primary:     #ffffff;
+  --text-muted:       #a0a0a0;
   --font-heading:     'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --ease-out:         cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -55,7 +55,7 @@ $showSplashOnLoad = (bool) flash('show_splash');
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #E5EFFB;
+  background: #000000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,8 +77,17 @@ $showSplashOnLoad = (bool) flash('show_splash');
   align-items: center;
   justify-content: center;
   animation: splashLogoIn 0.6s var(--ease-spring) 0.2s both;
-  box-shadow: 0 0 40px rgba(56,135,198,0.18), 0 8px 24px rgba(56,135,198,0.12);
+  box-shadow: 0 0 40px rgba(34,197,94,0.22), 0 8px 24px rgba(34,197,94,0.14);
   overflow: hidden;
+  background: var(--gradient-primary);
+}
+
+.splash-logo img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
 }
 
 @keyframes splashLogoIn {
@@ -157,8 +166,8 @@ body.splash-active { overflow: hidden; }
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <div class="sidebar-logo" style="background: none; box-shadow: none; padding: 0;">
-      <img src="<?= url('/public/assets/images/logo.png') ?>" alt="Findownn" style="width: 100%; height: 100%; object-fit: contain;">
+    <div class="sidebar-logo">
+      <img src="<?= e(site_logo_url()) ?>" alt="Findownn" width="40" height="40">
     </div>
     <span>FINDOWNN</span>
   </div>
@@ -254,7 +263,7 @@ body.splash-active { overflow: hidden; }
     <div class="d-flex align-items-center gap-2 mb-3 px-1">
       <div class="sidebar-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 1)) ?></div>
       <div class="lh-sm">
-        <div class="fw-600 small text-white"><?= e($user['name'] ?? '') ?></div>
+        <div class="fw-600 small sidebar-user-name"><?= e($user['name'] ?? '') ?></div>
         <div class="text-muted" style="font-size:.7rem;"><?= ucwords(str_replace('_', ' ', $role)) ?></div>
       </div>
     </div>

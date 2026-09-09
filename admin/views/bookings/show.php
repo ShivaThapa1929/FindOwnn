@@ -919,8 +919,7 @@ $isOffline = str_starts_with($booking['booking_reference'] ?? '', 'OFL-');
           <div class="company-info">
             <div class="company-logo-row">
               <div class="company-logo-box">
-                <img src="<?= url('/public/assets/images/logo.png') ?>" 
-                     alt="Findownn">
+                <img src="<?= e(site_logo_url()) ?>" alt="Findownn">
               </div>
               <h2>FINDOWNN</h2>
             </div>

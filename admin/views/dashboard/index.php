@@ -226,11 +226,11 @@ if (!function_exists('actColor')) {
 <div class="panel mb-4">
   <div class="panel-head d-flex align-items-center justify-content-between flex-wrap gap-2 py-3 px-4 border-bottom" style="border-color: var(--border) !important;">
     <div class="d-flex align-items-center gap-2">
-      <div class="icon-shape rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(56,135,198,0.15); color: #3887C6;">
+      <div class="icon-shape rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(34,197,94,0.15); color: #22c55e;">
         <i class="bi bi-shield-lock-fill fs-5"></i>
       </div>
       <div>
-        <h6 class="panel-title mb-0 fw-bold text-white" style="font-family: var(--font-h);">Role-Based Logins & User Accounts</h6>
+        <h6 class="panel-title mb-0 fw-bold" style="font-family: var(--font-h);">Role-Based Logins & User Accounts</h6>
         <div class="text-muted small" style="font-size: 0.78rem;">Live distribution of platform user roles and recent authentication status</div>
       </div>
     </div>
@@ -737,13 +737,13 @@ if (!function_exists('actColor')) {
         datasets: [
           {
             type: 'bar', label: 'Revenue (₹)', data: revenue,
-            backgroundColor: 'rgba(56,135,198,0.75)', borderColor: '#3887C6',
+            backgroundColor: 'rgba(34,197,94,0.75)', borderColor: '#22c55e',
             borderWidth: 1, borderRadius: 5, yAxisID: 'yRev',
           },
           {
             type: 'line', label: 'Bookings', data: bookings,
-            borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)',
-            tension: 0.4, pointRadius: 4, pointBackgroundColor: '#3b82f6',
+            borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)',
+            tension: 0.4, pointRadius: 4, pointBackgroundColor: '#4ade80',
             fill: true, yAxisID: 'yBook',
           }
         ]
@@ -782,7 +782,7 @@ if (!function_exists('actColor')) {
         labels: ['Approved','Pending','Rejected'],
         datasets: [{
           data: [<?= $venueStats['approved'] ?>, <?= $venueStats['pending'] ?>, <?= $venueStats['rejected'] ?>],
-          backgroundColor: ['#3887C6','#f59e0b','#ef4444'],
+          backgroundColor: ['#22c55e','#f59e0b','#ef4444'],
           borderWidth: 0, hoverOffset: 8,
         }]
       },

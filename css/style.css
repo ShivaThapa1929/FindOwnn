@@ -98,9 +98,11 @@
   background: var(--gradient-primary);
 }
 .splash-logo img {
-  width: 48px;
-  height: 48px;
+  width: 78%;
+  height: 78%;
   object-fit: contain;
+  border-radius: 10px;
+  display: block;
 }
 
 @keyframes splashLogoIn {
@@ -366,10 +368,11 @@ h1,h2,h3,h4,h5,h6 {
   overflow: hidden;
 }
 .navbar-brand-logo img {
-  width: 100%;
-  height: 100%;
+  width: 78%;
+  height: 78%;
   object-fit: contain;
-  padding: 4px;
+  display: block;
+  border-radius: inherit;
 }
 .navbar-brand-logo i { font-size: 1rem; color: var(--text-on-primary); }
 .navbar-brand-text { color: var(--text-primary); }
@@ -2084,12 +2087,18 @@ select.form-select.glass-input option {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(56, 135, 198, 0.06);
-  border: 1px solid rgba(56, 135, 198, 0.2);
-  box-shadow: 0 8px 24px rgba(56, 135, 198, 0.12);
+  background: var(--gradient-primary);
+  border: none;
+  box-shadow: 0 8px 24px rgba(56, 135, 198, 0.22);
+  overflow: hidden;
 }
 
-#authModal .auth-modal-logo img { border-radius: 12px; }
+#authModal .auth-modal-logo img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  border-radius: 10px;
+}
 
 #authModal .auth-modal-title {
   font-family: var(--font-heading);
@@ -2273,6 +2282,143 @@ select.form-select.glass-input option {
 .user-dash-table thead th {
   border-bottom-color: rgba(255,255,255,0.08);
   font-weight: 600;
+}
+
+/* User dashboard — dark mode */
+body.dashboard-page {
+  background: #0b1220;
+}
+
+.user-dashboard {
+  --dash-bg:          #0b1220;
+  --dash-bg-card:     rgba(15, 23, 42, 0.88);
+  --dash-bg-card-hover: rgba(20, 30, 52, 0.94);
+  --dash-bg-subcard:  rgba(255, 255, 255, 0.04);
+  --dash-border:      rgba(56, 135, 198, 0.2);
+  --dash-border-sub:  rgba(255, 255, 255, 0.08);
+  --dash-text:        #f1f5f9;
+  --dash-text-muted:  rgba(255, 255, 255, 0.58);
+  --dash-text-dim:    rgba(255, 255, 255, 0.42);
+  --dash-accent:      #5a9fd4;
+  --dash-glow:        rgba(56, 135, 198, 0.12);
+
+  background: var(--dash-bg);
+  color: var(--dash-text);
+}
+
+.user-dashboard .page-header {
+  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(56, 135, 198, 0.14) 0%, transparent 65%);
+}
+
+.user-dashboard .page-header::before {
+  background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(56, 135, 198, 0.1) 0%, transparent 60%);
+}
+
+.user-dashboard .page-header h1,
+.user-dashboard .dash-section-title,
+.user-dashboard .dash-stat-number,
+.user-dashboard .dash-card-title,
+.user-dashboard .dash-card-price,
+.user-dashboard .dash-table-price {
+  color: var(--dash-text);
+}
+
+.user-dashboard .page-header .text-secondary,
+.user-dashboard .text-secondary,
+.user-dashboard .text-muted {
+  color: var(--dash-text-muted) !important;
+}
+
+.user-dashboard .dash-section-title {
+  font-family: var(--font-heading);
+}
+
+.user-dashboard .dash-stat-number {
+  font-family: var(--font-heading);
+  line-height: 1.1;
+}
+
+.user-dashboard .dash-stat-number--accent {
+  color: var(--dash-accent);
+}
+
+.user-dashboard .dash-table-link {
+  color: var(--dash-accent);
+}
+
+.user-dashboard .dash-table-link:hover {
+  color: #9ec5e8;
+}
+
+.user-dashboard .badge-premium {
+  background: rgba(56, 135, 198, 0.14);
+  color: #9ec5e8;
+  border-color: rgba(56, 135, 198, 0.28);
+}
+
+.user-dashboard .glass-card {
+  background: var(--dash-bg-card);
+  border-color: var(--dash-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.user-dashboard .glass-card:hover {
+  background: var(--dash-bg-card-hover);
+  border-color: rgba(56, 135, 198, 0.32);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(56, 135, 198, 0.15);
+}
+
+.user-dashboard .glass-card::before {
+  background: linear-gradient(90deg, transparent, rgba(56, 135, 198, 0.18), transparent);
+}
+
+.user-dashboard .user-booking-card {
+  background: var(--dash-bg-subcard);
+  border: 1px solid var(--dash-border-sub);
+}
+
+.user-dashboard .user-venue-card {
+  background: var(--dash-bg-subcard);
+  border: 1px solid var(--dash-border-sub);
+}
+
+.user-dashboard .user-venue-card:hover {
+  border-color: rgba(56, 135, 198, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.user-dashboard .user-venue-img {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.user-dashboard .user-dash-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--dash-text);
+  --bs-table-hover-bg: rgba(56, 135, 198, 0.08);
+  --bs-table-border-color: var(--dash-border-sub);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+}
+
+.user-dashboard .user-dash-table thead th {
+  border-bottom-color: var(--dash-border-sub);
+  color: var(--dash-text-muted);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.user-dashboard .user-dash-table tbody td {
+  color: var(--dash-text);
+  border-bottom-color: var(--dash-border-sub);
+}
+
+.user-dashboard .user-dash-table tbody tr:hover {
+  background: rgba(56, 135, 198, 0.08);
+}
+
+.user-dashboard .glow-orb-bottom-left {
+  background: radial-gradient(circle, rgba(56, 135, 198, 0.14) 0%, transparent 70%);
 }
 
 /* ============================================================
@@ -3628,6 +3774,48 @@ textarea.glass-input {
 .partner-cta-card .btn-premium-outline i,
 .cta-block .btn-premium-outline i {
   color: #FFFFFF !important;
+}
+
+/* User dashboard dark mode — override light-theme globals */
+.user-dashboard .page-header h1,
+.user-dashboard .page-header p,
+.user-dashboard .page-header .lead,
+.user-dashboard .glass-card:not(.sport-card),
+.user-dashboard .glass-card:not(.sport-card) h1,
+.user-dashboard .glass-card:not(.sport-card) h2,
+.user-dashboard .glass-card:not(.sport-card) h3,
+.user-dashboard .glass-card:not(.sport-card) h4,
+.user-dashboard .glass-card:not(.sport-card) h5,
+.user-dashboard .glass-card:not(.sport-card) h6,
+.user-dashboard .glass-card:not(.sport-card) p,
+.user-dashboard .glass-card:not(.sport-card) strong,
+.user-dashboard .dash-section-title,
+.user-dashboard .dash-stat-number,
+.user-dashboard .dash-card-title,
+.user-dashboard .dash-card-price,
+.user-dashboard .dash-table-price,
+.user-dashboard .user-dash-table tbody td {
+  color: #f1f5f9 !important;
+}
+
+.user-dashboard .page-header .text-secondary,
+.user-dashboard .glass-card:not(.sport-card) .text-secondary,
+.user-dashboard .glass-card:not(.sport-card) small.text-muted,
+.user-dashboard .text-secondary,
+.user-dashboard .text-muted {
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+.user-dashboard .dash-stat-number--accent {
+  color: #5a9fd4 !important;
+}
+
+.user-dashboard .dash-table-link {
+  color: #5a9fd4 !important;
+}
+
+.user-dashboard .dash-table-link:hover {
+  color: #9ec5e8 !important;
 }
 
 /* Scroll animations — ensure content visible after load */

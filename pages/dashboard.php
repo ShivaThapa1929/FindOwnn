@@ -17,13 +17,14 @@ if (!empty($_GET['paid'])) {
 include __DIR__ . '/../includes/header.php';
 ?>
 
+<div class="user-dashboard">
 <header class="page-header">
     <div class="glow-orb glow-orb-bottom-left"></div>
     <div class="container position-relative z-1 animate-on-scroll">
         <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
             <div>
                 <span class="badge-premium mb-3"><i class="bi bi-speedometer2 me-1"></i> My Dashboard</span>
-                <h1 class="display-5 fw-bold text-white mb-1">Welcome, <?= e($user['name']) ?></h1>
+                <h1 class="display-5 fw-bold mb-1">Welcome, <?= e($user['name']) ?></h1>
                 <p class="text-secondary mb-0"><?= e($user['email']) ?> · <?= e($user['phone']) ?></p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
@@ -52,21 +53,21 @@ include __DIR__ . '/../includes/header.php';
             <div class="col-md-4">
                 <div class="glass-card p-4 text-center h-100 user-dash-stat">
                     <i class="bi bi-calendar-check text-success fs-4 mb-2 d-block"></i>
-                    <div class="display-6 fw-bold text-white"><?= $stats['total_bookings'] ?></div>
+                    <div class="display-6 fw-bold dash-stat-number"><?= $stats['total_bookings'] ?></div>
                     <div class="text-secondary small">Total Bookings</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="glass-card p-4 text-center h-100 user-dash-stat">
                     <i class="bi bi-clock-history text-success fs-4 mb-2 d-block"></i>
-                    <div class="display-6 fw-bold text-success"><?= $stats['upcoming'] ?></div>
+                    <div class="display-6 fw-bold dash-stat-number dash-stat-number--accent"><?= $stats['upcoming'] ?></div>
                     <div class="text-secondary small">Upcoming</div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="glass-card p-4 text-center h-100 user-dash-stat">
                     <i class="bi bi-currency-rupee text-success fs-4 mb-2 d-block"></i>
-                    <div class="display-6 fw-bold text-white">₹<?= number_format($stats['total_spent']) ?></div>
+                    <div class="display-6 fw-bold dash-stat-number">₹<?= number_format($stats['total_spent']) ?></div>
                     <div class="text-secondary small">Total Spent</div>
                 </div>
             </div>
@@ -74,7 +75,7 @@ include __DIR__ . '/../includes/header.php';
 
         <?php if (!empty($upcoming)): ?>
         <div class="glass-card p-4 mb-4 animate-on-scroll">
-            <h2 class="text-white fw-bold h5 mb-4"><i class="bi bi-lightning-charge text-success me-2"></i>Upcoming Bookings</h2>
+            <h2 class="dash-section-title fw-bold h5 mb-4"><i class="bi bi-lightning-charge text-success me-2"></i>Upcoming Bookings</h2>
             <div class="row g-3">
                 <?php foreach ($upcoming as $b): ?>
                     <?php $badge = site_booking_status_badge($b['status']); ?>
@@ -82,7 +83,7 @@ include __DIR__ . '/../includes/header.php';
                         <div class="user-booking-card">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <div>
-                                    <div class="text-white fw-600"><?= e($b['venue_name']) ?></div>
+                                    <div class="dash-card-title fw-600"><?= e($b['venue_name']) ?></div>
                                     <div class="text-secondary small"><?= e($b['venue_city'] ?? '') ?></div>
                                 </div>
                                 <div class="text-end">
@@ -100,7 +101,7 @@ include __DIR__ . '/../includes/header.php';
                             </div>
                             <div class="text-secondary small">
                                 <?= e($b['sport_name'] ?? 'Sport') ?> · <?= e($b['court_name'] ?? 'Court') ?>
-                                · <span class="text-white">₹<?= number_format((int) ($b['amount'] ?? 0)) ?></span>
+                                · <span class="dash-card-price">₹<?= number_format((int) ($b['amount'] ?? 0)) ?></span>
                             </div>
                         </div>
                     </div>
@@ -111,7 +112,7 @@ include __DIR__ . '/../includes/header.php';
 
         <div class="glass-card p-4 mb-4 animate-on-scroll">
             <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-                <h2 class="text-white fw-bold h5 mb-0"><i class="bi bi-geo-alt text-success me-2"></i>My Playgrounds</h2>
+                <h2 class="dash-section-title fw-bold h5 mb-0"><i class="bi bi-geo-alt text-success me-2"></i>My Playgrounds</h2>
                 <span class="text-secondary small"><?= count($venues) ?> venue<?= count($venues) === 1 ? '' : 's' ?></span>
             </div>
 
@@ -130,7 +131,7 @@ include __DIR__ . '/../includes/header.php';
                                     <img src="<?= e(site_resolve_image_url($v['featured_image'] ?? null)) ?>" alt="<?= e($v['name']) ?>">
                                 </div>
                                 <div class="user-venue-body">
-                                    <div class="text-white fw-600 mb-1"><?= e($v['name']) ?></div>
+                                    <div class="dash-card-title fw-600 mb-1"><?= e($v['name']) ?></div>
                                     <div class="text-secondary small mb-2">
                                         <i class="bi bi-geo-alt me-1"></i><?= e($v['city'] ?? 'Bhuj') ?>
                                         · <?= e(site_venue_type_label($v['type'] ?? '')) ?>
@@ -148,7 +149,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="glass-card p-4 animate-on-scroll">
-            <h2 class="text-white fw-bold h5 mb-4"><i class="bi bi-list-check text-success me-2"></i>Booking History</h2>
+            <h2 class="dash-section-title fw-bold h5 mb-4"><i class="bi bi-list-check text-success me-2"></i>Booking History</h2>
 
             <?php if (empty($past) && empty($upcoming)): ?>
                 <p class="text-secondary mb-0">No bookings to show.</p>
@@ -156,7 +157,7 @@ include __DIR__ . '/../includes/header.php';
                 <p class="text-secondary mb-0">No past bookings yet.</p>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table class="table table-dark table-hover align-middle mb-0 user-dash-table">
+                    <table class="table table-hover align-middle mb-0 user-dash-table">
                         <thead>
                             <tr class="text-secondary small">
                                 <th>Date</th>
@@ -171,9 +172,9 @@ include __DIR__ . '/../includes/header.php';
                             <?php foreach ($past as $b): ?>
                                 <?php $badge = site_booking_status_badge($b['status']); ?>
                                 <tr>
-                                    <td class="text-white-50"><?= e(date('M j, Y', strtotime($b['booking_date']))) ?></td>
+                                    <td><?= e(date('M j, Y', strtotime($b['booking_date']))) ?></td>
                                     <td>
-                                        <a href="<?= e($asset_base) ?>venue-details?id=<?= (int) $b['venue_id'] ?>" class="text-white fw-600 text-decoration-none"><?= e($b['venue_name']) ?></a>
+                                        <a href="<?= e($asset_base) ?>venue-details?id=<?= (int) $b['venue_id'] ?>" class="dash-table-link fw-600 text-decoration-none"><?= e($b['venue_name']) ?></a>
                                         <div class="text-secondary small"><?= e($b['venue_city'] ?? '') ?></div>
                                     </td>
                                     <td class="text-secondary small">
@@ -183,7 +184,7 @@ include __DIR__ . '/../includes/header.php';
                                     <td class="text-secondary small">
                                         <?= e(substr($b['start_time'] ?? '', 0, 5)) ?> – <?= e(substr($b['end_time'] ?? '', 0, 5)) ?>
                                     </td>
-                                    <td class="text-white">₹<?= number_format((int) ($b['amount'] ?? 0)) ?></td>
+                                    <td class="dash-table-price">₹<?= number_format((int) ($b['amount'] ?? 0)) ?></td>
                                     <td>
                                         <span class="badge bg-<?= e($badge) ?>"><?= e(ucfirst($b['status'])) ?></span>
                                         <?php if (($b['payment_status'] ?? '') === 'paid'): ?>
@@ -200,7 +201,7 @@ include __DIR__ . '/../includes/header.php';
 
         <!-- Legal -->
         <div class="glass-card p-4 animate-on-scroll mt-4">
-            <h2 class="text-white fw-bold h6 mb-3"><i class="bi bi-shield-check text-success me-2"></i>Legal &amp; Privacy</h2>
+            <h2 class="dash-section-title fw-bold h6 mb-3"><i class="bi bi-shield-check text-success me-2"></i>Legal &amp; Privacy</h2>
             <div class="d-flex flex-wrap gap-3">
                 <a href="<?= e($asset_base) ?>privacy" class="btn btn-sm btn-premium-outline">
                     <i class="bi bi-file-earmark-lock me-1"></i> Privacy Policy
@@ -213,6 +214,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
     </div>
 </section>
+</div>
 
 <script>
 (function () {
