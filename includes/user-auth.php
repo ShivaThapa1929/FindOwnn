@@ -36,6 +36,47 @@ function site_db(): Database
     return Database::getInstance();
 }
 
+/** Ensure DB accepts player role (older live DBs may miss the enum value). */
+function site_ensure_player_role_enum(): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+
+    try {
+        site_db()->execute(
+            "ALTER TABLE users MODIFY role ENUM('super_admin','admin','venue_owner','player') NOT NULL DEFAULT 'venue_owner'"
+        );
+    } catch (\Throwable) {
+        // Already applied or insufficient privileges — login may still work via role repair below.
+    }
+}
+
+/** Repair accounts saved with an empty role before player was added to the enum. */
+function site_repair_player_role(array $user): array
+{
+    $role = trim((string) ($user['role'] ?? ''));
+    if ($role !== '') {
+        return $user;
+    }
+
+    site_ensure_player_role_enum();
+
+    try {
+        site_db()->execute(
+            "UPDATE users SET role = 'player', updated_at = NOW() WHERE id = ? AND (role = '' OR role IS NULL)",
+            [(int) $user['id']]
+        );
+        $user['role'] = 'player';
+    } catch (\Throwable) {
+        $user['role'] = 'player';
+    }
+
+    return $user;
+}
+
 function site_user(): ?array
 {
     return $_SESSION['site_user'] ?? null;
@@ -244,7 +285,14 @@ function site_auth_login(string $email, string $password, string $loginAs = 'pla
         return ['ok' => false, 'error' => 'Your account is inactive. Contact support.'];
     }
 
-    $role = $user['role'] ?? 'player';
+    if ($loginAs === 'player') {
+        $user = site_repair_player_role($user);
+    }
+
+    $role = trim((string) ($user['role'] ?? ''));
+    if ($role === '') {
+        $role = 'player';
+    }
 
     if ($loginAs === 'venue_owner') {
         if ($role !== 'venue_owner') {
@@ -346,6 +394,8 @@ function site_auth_register(array $data): array
         return ['ok' => false, 'error' => 'This email is already registered. Try signing in.'];
     }
 
+    site_ensure_player_role_enum();
+
     $token = bin2hex(random_bytes(32));
     $whatsappOptIn = !empty($data['whatsapp_opt_in']) ? 1 : 0;
     $whatsapp = $data['whatsapp_number'] ?? null;
@@ -382,6 +432,10 @@ function site_auth_register(array $data): array
         'SELECT id, name, email, phone, role FROM users WHERE id = ?',
         [$userId]
     );
+
+    if ($user) {
+        $user = site_repair_player_role($user);
+    }
 
     site_login($user, $token);
 

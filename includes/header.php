@@ -96,7 +96,7 @@ $skip_splash = in_array($route_name ?? '', [
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
   <!-- Critical CSS (preload) -->
-  <link rel="preload" href="<?= $asset_base ?>css/style.css?v=6.1" as="style">
+  <link rel="preload" href="<?= $asset_base ?>css/style.css?v=6.3" as="style">
 
   <!-- Fonts (non-blocking) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -110,8 +110,8 @@ $skip_splash = in_array($route_name ?? '', [
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=6.1">
-  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=4.3">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/style.css?v=6.3">
+  <link rel="stylesheet" href="<?= $asset_base ?>css/responsive.css?v=4.4">
   <?php if (($route_name ?? '') === 'index'): ?>
   <link rel="stylesheet" href="<?= $asset_base ?>css/home-enhancements.css?v=9.0">
   <?php endif; ?>

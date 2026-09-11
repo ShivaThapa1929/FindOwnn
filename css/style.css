@@ -2249,12 +2249,13 @@ select.form-select.glass-input option {
 
 .user-venue-card {
   display: block;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-elevated);
   border: 1px solid var(--border-glass);
   border-radius: var(--r-md);
   overflow: hidden;
-  transition: transform var(--dur-base) var(--ease-out), border-color var(--dur-base);
+  transition: transform var(--dur-base) var(--ease-out), border-color var(--dur-base), box-shadow var(--dur-base);
   height: 100%;
+  box-shadow: var(--shadow-card);
 }
 
 .user-venue-card:hover {
@@ -2265,7 +2266,7 @@ select.form-select.glass-input option {
 .user-venue-img {
   height: 130px;
   overflow: hidden;
-  background: rgba(0,0,0,0.3);
+  background: var(--bg-subtle);
 }
 
 .user-venue-img img {
@@ -2280,145 +2281,64 @@ select.form-select.glass-input option {
 .user-venue-body { padding: 14px 16px; }
 
 .user-dash-table thead th {
-  border-bottom-color: rgba(255,255,255,0.08);
-  font-weight: 600;
-}
-
-/* User dashboard — dark mode */
-body.dashboard-page {
-  background: #0b1220;
-}
-
-.user-dashboard {
-  --dash-bg:          #0b1220;
-  --dash-bg-card:     rgba(15, 23, 42, 0.88);
-  --dash-bg-card-hover: rgba(20, 30, 52, 0.94);
-  --dash-bg-subcard:  rgba(255, 255, 255, 0.04);
-  --dash-border:      rgba(56, 135, 198, 0.2);
-  --dash-border-sub:  rgba(255, 255, 255, 0.08);
-  --dash-text:        #f1f5f9;
-  --dash-text-muted:  rgba(255, 255, 255, 0.58);
-  --dash-text-dim:    rgba(255, 255, 255, 0.42);
-  --dash-accent:      #5a9fd4;
-  --dash-glow:        rgba(56, 135, 198, 0.12);
-
-  background: var(--dash-bg);
-  color: var(--dash-text);
-}
-
-.user-dashboard .page-header {
-  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(56, 135, 198, 0.14) 0%, transparent 65%);
-}
-
-.user-dashboard .page-header::before {
-  background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(56, 135, 198, 0.1) 0%, transparent 60%);
-}
-
-.user-dashboard .page-header h1,
-.user-dashboard .dash-section-title,
-.user-dashboard .dash-stat-number,
-.user-dashboard .dash-card-title,
-.user-dashboard .dash-card-price,
-.user-dashboard .dash-table-price {
-  color: var(--dash-text);
-}
-
-.user-dashboard .page-header .text-secondary,
-.user-dashboard .text-secondary,
-.user-dashboard .text-muted {
-  color: var(--dash-text-muted) !important;
-}
-
-.user-dashboard .dash-section-title {
-  font-family: var(--font-heading);
-}
-
-.user-dashboard .dash-stat-number {
-  font-family: var(--font-heading);
-  line-height: 1.1;
-}
-
-.user-dashboard .dash-stat-number--accent {
-  color: var(--dash-accent);
-}
-
-.user-dashboard .dash-table-link {
-  color: var(--dash-accent);
-}
-
-.user-dashboard .dash-table-link:hover {
-  color: #9ec5e8;
-}
-
-.user-dashboard .badge-premium {
-  background: rgba(56, 135, 198, 0.14);
-  color: #9ec5e8;
-  border-color: rgba(56, 135, 198, 0.28);
-}
-
-.user-dashboard .glass-card {
-  background: var(--dash-bg-card);
-  border-color: var(--dash-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.04);
-}
-
-.user-dashboard .glass-card:hover {
-  background: var(--dash-bg-card-hover);
-  border-color: rgba(56, 135, 198, 0.32);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(56, 135, 198, 0.15);
-}
-
-.user-dashboard .glass-card::before {
-  background: linear-gradient(90deg, transparent, rgba(56, 135, 198, 0.18), transparent);
-}
-
-.user-dashboard .user-booking-card {
-  background: var(--dash-bg-subcard);
-  border: 1px solid var(--dash-border-sub);
-}
-
-.user-dashboard .user-venue-card {
-  background: var(--dash-bg-subcard);
-  border: 1px solid var(--dash-border-sub);
-}
-
-.user-dashboard .user-venue-card:hover {
-  border-color: rgba(56, 135, 198, 0.35);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.user-dashboard .user-venue-img {
-  background: rgba(0, 0, 0, 0.35);
-}
-
-.user-dashboard .user-dash-table {
-  --bs-table-bg: transparent;
-  --bs-table-color: var(--dash-text);
-  --bs-table-hover-bg: rgba(56, 135, 198, 0.08);
-  --bs-table-border-color: var(--dash-border-sub);
-  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
-}
-
-.user-dashboard .user-dash-table thead th {
-  border-bottom-color: var(--dash-border-sub);
-  color: var(--dash-text-muted);
+  border-bottom-color: var(--border-subtle);
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.8125rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
+/* User dashboard — same light theme as the rest of the site */
+.user-dashboard .dash-section-title,
+.user-dashboard .dash-stat-number,
+.user-dashboard .dash-card-title {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+.user-dashboard .dash-stat-number {
+  line-height: 1.1;
+}
+
+.user-dashboard .dash-stat-number--accent,
+.user-dashboard .dash-card-price,
+.user-dashboard .dash-table-price {
+  color: var(--primary);
+}
+
+.user-dashboard .dash-table-link {
+  color: var(--primary);
+}
+
+.user-dashboard .dash-table-link:hover {
+  color: var(--primary-dark);
+}
+
+.user-dashboard .user-dash-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-primary);
+  --bs-table-hover-bg: var(--bg-surface);
+  --bs-table-border-color: var(--border-subtle);
+}
+
 .user-dashboard .user-dash-table tbody td {
-  color: var(--dash-text);
-  border-bottom-color: var(--dash-border-sub);
+  color: var(--text-primary);
+  border-bottom-color: var(--border-subtle);
 }
 
 .user-dashboard .user-dash-table tbody tr:hover {
-  background: rgba(56, 135, 198, 0.08);
+  background: var(--bg-surface);
 }
 
-.user-dashboard .glow-orb-bottom-left {
-  background: radial-gradient(circle, rgba(56, 135, 198, 0.14) 0%, transparent 70%);
+.user-dashboard .user-venue-card:hover {
+  border-color: var(--border-glass-hover);
+  box-shadow: var(--shadow-hover);
+}
+
+body.dashboard-page .animate-on-scroll {
+  opacity: 1;
+  transform: none;
 }
 
 /* ============================================================
@@ -3037,8 +2957,8 @@ p,
   visibility: visible !important;
 }
 
-/* Fix glass card visibility */
-.glass-card {
+/* Fix glass card visibility on light pages */
+body .glass-card {
   background: var(--bg-card) !important;
   backdrop-filter: blur(var(--glass-blur)) !important;
   -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
@@ -3650,32 +3570,32 @@ body .text-muted small {
   color: var(--text-muted) !important;
 }
 
-.page-header h1,
-.page-header p,
-.page-header .lead {
+body .page-header h1,
+body .page-header p,
+body .page-header .lead {
   color: var(--text-primary);
 }
 
-.page-header p.lead,
-.page-header .text-secondary {
+body .page-header p.lead,
+body .page-header .text-secondary {
   color: var(--text-secondary) !important;
 }
 
-.glass-card:not(.sport-card),
-.glass-card:not(.sport-card) h1,
-.glass-card:not(.sport-card) h2,
-.glass-card:not(.sport-card) h3,
-.glass-card:not(.sport-card) h4,
-.glass-card:not(.sport-card) h5,
-.glass-card:not(.sport-card) h6,
-.glass-card:not(.sport-card) p,
-.glass-card:not(.sport-card) label,
-.glass-card:not(.sport-card) strong {
+body .glass-card:not(.sport-card),
+body .glass-card:not(.sport-card) h1,
+body .glass-card:not(.sport-card) h2,
+body .glass-card:not(.sport-card) h3,
+body .glass-card:not(.sport-card) h4,
+body .glass-card:not(.sport-card) h5,
+body .glass-card:not(.sport-card) h6,
+body .glass-card:not(.sport-card) p,
+body .glass-card:not(.sport-card) label,
+body .glass-card:not(.sport-card) strong {
   color: var(--text-primary);
 }
 
-.glass-card:not(.sport-card) .text-secondary,
-.glass-card:not(.sport-card) small.text-muted {
+body .glass-card:not(.sport-card) .text-secondary,
+body .glass-card:not(.sport-card) small.text-muted {
   color: var(--text-secondary) !important;
 }
 
@@ -3774,48 +3694,6 @@ textarea.glass-input {
 .partner-cta-card .btn-premium-outline i,
 .cta-block .btn-premium-outline i {
   color: #FFFFFF !important;
-}
-
-/* User dashboard dark mode — override light-theme globals */
-.user-dashboard .page-header h1,
-.user-dashboard .page-header p,
-.user-dashboard .page-header .lead,
-.user-dashboard .glass-card:not(.sport-card),
-.user-dashboard .glass-card:not(.sport-card) h1,
-.user-dashboard .glass-card:not(.sport-card) h2,
-.user-dashboard .glass-card:not(.sport-card) h3,
-.user-dashboard .glass-card:not(.sport-card) h4,
-.user-dashboard .glass-card:not(.sport-card) h5,
-.user-dashboard .glass-card:not(.sport-card) h6,
-.user-dashboard .glass-card:not(.sport-card) p,
-.user-dashboard .glass-card:not(.sport-card) strong,
-.user-dashboard .dash-section-title,
-.user-dashboard .dash-stat-number,
-.user-dashboard .dash-card-title,
-.user-dashboard .dash-card-price,
-.user-dashboard .dash-table-price,
-.user-dashboard .user-dash-table tbody td {
-  color: #f1f5f9 !important;
-}
-
-.user-dashboard .page-header .text-secondary,
-.user-dashboard .glass-card:not(.sport-card) .text-secondary,
-.user-dashboard .glass-card:not(.sport-card) small.text-muted,
-.user-dashboard .text-secondary,
-.user-dashboard .text-muted {
-  color: rgba(255, 255, 255, 0.58) !important;
-}
-
-.user-dashboard .dash-stat-number--accent {
-  color: #5a9fd4 !important;
-}
-
-.user-dashboard .dash-table-link {
-  color: #5a9fd4 !important;
-}
-
-.user-dashboard .dash-table-link:hover {
-  color: #9ec5e8 !important;
 }
 
 /* Scroll animations — ensure content visible after load */

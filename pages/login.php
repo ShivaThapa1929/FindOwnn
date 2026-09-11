@@ -124,6 +124,21 @@ include __DIR__ . '/../includes/header.php';
   var alertEl = document.getElementById('roleLoginAlert');
   var base = document.documentElement.getAttribute('data-site-base') || '/';
 
+  function parseJsonResponse(res) {
+    return res.text().then(function (text) {
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        return {
+          ok: false,
+          error: res.status === 403
+            ? 'Session expired. Refresh the page and try again.'
+            : 'Server error. Please try again.'
+        };
+      }
+    });
+  }
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     alertEl.classList.add('d-none');
@@ -133,7 +148,7 @@ include __DIR__ . '/../includes/header.php';
       credentials: 'same-origin',
       headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
     })
-      .then(function (r) { return r.json(); })
+      .then(function (r) { return parseJsonResponse(r); })
       .then(function (body) {
         if (body.ok) {
           window.location.href = base.replace(/\/?$/, '/') + (body.redirect || 'dashboard');

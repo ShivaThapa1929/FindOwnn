@@ -30,10 +30,7 @@ $showSplashOnLoad = (bool) flash('show_splash');
 <!-- Splash (same as website — shown after login) -->
 <?php if ($showSplashOnLoad): ?>
 <div id="splash-screen" aria-hidden="true">
-  <div class="splash-logo">
-    <img src="<?= e(site_logo_url()) ?>" alt="Findownn" width="48" height="48">
-  </div>
-  <div class="splash-wordmark">Findownn <span class="brand-accent">Dashboard</span></div>
+  <?php $brandContext = 'splash'; $brandHref = ''; include ROOT_PATH . '/views/partials/brand-mark.php'; ?>
   <div class="splash-tagline">Book playgrounds. Play more.</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
@@ -69,47 +66,13 @@ $showSplashOnLoad = (bool) flash('show_splash');
   to { opacity: 0; transform: scale(1.04); }
 }
 
-.splash-logo {
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#splash-screen .admin-brand-mark--splash {
   animation: splashLogoIn 0.6s var(--ease-spring) 0.2s both;
-  box-shadow: 0 0 40px rgba(34,197,94,0.22), 0 8px 24px rgba(34,197,94,0.14);
-  overflow: hidden;
-  background: var(--gradient-primary);
-}
-
-.splash-logo img {
-  width: 78%;
-  height: 78%;
-  object-fit: contain;
-  border-radius: 10px;
-  display: block;
 }
 
 @keyframes splashLogoIn {
   from { opacity: 0; transform: scale(0.6) translateY(12px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.splash-wordmark {
-  font-family: var(--font-heading);
-  font-weight: 900;
-  font-size: 2rem;
-  letter-spacing: -0.04em;
-  color: var(--text-primary);
-  animation: splashTextIn 0.55s var(--ease-out) 0.55s both;
-}
-
-.splash-wordmark span,
-.splash-wordmark .brand-accent {
-  background: var(--gradient-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 @keyframes splashTextIn {
@@ -166,10 +129,7 @@ body.splash-active { overflow: hidden; }
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <div class="sidebar-logo">
-      <img src="<?= e(site_logo_url()) ?>" alt="Findownn" width="40" height="40">
-    </div>
-    <span>FINDOWNN</span>
+    <?php $brandContext = 'sidebar'; $brandHref = url('/dashboard'); include ROOT_PATH . '/views/partials/brand-mark.php'; ?>
   </div>
 
   <nav class="sidebar-nav">

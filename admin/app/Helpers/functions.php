@@ -75,7 +75,7 @@ if (!function_exists('site_logo_url')) {
     /** Same logo asset path as the public website navbar */
     function site_logo_url(): string
     {
-        return rtrim(site_home_url(), '/') . '/assets/images/logo.png';
+        return rtrim(site_home_url(), '/') . '/assets/images/logo.png?v=7';
     }
 }
 

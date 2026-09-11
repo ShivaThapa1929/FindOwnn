@@ -20,6 +20,29 @@ try {
 
     try {
         $db->execute(
+            "ALTER TABLE users MODIFY role ENUM('super_admin','admin','venue_owner','player') NOT NULL DEFAULT 'venue_owner'"
+        );
+        echo "✅ Added player to users.role enum\n";
+    } catch (Exception $e) {
+        if (str_contains($e->getMessage(), 'Duplicate') || str_contains($e->getMessage(), 'already')) {
+            echo "⚠️ users.role enum already includes player\n";
+        } else {
+            echo "⚠️ users.role enum: " . $e->getMessage() . "\n";
+        }
+    }
+
+    try {
+        $fixedRoles = $db->execute(
+            "UPDATE users SET role = 'player', updated_at = NOW()
+             WHERE deleted_at IS NULL AND (role = '' OR role IS NULL)"
+        );
+        echo "✅ Repaired empty player roles ({$fixedRoles} rows)\n";
+    } catch (Exception $e) {
+        echo "⚠️ Role repair: " . $e->getMessage() . "\n";
+    }
+
+    try {
+        $db->execute(
             "ALTER TABLE bookings ADD COLUMN reminder_sent_at DATETIME NULL DEFAULT NULL AFTER cancelled_at"
         );
         echo "✅ Added reminder_sent_at to bookings\n";

@@ -90,37 +90,66 @@ a:hover { color: var(--primary); }
 }
 
 .sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   padding: 18px 20px;
   border-bottom: 1px solid var(--border);
-  font-family: var(--font-h);
-  font-weight: 900;
-  font-size: 1.2rem;
-  letter-spacing: -0.02em;
-  color: var(--text);
   flex-shrink: 0;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), transparent);
 }
 
-.sidebar-logo {
+/* Same brand as login page — sidebar + splash */
+.admin-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.admin-brand-mark:hover {
+  opacity: 0.92;
+  color: inherit;
+}
+
+.admin-brand-logo {
+  object-fit: contain;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: #000000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.admin-brand-mark--sidebar .admin-brand-logo {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.28);
 }
-.sidebar-logo img {
-  width: 78%;
-  height: 78%;
-  object-fit: contain;
-  display: block;
+
+.admin-brand-mark--splash .admin-brand-logo {
+  width: 48px;
+  height: 48px;
+}
+
+.admin-brand-text {
+  font-family: var(--font-h);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.admin-brand-mark--sidebar .admin-brand-text {
+  font-size: 1.2rem;
+}
+
+.admin-brand-mark--splash .admin-brand-text {
+  font-size: 1.6rem;
+}
+
+.admin-brand-text .brand-accent {
+  background: linear-gradient(135deg, #ffffff, #4ade80, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .sidebar-nav {
@@ -429,6 +458,8 @@ body.sidebar-collapsed .main-wrapper { margin-left: 0; }
   object-fit: contain;
   border-radius: 10px;
   flex-shrink: 0;
+  background: #000000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
 .auth-split-brand {
